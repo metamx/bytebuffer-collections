@@ -1,0 +1,121 @@
+package com.metamx.collections.spatial;
+
+import com.google.common.base.Preconditions;
+import com.google.common.primitives.Ints;
+import com.metamx.collections.spatial.search.Bound;
+import com.metamx.collections.spatial.search.GutmanSearchStrategy;
+import com.metamx.collections.spatial.search.SearchStrategy;
+
+import java.nio.ByteBuffer;
+
+/**
+ * An immutable representation of an {@link RTree} for spatial indexing.
+ */
+public class ImmutableRTree
+{
+  private static byte VERSION = 0x0;
+
+  public static ImmutableRTree newImmutableFromMutable(RTree rTree)
+  {
+    ByteBuffer buffer = ByteBuffer.wrap(new byte[calcNumBytes(rTree)]);
+
+    buffer.put(VERSION);
+    buffer.putInt(rTree.getNumDims());
+    ImmutableNode.fillBuffer(rTree.getRoot(), buffer.position(), buffer);
+
+    buffer.position(0);
+    return new ImmutableRTree(buffer.asReadOnlyBuffer());
+  }
+
+  private static int calcNumBytes(RTree tree)
+  {
+    int total = 1 + Ints.BYTES; // VERSION and numDims
+    total += calcNodeBytes(tree.getRoot());
+
+    return total;
+  }
+
+  private static int calcNodeBytes(Node node)
+  {
+    int total = 0;
+
+    // find size of this node
+    total += ImmutableNode.calcNumBytes(node);
+
+    // recursively find sizes of child nodes
+    for (Node child : node.getChildren()) {
+      if (node.isLeaf()) {
+        total += ImmutablePoint.calcNumBytes((Point) child);
+      } else {
+        total += calcNodeBytes(child);
+      }
+    }
+
+    return total;
+  }
+
+  private final int numDims;
+  private final ImmutableNode root;
+  private final ByteBuffer data;
+
+  private final SearchStrategy defaultSearchStrategy = new GutmanSearchStrategy();
+
+  public ImmutableRTree()
+  {
+    this.numDims = 0;
+    this.data = null;
+    this.root = null;
+  }
+
+  public ImmutableRTree(ByteBuffer data)
+  {
+    final int initPosition = data.position();
+
+    Preconditions.checkArgument(data.get(0) == VERSION, "Mismatching versions");
+
+    this.numDims = data.getInt(1 + initPosition) & 0x7FFF;
+    this.data = data;
+    this.root = new ImmutableNode(numDims, initPosition, 1 + Ints.BYTES, data);
+  }
+
+  public int size()
+  {
+    return data.capacity();
+  }
+
+  public ImmutableNode getRoot()
+  {
+    return root;
+  }
+
+  public int getNumDims()
+  {
+    return numDims;
+  }
+
+  public Iterable<Integer> search(Bound bound)
+  {
+    Preconditions.checkArgument(bound.getNumDims() == numDims);
+
+    return defaultSearchStrategy.search(root, bound);
+  }
+
+  public Iterable<Integer> search(SearchStrategy strategy, Bound bound)
+  {
+    Preconditions.checkArgument(bound.getNumDims() == numDims);
+
+    return strategy.search(root, bound);
+  }
+
+  public byte[] toBytes()
+  {
+    ByteBuffer buf = ByteBuffer.allocate(data.capacity());
+    buf.put(data.asReadOnlyBuffer());
+    return buf.array();
+  }
+
+  public int compareTo(ImmutableRTree other)
+  {
+    return data.asReadOnlyBuffer().compareTo(other.data.asReadOnlyBuffer());
+  }
+}
