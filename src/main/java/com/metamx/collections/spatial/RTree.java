@@ -7,7 +7,7 @@ import com.metamx.collections.spatial.split.SplitStrategy;
 import java.util.Arrays;
 
 /**
- * This RTree only takes integer entries because serde is hard.
+ * This RTree has been optimized to work with Concise Sets.
  * <p/>
  * This code will probably make a lot more sense if you read:
  * http://www.sai.msu.su/~megera/postgres/gist/papers/gutman-rtree.pdf
@@ -23,7 +23,7 @@ public class RTree
 
   public RTree()
   {
-    this(0, new LinearGutmanSplitStrategy(0, 50));
+    this(0, new LinearGutmanSplitStrategy(0, 0));
   }
 
   public RTree(int numDims, SplitStrategy splitStrategy)
@@ -136,6 +136,8 @@ public class RTree
    */
   private Node chooseLeaf(Node node, Point point)
   {
+    node.addToConciseSet(point);
+
     if (node.isLeaf()) {
       return node;
     }
@@ -183,8 +185,6 @@ public class RTree
         root = buildRoot(false);
         root.addChild(n);
         root.addChild(nn);
-        n.setParent(root);
-        nn.setParent(root);
       }
       root.enclose();
       return;

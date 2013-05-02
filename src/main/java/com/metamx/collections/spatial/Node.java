@@ -2,7 +2,12 @@ package com.metamx.collections.spatial;
 
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Lists;
+import com.google.common.primitives.Floats;
+import com.google.common.primitives.Ints;
+import it.uniroma3.mat.extendedset.intset.ConciseSet;
+import it.uniroma3.mat.extendedset.intset.ImmutableConciseSet;
 
+import java.nio.ByteBuffer;
 import java.util.Arrays;
 import java.util.List;
 
@@ -15,6 +20,7 @@ public class Node
 
   private final List<Node> children;
   private final boolean isLeaf;
+  private final ConciseSet conciseSet;
 
   private Node parent;
 
@@ -25,7 +31,8 @@ public class Node
         maxCoordinates,
         Lists.<Node>newArrayList(),
         isLeaf,
-        null
+        null,
+        new ConciseSet()
     );
   }
 
@@ -34,7 +41,8 @@ public class Node
       float[] maxCoordinates,
       List<Node> children,
       boolean isLeaf,
-      Node parent
+      Node parent,
+      ConciseSet conciseSet
   )
   {
     Preconditions.checkArgument(minCoordinates.length == maxCoordinates.length);
@@ -43,6 +51,7 @@ public class Node
     this.maxCoordinates = maxCoordinates;
     this.children = children;
     this.isLeaf = isLeaf;
+    this.conciseSet = conciseSet;
     this.parent = parent;
   }
 
@@ -61,11 +70,6 @@ public class Node
     return maxCoordinates;
   }
 
-  public void setParent(Node p)
-  {
-    parent = p;
-  }
-
   public Node getParent()
   {
     return parent;
@@ -77,22 +81,9 @@ public class Node
     children.add(node);
   }
 
-  public void addChildren(List<Node> nodes)
-  {
-    for (Node node : nodes) {
-      node.setParent(this);
-    }
-    children.addAll(nodes);
-  }
-
   public List<Node> getChildren()
   {
     return children;
-  }
-
-  public void clearChildren()
-  {
-    children.clear();
   }
 
   public boolean isLeaf()
@@ -156,6 +147,56 @@ public class Node
     return retVal;
   }
 
+  public ConciseSet getConciseSet()
+  {
+    return conciseSet;
+  }
+
+  public void addToConciseSet(Node node)
+  {
+    conciseSet.addAll(node.getConciseSet());
+  }
+
+  public void clear()
+  {
+    children.clear();
+    conciseSet.clear();
+  }
+
+  public int getSizeInBytes()
+  {
+    return ImmutableNode.HEADER_NUM_BYTES
+           + 2 * getNumDims() * Floats.BYTES
+           + Ints.BYTES // size of Concise set
+           + conciseSet.getWords().length * Ints.BYTES
+           + getChildren().size() * Ints.BYTES;
+  }
+
+  public int storeInByteBuffer(ByteBuffer buffer, int position)
+  {
+    buffer.position(position);
+    buffer.putShort((short) (((isLeaf ? 0x1 : 0x0) << 15) | getChildren().size()));
+    for (float v : getMinCoordinates()) {
+      buffer.putFloat(v);
+    }
+    for (float v : getMaxCoordinates()) {
+      buffer.putFloat(v);
+    }
+    byte[] bytes = ImmutableConciseSet.newImmutableFromMutable(conciseSet).toBytes();
+    buffer.putInt(bytes.length);
+    buffer.put(bytes);
+
+    position = buffer.position();
+    int childStartOffset = position + getChildren().size() * Ints.BYTES;
+    for (Node child : getChildren()) {
+      buffer.putInt(position, childStartOffset);
+      childStartOffset = child.storeInByteBuffer(buffer, childStartOffset);
+      position += Ints.BYTES;
+    }
+
+    return childStartOffset;
+  }
+
   private double calculateArea()
   {
     double area = 1.0;
@@ -163,5 +204,10 @@ public class Node
       area *= (maxCoordinates[i] - minCoordinates[i]);
     }
     return area;
+  }
+
+  private void setParent(Node p)
+  {
+    parent = p;
   }
 }

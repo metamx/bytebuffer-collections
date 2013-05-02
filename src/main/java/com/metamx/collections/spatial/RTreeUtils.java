@@ -84,10 +84,10 @@ public class RTreeUtils
         Point point = (Point)(child);
         System.out
               .printf(
-                  "%scoords: %s, entry: %s%n",
+                  "%scoords: %s, conciseSet: %s%n",
                   makeDashes(level),
                   jsonMapper.writeValueAsString(point.getCoords()),
-                  point.getEntry()
+                  point.getConciseSet()
               );
       }
     } else {
@@ -113,10 +113,10 @@ public class RTreeUtils
         ImmutablePoint point = new ImmutablePoint(immutableNode);
         System.out
               .printf(
-                  "%scoords: %s, entry: %s%n",
+                  "%scoords: %s, conciseSet: %s%n",
                   makeDashes(level),
                   jsonMapper.writeValueAsString(point.getCoords()),
-                  point.getEntry()
+                  point.getImmutableConciseSet()
               );
       }
     } else {

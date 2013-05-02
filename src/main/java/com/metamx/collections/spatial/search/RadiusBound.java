@@ -34,13 +34,22 @@ public class RadiusBound extends RectangularBound
   @JsonCreator
   public RadiusBound(
       @JsonProperty("coords") float[] coords,
-      @JsonProperty("radius") float radius
+      @JsonProperty("radius") float radius,
+      @JsonProperty("limit") int limit
   )
   {
-    super(getMinCoords(coords, radius), getMaxCoords(coords, radius));
+    super(getMinCoords(coords, radius), getMaxCoords(coords, radius), limit);
 
     this.coords = coords;
     this.radius = radius;
+  }
+
+  public RadiusBound(
+      float[] coords,
+      float radius
+  )
+  {
+    this(coords, radius, 0);
   }
 
   @JsonProperty

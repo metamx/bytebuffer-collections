@@ -14,6 +14,8 @@ import com.metamx.collections.spatial.ImmutablePoint;
 })
 public interface Bound
 {
+  public int getLimit();
+
   public int getNumDims();
 
   public boolean overlaps(ImmutableNode node);

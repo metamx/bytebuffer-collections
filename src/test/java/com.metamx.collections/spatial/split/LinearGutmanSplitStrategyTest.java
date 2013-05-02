@@ -38,7 +38,7 @@ public class LinearGutmanSplitStrategyTest
     RTree tree = new RTree(2, new LinearGutmanSplitStrategy(0, 50));
     Random rand = new Random();
     for (int i = 0; i < 100; i++) {
-      tree.insert(new float[]{rand.nextFloat(), rand.nextFloat()}, rand.nextInt());
+      tree.insert(new float[]{rand.nextFloat(), rand.nextFloat()}, i);
     }
 
     Assert.assertTrue(getNumPoints(tree.getRoot()) >= tree.getSize());

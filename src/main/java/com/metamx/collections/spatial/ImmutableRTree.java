@@ -5,6 +5,7 @@ import com.google.common.primitives.Ints;
 import com.metamx.collections.spatial.search.Bound;
 import com.metamx.collections.spatial.search.GutmanSearchStrategy;
 import com.metamx.collections.spatial.search.SearchStrategy;
+import it.uniroma3.mat.extendedset.intset.ImmutableConciseSet;
 
 import java.nio.ByteBuffer;
 
@@ -21,7 +22,7 @@ public class ImmutableRTree
 
     buffer.put(VERSION);
     buffer.putInt(rTree.getNumDims());
-    ImmutableNode.fillBuffer(rTree.getRoot(), buffer.position(), buffer);
+    rTree.getRoot().storeInByteBuffer(buffer, buffer.position());
 
     buffer.position(0);
     return new ImmutableRTree(buffer.asReadOnlyBuffer());
@@ -40,12 +41,12 @@ public class ImmutableRTree
     int total = 0;
 
     // find size of this node
-    total += ImmutableNode.calcNumBytes(node);
+    total += node.getSizeInBytes();
 
     // recursively find sizes of child nodes
     for (Node child : node.getChildren()) {
       if (node.isLeaf()) {
-        total += ImmutablePoint.calcNumBytes((Point) child);
+        total += child.getSizeInBytes();
       } else {
         total += calcNodeBytes(child);
       }
@@ -93,14 +94,14 @@ public class ImmutableRTree
     return numDims;
   }
 
-  public Iterable<Integer> search(Bound bound)
+  public Iterable<ImmutableConciseSet> search(Bound bound)
   {
     Preconditions.checkArgument(bound.getNumDims() == numDims);
 
     return defaultSearchStrategy.search(root, bound);
   }
 
-  public Iterable<Integer> search(SearchStrategy strategy, Bound bound)
+  public Iterable<ImmutableConciseSet> search(SearchStrategy strategy, Bound bound)
   {
     Preconditions.checkArgument(bound.getNumDims() == numDims);
 
@@ -112,10 +113,5 @@ public class ImmutableRTree
     ByteBuffer buf = ByteBuffer.allocate(data.capacity());
     buf.put(data.asReadOnlyBuffer());
     return buf.array();
-  }
-
-  public int compareTo(ImmutableRTree other)
-  {
-    return data.asReadOnlyBuffer().compareTo(other.data.asReadOnlyBuffer());
   }
 }

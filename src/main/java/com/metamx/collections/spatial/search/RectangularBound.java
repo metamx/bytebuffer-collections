@@ -19,12 +19,14 @@ public class RectangularBound implements Bound
 
   private final float[] minCoords;
   private final float[] maxCoords;
+  private final int limit;
   private final int numDims;
 
   @JsonCreator
   public RectangularBound(
       @JsonProperty("minCoords") float[] minCoords,
-      @JsonProperty("maxCoords") float[] maxCoords
+      @JsonProperty("maxCoords") float[] maxCoords,
+      @JsonProperty("limit") int limit
   )
   {
     Preconditions.checkArgument(minCoords.length == maxCoords.length);
@@ -33,6 +35,15 @@ public class RectangularBound implements Bound
 
     this.minCoords = minCoords;
     this.maxCoords = maxCoords;
+    this.limit = limit;
+  }
+
+  public RectangularBound(
+      float[] minCoords,
+      float[] maxCoords
+  )
+  {
+    this(minCoords, maxCoords, 0);
   }
 
   @JsonProperty
@@ -45,6 +56,12 @@ public class RectangularBound implements Bound
   public float[] getMaxCoords()
   {
     return maxCoords;
+  }
+
+  @JsonProperty
+  public int getLimit()
+  {
+    return limit;
   }
 
   @Override

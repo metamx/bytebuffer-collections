@@ -3,6 +3,7 @@ package com.metamx.collections.spatial.split;
 import com.google.common.collect.Lists;
 import com.metamx.collections.spatial.Node;
 import com.metamx.collections.spatial.RTreeUtils;
+import it.uniroma3.mat.extendedset.intset.ConciseSet;
 
 import java.util.Arrays;
 import java.util.List;
@@ -48,16 +49,19 @@ public abstract class GutmanSplitStrategy implements SplitStrategy
     List<Node> children = Lists.newArrayList(node.getChildren());
     Node[] seeds = pickSeeds(children);
 
-    node.clearChildren();
+    node.clear();
     node.addChild(seeds[0]);
+    node.addToConciseSet(seeds[0]);
 
     Node group1 = new Node(
         Arrays.copyOf(seeds[1].getMinCoordinates(), seeds[1].getMinCoordinates().length),
         Arrays.copyOf(seeds[1].getMaxCoordinates(), seeds[1].getMaxCoordinates().length),
         Lists.newArrayList(seeds[1]),
         node.isLeaf(),
-        node.getParent()
+        node.getParent(),
+        new ConciseSet()
     );
+    group1.addToConciseSet(seeds[1]);
     if (node.getParent() != null) {
       node.getParent().addChild(group1);
     }
@@ -70,7 +74,10 @@ public abstract class GutmanSplitStrategy implements SplitStrategy
     while (!children.isEmpty()) {
       for (Node group : groups) {
         if (group.getChildren().size() + children.size() <= minNumChildren) {
-          group.addChildren(children);
+          for (Node child : group.getChildren()) {
+            group.addToConciseSet(child);
+            group.addChild(child);
+          }
           RTreeUtils.enclose(groups);
           return groups;
         }
@@ -93,6 +100,7 @@ public abstract class GutmanSplitStrategy implements SplitStrategy
         optimal = groups[1];
       }
 
+      optimal.addToConciseSet(nextToAssign);
       optimal.addChild(nextToAssign);
       optimal.enclose();
     }

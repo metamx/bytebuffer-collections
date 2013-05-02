@@ -58,7 +58,7 @@ public class RTreeTest
   {
     Random rand = new Random();
     for (int i = 0; i < 100; i++) {
-      tree.insert(new float[]{rand.nextFloat(), rand.nextFloat()}, rand.nextInt());
+      tree.insert(new float[]{rand.nextFloat(), rand.nextFloat()}, i);
     }
 
     Assert.assertTrue(tree.getRoot().getChildren().size() > 1);

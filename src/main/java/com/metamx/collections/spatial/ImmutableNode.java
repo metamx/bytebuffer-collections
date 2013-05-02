@@ -5,7 +5,6 @@ import com.google.common.primitives.Ints;
 import it.uniroma3.mat.extendedset.intset.ImmutableConciseSet;
 
 import java.nio.ByteBuffer;
-import java.util.Arrays;
 import java.util.Iterator;
 
 /**
@@ -15,6 +14,7 @@ import java.util.Iterator;
  * Body
  * 2 to 2 + numDims * Floats.BYTES : minCoordinates
  * 2 + numDims * Floats.BYTES to 2 + 2 * numDims * Floats.BYTES : maxCoordinates
+ * concise set
  * rest (children) : Every 4 bytes is storing an offset representing the position of a child.
  * <p/>
  * The child offset is an offset from the initialOffset
@@ -23,43 +23,13 @@ public class ImmutableNode
 {
   public static final int HEADER_NUM_BYTES = 2;
 
-  public static int calcNumBytes(Node node)
-  {
-    return HEADER_NUM_BYTES + 2 * node.getNumDims() * Floats.BYTES + node.getChildren().size() * Ints.BYTES;
-  }
-
-  public static int fillBuffer(Node node, int offSet, ByteBuffer buffer)
-  {
-    buffer.position(offSet);
-    buffer.putShort((short) (((node.isLeaf() ? 0x1 : 0x0) << 15) | node.getChildren().size()));
-    for (float v : node.getMinCoordinates()) {
-      buffer.putFloat(v);
-    }
-    for (float v : node.getMaxCoordinates()) {
-      buffer.putFloat(v);
-    }
-
-    int position = buffer.position();
-    int childStartOffset = position + node.getChildren().size() * Ints.BYTES;
-    for (Node child : node.getChildren()) {
-      buffer.putInt(position, childStartOffset);
-      if (node.isLeaf()) {
-        childStartOffset = ImmutablePoint.fillBuffer((Point) child, childStartOffset, buffer);
-      } else {
-        childStartOffset = fillBuffer(child, childStartOffset, buffer);
-      }
-      position += Ints.BYTES;
-    }
-
-    return childStartOffset;
-  }
-
   private final int numDims;
   private final int initialOffset;
   private final int offsetFromInitial;
 
   private final short numChildren;
   private final boolean isLeaf;
+  private final int conciseSetSize;
   private final int childrenOffset;
 
   private final ByteBuffer data;
@@ -72,8 +42,14 @@ public class ImmutableNode
     short header = data.getShort(initialOffset + offsetFromInitial);
     this.isLeaf = (header & 0x8000) != 0;
     this.numChildren = (short) (header & 0x7FFF);
-
-    this.childrenOffset = initialOffset + offsetFromInitial + HEADER_NUM_BYTES + getCoordinateNumBytes();
+    final int sizePosition = initialOffset + offsetFromInitial + HEADER_NUM_BYTES + 2 * numDims * Floats.BYTES;
+    this.conciseSetSize = data.getInt(sizePosition);
+    this.childrenOffset = initialOffset
+                          + offsetFromInitial
+                          + HEADER_NUM_BYTES
+                          + 2 * numDims * Floats.BYTES
+                          + Ints.BYTES
+                          + conciseSetSize;
 
     this.data = data;
   }
@@ -92,15 +68,16 @@ public class ImmutableNode
     this.offsetFromInitial = offsetFromInitial;
     this.numChildren = numChildren;
     this.isLeaf = leaf;
-
-    this.childrenOffset = initialOffset + offsetFromInitial + HEADER_NUM_BYTES + getCoordinateNumBytes();
+    final int sizePosition = initialOffset + offsetFromInitial + HEADER_NUM_BYTES + 2 * numDims * Floats.BYTES;
+    this.conciseSetSize = data.getInt(sizePosition);
+    this.childrenOffset = initialOffset
+                          + offsetFromInitial
+                          + HEADER_NUM_BYTES
+                          + 2 * numDims * Floats.BYTES
+                          + Ints.BYTES
+                          + conciseSetSize;
 
     this.data = data;
-  }
-
-  public ImmutableConciseSet getImmutableConciseSet()
-  {
-    return makeConciseSet();
   }
 
   public int getInitialOffset()
@@ -111,18 +88,6 @@ public class ImmutableNode
   public int getOffsetFromInitial()
   {
     return offsetFromInitial;
-  }
-
-  public int getCoordinateNumBytes()
-  {
-    return 2 * numDims * Floats.BYTES;
-  }
-
-  public int getNumBytes()
-  {
-    return ImmutableNode.HEADER_NUM_BYTES
-           + getCoordinateNumBytes()
-           + getNumChildren() * Ints.BYTES;
   }
 
   public int getNumDims()
@@ -147,7 +112,17 @@ public class ImmutableNode
 
   public float[] getMaxCoordinates()
   {
-    return getCoords(initialOffset + offsetFromInitial + HEADER_NUM_BYTES + +numDims * Floats.BYTES);
+    return getCoords(initialOffset + offsetFromInitial + HEADER_NUM_BYTES + numDims * Floats.BYTES);
+  }
+
+  public ImmutableConciseSet getImmutableConciseSet()
+  {
+    final int sizePosition = initialOffset + offsetFromInitial + HEADER_NUM_BYTES + 2 * numDims * Floats.BYTES;
+    int numBytes = data.getInt(sizePosition);
+    data.position(sizePosition + Ints.BYTES);
+    ByteBuffer tmpBuffer = data.slice();
+    tmpBuffer.limit(numBytes);
+    return new ImmutableConciseSet(tmpBuffer.asReadOnlyBuffer());
   }
 
   public Iterable<ImmutableNode> getChildren()
@@ -199,15 +174,6 @@ public class ImmutableNode
   public ByteBuffer getData()
   {
     return data;
-  }
-
-  protected ImmutableConciseSet makeConciseSet()
-  {
-    ImmutableConciseSet theSet = new ImmutableConciseSet();
-    for (ImmutableNode immutableNode : getChildren()) {
-      theSet = ImmutableConciseSet.union(Arrays.<ImmutableConciseSet>asList(theSet, immutableNode.makeConciseSet()));
-    }
-    return theSet;
   }
 
   private float[] getCoords(int offset)
