@@ -18,6 +18,10 @@ public class ImmutableRTree
 
   public static ImmutableRTree newImmutableFromMutable(RTree rTree)
   {
+    if (rTree.getSize() == 0) {
+      return new ImmutableRTree();
+    }
+
     ByteBuffer buffer = ByteBuffer.wrap(new byte[calcNumBytes(rTree)]);
 
     buffer.put(VERSION);
@@ -31,6 +35,7 @@ public class ImmutableRTree
   private static int calcNumBytes(RTree tree)
   {
     int total = 1 + Ints.BYTES; // VERSION and numDims
+
     total += calcNodeBytes(tree.getRoot());
 
     return total;
@@ -64,7 +69,7 @@ public class ImmutableRTree
   public ImmutableRTree()
   {
     this.numDims = 0;
-    this.data = null;
+    this.data = ByteBuffer.wrap(new byte[]{});
     this.root = null;
   }
 
@@ -113,5 +118,10 @@ public class ImmutableRTree
     ByteBuffer buf = ByteBuffer.allocate(data.capacity());
     buf.put(data.asReadOnlyBuffer());
     return buf.array();
+  }
+
+  public int compareTo(ImmutableRTree other)
+  {
+    return this.data.compareTo(other.data);
   }
 }

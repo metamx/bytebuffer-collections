@@ -140,6 +140,38 @@ public class ImmutableRTreeTest
   }
 
   @Test
+  public void testSearchWithSplit3()
+  {
+    RTree tree = new RTree(2, new LinearGutmanSplitStrategy(0, 50));
+    tree.insert(new float[]{0.0f, 0.0f}, 0);
+    tree.insert(new float[]{1.0f, 3.0f}, 1);
+    tree.insert(new float[]{4.0f, 2.0f}, 2);
+    tree.insert(new float[]{7.0f, 3.0f}, 3);
+    tree.insert(new float[]{8.0f, 6.0f}, 4);
+
+    Random rand = new Random();
+    for (int i = 5; i < 5000; i++) {
+      tree.insert(
+          new float[]{(float) (rand.nextFloat() * 10 + 10.0), (float) (rand.nextFloat() * 10 + 10.0)},
+          i
+      );
+    }
+
+    ImmutableRTree searchTree = ImmutableRTree.newImmutableFromMutable(tree);
+    Iterable<ImmutableConciseSet> points = searchTree.search(
+        new RadiusBound(new float[]{0.0f, 0.0f}, 5)
+    );
+    ImmutableConciseSet finalSet = ImmutableConciseSet.union(points);
+    Assert.assertTrue(finalSet.size() >= 3);
+
+    Set<Integer> expected = Sets.newHashSet(0, 1, 2);
+    IntSet.IntIterator iter = finalSet.iterator();
+    while (iter.hasNext()) {
+      Assert.assertTrue(expected.contains(iter.next()));
+    }
+  }
+
+  @Test
   public void testSearchWithSplitLimitedBound()
   {
     RTree tree = new RTree(2, new LinearGutmanSplitStrategy(0, 50));
