@@ -50,6 +50,9 @@ public class Node
     this.minCoordinates = minCoordinates;
     this.maxCoordinates = maxCoordinates;
     this.children = children;
+    for (Node child : children) {
+      child.setParent(this);
+    }
     this.isLeaf = isLeaf;
     this.conciseSet = conciseSet;
     this.parent = parent;
@@ -77,6 +80,9 @@ public class Node
 
   public void addChild(Node node)
   {
+    if (node == this) {
+      System.out.println("WTF");
+    }
     node.setParent(this);
     children.add(node);
   }
