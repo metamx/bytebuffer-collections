@@ -3,6 +3,7 @@ package com.metamx.collections.spatial;
 import com.google.common.base.Preconditions;
 import com.metamx.collections.spatial.split.LinearGutmanSplitStrategy;
 import com.metamx.collections.spatial.split.SplitStrategy;
+import it.uniroma3.mat.extendedset.intset.ConciseSet;
 
 import java.util.Arrays;
 
@@ -56,19 +57,13 @@ public class RTree
   public void insert(float[] coords, int entry)
   {
     Preconditions.checkArgument(coords.length == numDims);
+    insertInner(new Point(coords, entry));
+  }
 
-    Point point = new Point(coords, entry);
-    Node node = chooseLeaf(root, point);
-    node.addChild(point);
-
-    if (splitStrategy.needToSplit(node)) {
-      Node[] groups = splitStrategy.split(node);
-      adjustTree(groups[0], groups[1]);
-    } else {
-      adjustTree(node, null);
-    }
-
-    size++;
+  public void insert(float[] coords, ConciseSet entry)
+  {
+    Preconditions.checkArgument(coords.length == numDims);
+    insertInner(new Point(coords, entry));
   }
 
   /**
@@ -113,6 +108,22 @@ public class RTree
 
     return new Node(initMinCoords, initMaxCoords, isLeaf);
   }
+
+  private void insertInner(Point point)
+  {
+    Node node = chooseLeaf(root, point);
+    node.addChild(point);
+
+    if (splitStrategy.needToSplit(node)) {
+      Node[] groups = splitStrategy.split(node);
+      adjustTree(groups[0], groups[1]);
+    } else {
+      adjustTree(node, null);
+    }
+
+    size++;
+  }
+
 
   /**
    * This description is from the original paper.

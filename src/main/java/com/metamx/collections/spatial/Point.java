@@ -33,6 +33,14 @@ public class Point extends Node
     this.conciseSet.add(entry);
   }
 
+  public Point(float[] coords, ConciseSet entry)
+  {
+    super(coords, Arrays.copyOf(coords, coords.length), Lists.<Node>newArrayList(), true, null, entry);
+
+    this.coords = coords;
+    this.conciseSet = entry;
+  }
+
   public float[] getCoords()
   {
     return coords;

@@ -2,13 +2,10 @@ package com.metamx.collections.spatial.search;
 
 import com.google.common.base.Function;
 import com.google.common.base.Predicate;
-import com.google.common.base.Throwables;
 import com.google.common.collect.Iterables;
 import com.metamx.collections.spatial.ImmutableNode;
 import com.metamx.collections.spatial.ImmutablePoint;
 import it.uniroma3.mat.extendedset.intset.ImmutableConciseSet;
-
-import javax.annotation.Nullable;
 
 /**
  */
