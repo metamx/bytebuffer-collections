@@ -1,0 +1,6 @@
+Cenarius is a layer that lives above the Druid broker and understands what segments exist on what tiers.
+
+It can be started with:
+io.druid.cli.Main server cenarius
+
+Cenarius belongs in the main Druid repo and will be moved there at some point when we get better at dealing with memory issues due to segment merges in the Druid broker.
