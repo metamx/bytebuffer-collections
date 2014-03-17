@@ -9,7 +9,8 @@ target
 .classpath
 .idea
 .project
-.settings/
-*.log
-*.DS_Store
-_site
+.settings/org.eclipse.jdt.core.prefs
+.settings/org.maven.ide.eclipse.prefs
+client/.settings/org.eclipse.jdt.core.prefs
+common/.settings/org.eclipse.jdt.core.prefs
+server/.settings/org.eclipse.jdt.core.prefs
