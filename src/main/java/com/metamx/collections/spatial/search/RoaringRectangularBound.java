@@ -8,12 +8,14 @@ import com.google.common.collect.Iterables;
 import com.google.common.primitives.Floats;
 import com.metamx.collections.spatial.ImmutableNode;
 import com.metamx.collections.spatial.ImmutablePoint;
+import com.metamx.collections.spatial.RoaringImmutableNode;
+import com.metamx.collections.spatial.RoaringImmutablePoint;
 
 import java.nio.ByteBuffer;
 
 /**
  */
-public class RectangularBound implements Bound
+public class RoaringRectangularBound implements RoaringBound
 {
     private static final byte CACHE_TYPE_ID = 0x0;
 
@@ -23,10 +25,10 @@ public class RectangularBound implements Bound
   private final int numDims;
 
   @JsonCreator
-  public RectangularBound(
-      @JsonProperty("minCoords") float[] minCoords,
-      @JsonProperty("maxCoords") float[] maxCoords,
-      @JsonProperty("limit") int limit
+  public RoaringRectangularBound(
+          @JsonProperty("minCoords") float[] minCoords,
+          @JsonProperty("maxCoords") float[] maxCoords,
+          @JsonProperty("limit") int limit
   )
   {
     Preconditions.checkArgument(minCoords.length == maxCoords.length);
@@ -38,9 +40,9 @@ public class RectangularBound implements Bound
     this.limit = limit;
   }
 
-  public RectangularBound(
-      float[] minCoords,
-      float[] maxCoords
+  public RoaringRectangularBound(
+          float[] minCoords,
+          float[] maxCoords
   )
   {
     this(minCoords, maxCoords, 0);
@@ -71,7 +73,7 @@ public class RectangularBound implements Bound
   }
 
   @Override
-  public boolean overlaps(ImmutableNode node)
+  public boolean overlaps(RoaringImmutableNode node)
   {
     final float[] nodeMinCoords = node.getMinCoordinates();
     final float[] nodeMaxCoords = node.getMaxCoordinates();
@@ -98,14 +100,14 @@ public class RectangularBound implements Bound
   }
 
   @Override
-  public Iterable<ImmutablePoint> filter(Iterable<ImmutablePoint> points)
+  public Iterable<RoaringImmutablePoint> filter(Iterable<RoaringImmutablePoint> points)
   {
     return Iterables.filter(
         points,
-        new Predicate<ImmutablePoint>()
+        new Predicate<RoaringImmutablePoint>()
         {
           @Override
-          public boolean apply(ImmutablePoint immutablePoint)
+          public boolean apply(RoaringImmutablePoint immutablePoint)
           {
             return contains(immutablePoint.getCoords());
           }
