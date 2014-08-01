@@ -1,9 +1,12 @@
-package com.metamx.collections.spatial.split;
+package com.metamx.collections.spatial;
 
 import com.metamx.collections.spatial.RTree;
 import com.metamx.collections.spatial.RoaringRTree;
 import com.metamx.collections.spatial.split.LinearGutmanSplitStrategy;
+import com.metamx.collections.spatial.split.RoaringLinearGutmanSplitStrategy;
+
 import junit.framework.Assert;
+
 import org.junit.Before;
 import org.junit.Test;
 

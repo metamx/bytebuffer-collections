@@ -28,7 +28,6 @@ public class RoaringNode
 
   private final List<RoaringNode> children;
   private final boolean isLeaf;
-  //private final ConciseSet conciseSet;
    private final MutableRoaringBitmap roaring;
   private RoaringNode parent;
 
@@ -190,48 +189,43 @@ public class RoaringNode
   {
     return ImmutableNode.HEADER_NUM_BYTES
            + 2 * getNumDims() * Floats.BYTES
-           + Ints.BYTES // size of Concise set
-           + roaring.getSizeInBytes()//conciseSet.getWords().length * Ints.BYTES
+           + Ints.BYTES // size of set
+           + roaring.serializedSizeInBytes()//conciseSet.getWords().length * Ints.BYTES
            + getChildren().size() * Ints.BYTES;
   }
 
   public int storeInByteBuffer(ByteBuffer buffer, int position)
   {
-    buffer.position(position);
-    buffer.putShort((short) (((isLeaf ? 0x1 : 0x0) << 15) | getChildren().size()));
-    for (float v : getMinCoordinates()) {
-      buffer.putFloat(v);
-    }
-    for (float v : getMaxCoordinates()) {
-      buffer.putFloat(v);
-    }
-    
-    ByteBuffer outbb = ByteBuffer.allocate(1024*1024);
-    try {
-		this.roaring.serialize(new DataOutputStream(new OutputStream(){
-		    ByteBuffer mBB;
-		    OutputStream init(ByteBuffer mbb) {mBB=mbb; return this;}
-		    public void close() {}
-		    public void flush() {}
-		    public void write(int b) {mBB.put((byte) b);}
-		    public void write(byte[] b) {}            
-		    public void write(byte[] b, int off, int l) {}
-		}.init(outbb)));
-	} catch (IOException e) {e.printStackTrace();}
-    outbb.flip();    
-    byte[] bytes = outbb.array();
-    buffer.putInt(bytes.length);
-    buffer.put(bytes);    
+      buffer.position(position);
+      buffer.putShort((short) (((isLeaf ? 0x1 : 0x0) << 15) | getChildren().size()));
+      for (float v : getMinCoordinates()) {
+        buffer.putFloat(v);
+      }
+      for (float v : getMaxCoordinates()) {
+        buffer.putFloat(v);
+      }
+      buffer.putInt(roaring.serializedSizeInBytes());
+      try {
+          this.roaring.serialize(new DataOutputStream(new OutputStream(){
+              ByteBuffer mBB;
+              OutputStream init(ByteBuffer mbb) {mBB=mbb; return this;}
+              public void close() {}
+              public void flush() {}
+              public void write(int b) {mBB.put((byte) b);}
+              public void write(byte[] b) {}            
+              public void write(byte[] b, int off, int l) {}
+          }.init(buffer)));
+      } catch (IOException e) {e.printStackTrace();}
 
-    position = buffer.position();
-    int childStartOffset = position + getChildren().size() * Ints.BYTES;
-    for (RoaringNode child : getChildren()) {
-      buffer.putInt(position, childStartOffset);
-      childStartOffset = child.storeInByteBuffer(buffer, childStartOffset);
-      position += Ints.BYTES;
-    }
-    							
-    return childStartOffset;
+      position = buffer.position();
+      int childStartOffset = position + getChildren().size() * Ints.BYTES;
+      for (RoaringNode child : getChildren()) {
+        buffer.putInt(position, childStartOffset);
+        childStartOffset = child.storeInByteBuffer(buffer, childStartOffset);
+        position += Ints.BYTES;
+      }
+
+      return childStartOffset;
   }
 
   private double calculateArea()
