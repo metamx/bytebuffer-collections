@@ -49,12 +49,12 @@ public class RoaringImmutableRTreeTest
           finalSet = ImmutableRoaringBitmap.or(finalSet, points.iterator().next());
       }
     Assert.assertTrue(finalSet.getCardinality() >= 5);
-/*
+
     Set<Integer> expected = Sets.newHashSet(1, 2, 3, 4, 5);
     IntIterator iter = finalSet.getIntIterator();
     while (iter.hasNext()) {
       Assert.assertTrue(expected.contains(iter.next()));
-    }*/
+    }
   }
 
   @Test
