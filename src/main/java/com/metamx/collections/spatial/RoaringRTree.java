@@ -1,10 +1,9 @@
 package com.metamx.collections.spatial;
 
 import com.google.common.base.Preconditions;
-import com.metamx.collections.spatial.split.LinearGutmanSplitStrategy;
 import com.metamx.collections.spatial.split.RoaringLinearGutmanSplitStrategy;
 import com.metamx.collections.spatial.split.RoaringSplitStrategy;
-import com.metamx.collections.spatial.split.SplitStrategy;
+
 
 import it.uniroma3.mat.extendedset.intset.ConciseSet;
 
@@ -13,7 +12,7 @@ import java.util.Arrays;
 import org.roaringbitmap.buffer.MutableRoaringBitmap;
 
 /**
- * This RTree has been optimized to work with Concise Sets.
+ * This RTree has been optimized to work with Roaring bitmaps.
  * <p/>
  * This code will probably make a lot more sense if you read:
  * http://www.sai.msu.su/~megera/postgres/gist/papers/gutman-rtree.pdf
