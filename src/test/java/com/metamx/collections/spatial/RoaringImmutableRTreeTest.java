@@ -4,25 +4,19 @@ import com.google.common.base.Stopwatch;
 import com.google.common.base.Throwables;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Sets;
-import com.metamx.collections.spatial.ImmutableRTree;
-import com.metamx.collections.spatial.RTree;
-import com.metamx.collections.spatial.RoaringImmutableRTree;
-import com.metamx.collections.spatial.RoaringRTree;
-import com.metamx.collections.spatial.search.RadiusBound;
-import com.metamx.collections.spatial.search.RectangularBound;
 import com.metamx.collections.spatial.search.RoaringRadiusBound;
 import com.metamx.collections.spatial.search.RoaringRectangularBound;
 import com.metamx.collections.spatial.split.RoaringLinearGutmanSplitStrategy;
 
-import it.uniroma3.mat.extendedset.intset.ImmutableConciseSet;
-import it.uniroma3.mat.extendedset.intset.IntSet;
 import junit.framework.Assert;
 
 import org.junit.Test;
 import org.roaringbitmap.IntIterator;
 import org.roaringbitmap.buffer.ImmutableRoaringBitmap;
+import org.roaringbitmap.buffer.MutableRoaringBitmap;
 
 import java.nio.ByteBuffer;
+import java.util.Iterator;
 import java.util.Random;
 import java.util.Set;
 
@@ -43,10 +37,10 @@ public class RoaringImmutableRTreeTest
     ByteBuffer buffer = ByteBuffer.wrap(firstTree.toBytes());
     RoaringImmutableRTree secondTree = new RoaringImmutableRTree(buffer);  
     Iterable<ImmutableRoaringBitmap> points = secondTree.search(new RoaringRadiusBound(new float[]{0, 0}, 10));
-      ImmutableRoaringBitmap finalSet = points.iterator().next();
-      finalSet = finalSet.toMutableRoaringBitmap();
-      while(points.iterator().hasNext()){
-          finalSet = ImmutableRoaringBitmap.or(finalSet, points.iterator().next());
+      Iterator<ImmutableRoaringBitmap> sets =  points.iterator();
+      MutableRoaringBitmap finalSet = sets.next().toMutableRoaringBitmap();
+      while(sets.hasNext()){
+          finalSet.or(sets.next());
       }
     Assert.assertTrue(finalSet.getCardinality() >= 5);
 
@@ -76,10 +70,10 @@ public class RoaringImmutableRTreeTest
 
     RoaringImmutableRTree searchTree = RoaringImmutableRTree.newImmutableFromMutable(tree);
     Iterable<ImmutableRoaringBitmap> points = searchTree.search(new RoaringRadiusBound(new float[]{0, 0}, 5));
-      ImmutableRoaringBitmap finalSet = points.iterator().next();
-      finalSet = finalSet.toMutableRoaringBitmap();
-      while(points.iterator().hasNext()){
-          finalSet = ImmutableRoaringBitmap.or(finalSet, points.iterator().next());
+      Iterator<ImmutableRoaringBitmap> sets =  points.iterator();
+      MutableRoaringBitmap finalSet = sets.next().toMutableRoaringBitmap();
+      while(sets.hasNext()){
+          finalSet.or(sets.next());
       }
     Assert.assertTrue(finalSet.getCardinality() >= 5);
 
@@ -110,10 +104,10 @@ public class RoaringImmutableRTreeTest
 
     RoaringImmutableRTree searchTree = RoaringImmutableRTree.newImmutableFromMutable(tree);
     Iterable<ImmutableRoaringBitmap> points = searchTree.search(new RoaringRadiusBound(new float[]{0, 0}, 5));
-      ImmutableRoaringBitmap finalSet = points.iterator().next();
-      finalSet = finalSet.toMutableRoaringBitmap();
-      while(points.iterator().hasNext()){
-          finalSet = ImmutableRoaringBitmap.or(finalSet, points.iterator().next());
+      Iterator<ImmutableRoaringBitmap> sets =  points.iterator();
+      MutableRoaringBitmap finalSet = sets.next().toMutableRoaringBitmap();
+      while(sets.hasNext()){
+          finalSet.or(sets.next());
       }
     Assert.assertTrue(finalSet.getCardinality() >= 5);
 
@@ -149,10 +143,10 @@ public class RoaringImmutableRTreeTest
             new float[]{9, 9}
         )
     );
-      ImmutableRoaringBitmap finalSet = points.iterator().next();
-      finalSet = finalSet.toMutableRoaringBitmap();
-      while(points.iterator().hasNext()){
-          finalSet = ImmutableRoaringBitmap.or(finalSet, points.iterator().next());
+      Iterator<ImmutableRoaringBitmap> sets =  points.iterator();
+      MutableRoaringBitmap finalSet = sets.next().toMutableRoaringBitmap();
+      while(sets.hasNext()){
+          finalSet.or(sets.next());
       }
     Assert.assertTrue(finalSet.getCardinality() >= 5);
 
@@ -180,15 +174,14 @@ public class RoaringImmutableRTreeTest
           i
       );
     }
-
     RoaringImmutableRTree searchTree = RoaringImmutableRTree.newImmutableFromMutable(tree);
     Iterable<ImmutableRoaringBitmap> points = searchTree.search(
         new RoaringRadiusBound(new float[]{0.0f, 0.0f}, 5)
     );
-      ImmutableRoaringBitmap finalSet = points.iterator().next();
-      finalSet = finalSet.toMutableRoaringBitmap();
-      while(points.iterator().hasNext()){
-          finalSet = ImmutableRoaringBitmap.or(finalSet, points.iterator().next());
+      Iterator<ImmutableRoaringBitmap> sets =  points.iterator();
+      MutableRoaringBitmap finalSet = sets.next().toMutableRoaringBitmap();
+      while(sets.hasNext()){
+          finalSet.or(sets.next());
       }
     Assert.assertTrue(finalSet.getCardinality() >= 3);
 
@@ -202,6 +195,7 @@ public class RoaringImmutableRTreeTest
   @Test
   public void testSearchWithSplitLimitedBound()
   {
+
     RoaringRTree tree = new RoaringRTree(2, new RoaringLinearGutmanSplitStrategy(0, 50));
     tree.insert(new float[]{0, 0}, 1);
     tree.insert(new float[]{1, 3}, 2);
@@ -219,10 +213,10 @@ public class RoaringImmutableRTreeTest
 
     RoaringImmutableRTree searchTree = RoaringImmutableRTree.newImmutableFromMutable(tree);
     Iterable<ImmutableRoaringBitmap> points = searchTree.search(new RoaringRadiusBound(new float[]{0, 0}, 5, 2));
-      ImmutableRoaringBitmap finalSet = points.iterator().next();
-      finalSet = finalSet.toMutableRoaringBitmap();
-      while(points.iterator().hasNext()){
-          finalSet = ImmutableRoaringBitmap.or(finalSet, points.iterator().next());
+      Iterator<ImmutableRoaringBitmap> sets =  points.iterator();
+      MutableRoaringBitmap finalSet = sets.next().toMutableRoaringBitmap();
+      while(sets.hasNext()){
+          finalSet.or(sets.next());
       }
     Assert.assertTrue(finalSet.getCardinality() >= 5);
 
@@ -270,10 +264,10 @@ public class RoaringImmutableRTreeTest
 
         stopwatch.reset().start();
 
-          ImmutableRoaringBitmap finalSet = points.iterator().next();
-          finalSet = finalSet.toMutableRoaringBitmap();
-          while(points.iterator().hasNext()){
-              finalSet = ImmutableRoaringBitmap.or(finalSet, points.iterator().next());
+          Iterator<ImmutableRoaringBitmap> sets =  points.iterator();
+          MutableRoaringBitmap finalSet = sets.next().toMutableRoaringBitmap();
+          while(sets.hasNext()){
+              finalSet.or(sets.next());
           }
 
         stop = stopwatch.elapsedMillis();
@@ -329,10 +323,10 @@ public class RoaringImmutableRTreeTest
 
         stopwatch.reset().start();
 
-          ImmutableRoaringBitmap finalSet = points.iterator().next();
-          finalSet = finalSet.toMutableRoaringBitmap();
-          while(points.iterator().hasNext()){
-              finalSet = ImmutableRoaringBitmap.or(finalSet, points.iterator().next());
+          Iterator<ImmutableRoaringBitmap> sets =  points.iterator();
+          MutableRoaringBitmap finalSet = sets.next().toMutableRoaringBitmap();
+          while(sets.hasNext()){
+              finalSet.or(sets.next());
           }
 
         stop = stopwatch.elapsedMillis();

@@ -20,13 +20,12 @@ public class RoaringImmutableRTree
     if (rTree.getSize() == 0) {
       return new RoaringImmutableRTree();
     }
-
-    ByteBuffer buffer = ByteBuffer.wrap(new byte[calcNumBytes(rTree)]);
+    int space = calcNumBytes(rTree);
+    ByteBuffer buffer = ByteBuffer.wrap(new byte[space]);
 
     buffer.put(VERSION);
     buffer.putInt(rTree.getNumDims());
-    rTree.getRoot().storeInByteBuffer(buffer, buffer.position());
-
+    int spaceUsed = rTree.getRoot().storeInByteBuffer(buffer, buffer.position());
     buffer.position(0);
     return new RoaringImmutableRTree(buffer.asReadOnlyBuffer());
   }
@@ -101,9 +100,9 @@ public class RoaringImmutableRTree
   public Iterable<ImmutableRoaringBitmap> search(RoaringBound bound)
   {
     Preconditions.checkArgument(bound.getNumDims() == numDims);
-
-    return defaultSearchStrategy.search(root, bound);
-  }
+    Iterable<ImmutableRoaringBitmap> res = defaultSearchStrategy.search(root, bound);
+      return res;
+   }
 
   public Iterable<ImmutableRoaringBitmap> search(RoaringSearchStrategy strategy, RoaringBound bound)
   {

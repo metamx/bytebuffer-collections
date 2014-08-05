@@ -30,7 +30,7 @@ public class RoaringImmutableNode
 
   private final short numChildren;
   private final boolean isLeaf;
-  private final int conciseSetSize;
+  private final int RoaringSize;
   private final int childrenOffset;
 
   private final ByteBuffer data;
@@ -44,13 +44,13 @@ public class RoaringImmutableNode
     this.isLeaf = (header & 0x8000) != 0;
     this.numChildren = (short) (header & 0x7FFF);
     final int sizePosition = initialOffset + offsetFromInitial + HEADER_NUM_BYTES + 2 * numDims * Floats.BYTES;
-    this.conciseSetSize = data.getInt(sizePosition);
+    this.RoaringSize = data.getInt(sizePosition);
     this.childrenOffset = initialOffset
                           + offsetFromInitial
                           + HEADER_NUM_BYTES
                           + 2 * numDims * Floats.BYTES
                           + Ints.BYTES
-                          + conciseSetSize;
+                          + RoaringSize;
 
     this.data = data;
   }
@@ -70,13 +70,13 @@ public class RoaringImmutableNode
     this.numChildren = numChildren;
     this.isLeaf = leaf;
     final int sizePosition = initialOffset + offsetFromInitial + HEADER_NUM_BYTES + 2 * numDims * Floats.BYTES;
-    this.conciseSetSize = data.getInt(sizePosition);
+    this.RoaringSize = data.getInt(sizePosition);
     this.childrenOffset = initialOffset
                           + offsetFromInitial
                           + HEADER_NUM_BYTES
                           + 2 * numDims * Floats.BYTES
                           + Ints.BYTES
-                          + conciseSetSize;
+                          + RoaringSize;
 
     this.data = data;
   }
