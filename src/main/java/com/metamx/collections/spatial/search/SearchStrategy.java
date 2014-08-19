@@ -1,11 +1,10 @@
 package com.metamx.collections.spatial.search;
 
 import com.metamx.collections.spatial.ImmutableNode;
-import it.uniroma3.mat.extendedset.intset.ImmutableConciseSet;
-
+import org.roaringbitmap.buffer.ImmutableRoaringBitmap;
 /**
  */
 public interface SearchStrategy
 {
-  public Iterable<ImmutableConciseSet> search(ImmutableNode node, Bound bound);
+    public Iterable<ImmutableRoaringBitmap> search(ImmutableNode node, Bound bound);
 }

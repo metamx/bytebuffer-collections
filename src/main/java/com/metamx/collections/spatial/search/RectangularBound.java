@@ -17,117 +17,117 @@ public class RectangularBound implements Bound
 {
     private static final byte CACHE_TYPE_ID = 0x0;
 
-  private final float[] minCoords;
-  private final float[] maxCoords;
-  private final int limit;
-  private final int numDims;
+    private final float[] minCoords;
+    private final float[] maxCoords;
+    private final int limit;
+    private final int numDims;
 
-  @JsonCreator
-  public RectangularBound(
-      @JsonProperty("minCoords") float[] minCoords,
-      @JsonProperty("maxCoords") float[] maxCoords,
-      @JsonProperty("limit") int limit
-  )
-  {
-    Preconditions.checkArgument(minCoords.length == maxCoords.length);
+    @JsonCreator
+    public RectangularBound(
+            @JsonProperty("minCoords") float[] minCoords,
+            @JsonProperty("maxCoords") float[] maxCoords,
+            @JsonProperty("limit") int limit
+    )
+    {
+        Preconditions.checkArgument(minCoords.length == maxCoords.length);
 
-    this.numDims = minCoords.length;
+        this.numDims = minCoords.length;
 
-    this.minCoords = minCoords;
-    this.maxCoords = maxCoords;
-    this.limit = limit;
-  }
-
-  public RectangularBound(
-      float[] minCoords,
-      float[] maxCoords
-  )
-  {
-    this(minCoords, maxCoords, 0);
-  }
-
-  @JsonProperty
-  public float[] getMinCoords()
-  {
-    return minCoords;
-  }
-
-  @JsonProperty
-  public float[] getMaxCoords()
-  {
-    return maxCoords;
-  }
-
-  @JsonProperty
-  public int getLimit()
-  {
-    return limit;
-  }
-
-  @Override
-  public int getNumDims()
-  {
-    return numDims;
-  }
-
-  @Override
-  public boolean overlaps(ImmutableNode node)
-  {
-    final float[] nodeMinCoords = node.getMinCoordinates();
-    final float[] nodeMaxCoords = node.getMaxCoordinates();
-
-    for (int i = 0; i < numDims; i++) {
-      if (nodeMaxCoords[i] < minCoords[i] || nodeMinCoords[i] > maxCoords[i]) {
-        return false;
-      }
+        this.minCoords = minCoords;
+        this.maxCoords = maxCoords;
+        this.limit = limit;
     }
 
-    return true;
-  }
-
-  @Override
-  public boolean contains(float[] coords)
-  {
-    for (int i = 0; i < numDims; i++) {
-      if (coords[i] < minCoords[i] || coords[i] > maxCoords[i]) {
-        return false;
-      }
+    public RectangularBound(
+            float[] minCoords,
+            float[] maxCoords
+    )
+    {
+        this(minCoords, maxCoords, 0);
     }
 
-    return true;
-  }
+    @JsonProperty
+    public float[] getMinCoords()
+    {
+        return minCoords;
+    }
 
-  @Override
-  public Iterable<ImmutablePoint> filter(Iterable<ImmutablePoint> points)
-  {
-    return Iterables.filter(
-        points,
-        new Predicate<ImmutablePoint>()
-        {
-          @Override
-          public boolean apply(ImmutablePoint immutablePoint)
-          {
-            return contains(immutablePoint.getCoords());
-          }
+    @JsonProperty
+    public float[] getMaxCoords()
+    {
+        return maxCoords;
+    }
+
+    @JsonProperty
+    public int getLimit()
+    {
+        return limit;
+    }
+
+    @Override
+    public int getNumDims()
+    {
+        return numDims;
+    }
+
+    @Override
+    public boolean overlaps(ImmutableNode node)
+    {
+        final float[] nodeMinCoords = node.getMinCoordinates();
+        final float[] nodeMaxCoords = node.getMaxCoordinates();
+
+        for (int i = 0; i < numDims; i++) {
+            if (nodeMaxCoords[i] < minCoords[i] || nodeMinCoords[i] > maxCoords[i]) {
+                return false;
+            }
         }
-    );
-  }
 
-  @Override
-  public byte[] getCacheKey()
-  {
-    ByteBuffer minCoordsBuffer = ByteBuffer.allocate(minCoords.length * Floats.BYTES);
-    minCoordsBuffer.asFloatBuffer().put(minCoords);
-    final byte[] minCoordsCacheKey = minCoordsBuffer.array();
+        return true;
+    }
 
-    ByteBuffer maxCoordsBuffer = ByteBuffer.allocate(maxCoords.length * Floats.BYTES);
-    maxCoordsBuffer.asFloatBuffer().put(maxCoords);
-    final byte[] maxCoordsCacheKey = maxCoordsBuffer.array();
+    @Override
+    public boolean contains(float[] coords)
+    {
+        for (int i = 0; i < numDims; i++) {
+            if (coords[i] < minCoords[i] || coords[i] > maxCoords[i]) {
+                return false;
+            }
+        }
 
-    final ByteBuffer cacheKey = ByteBuffer.allocate(1 + minCoordsCacheKey.length + maxCoordsCacheKey.length)
-                                          .put(minCoordsCacheKey)
-                                          .put(maxCoordsCacheKey)
-                                          .put(CACHE_TYPE_ID);
-    return cacheKey.array();
-  }
+        return true;
+    }
+
+    @Override
+    public Iterable<ImmutablePoint> filter(Iterable<ImmutablePoint> points)
+    {
+        return Iterables.filter(
+                points,
+                new Predicate<ImmutablePoint>()
+                {
+                    @Override
+                    public boolean apply(ImmutablePoint immutablePoint)
+                    {
+                        return contains(immutablePoint.getCoords());
+                    }
+                }
+        );
+    }
+
+    @Override
+    public byte[] getCacheKey()
+    {
+        ByteBuffer minCoordsBuffer = ByteBuffer.allocate(minCoords.length * Floats.BYTES);
+        minCoordsBuffer.asFloatBuffer().put(minCoords);
+        final byte[] minCoordsCacheKey = minCoordsBuffer.array();
+
+        ByteBuffer maxCoordsBuffer = ByteBuffer.allocate(maxCoords.length * Floats.BYTES);
+        maxCoordsBuffer.asFloatBuffer().put(maxCoords);
+        final byte[] maxCoordsCacheKey = maxCoordsBuffer.array();
+
+        final ByteBuffer cacheKey = ByteBuffer.allocate(1 + minCoordsCacheKey.length + maxCoordsCacheKey.length)
+                .put(minCoordsCacheKey)
+                .put(maxCoordsCacheKey)
+                .put(CACHE_TYPE_ID);
+        return cacheKey.array();
+    }
 }
