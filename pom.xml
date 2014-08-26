@@ -3,7 +3,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>com.metamx</groupId>
     <artifactId>bytebuffer-collections</artifactId>
-    <version>0.0.3-SNAPSHOT</version>
+    <version>0.0.4-SNAPSHOT</version>
     <name>bytebuffer-collections</name>
     <description>ByteBuffer Collections</description>
     <scm>
@@ -20,7 +20,7 @@
         <dependency>
             <groupId>org.roaringbitmap</groupId>
             <artifactId>RoaringBitmap</artifactId>
-            <version>0.3.6</version>
+            <version>0.3.7</version>
         </dependency>
         <dependency>
             <groupId>org.slf4j</groupId>
