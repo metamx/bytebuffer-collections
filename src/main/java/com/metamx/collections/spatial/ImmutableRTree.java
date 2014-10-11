@@ -5,123 +5,121 @@ import com.google.common.primitives.Ints;
 import com.metamx.collections.spatial.search.Bound;
 import com.metamx.collections.spatial.search.GutmanSearchStrategy;
 import com.metamx.collections.spatial.search.SearchStrategy;
-import it.uniroma3.mat.extendedset.intset.ImmutableConciseSet;
+import org.roaringbitmap.buffer.ImmutableRoaringBitmap;
 
 import java.nio.ByteBuffer;
 
 /**
- * An immutable representation of an {@link RTree} for spatial indexing.
+ * An immutable representation of an {@link com.metamx.collections.spatial.RTree} for spatial indexing.
  */
 public class ImmutableRTree
 {
-  private static byte VERSION = 0x0;
+    private static byte VERSION = 0x0;
 
-  public static ImmutableRTree newImmutableFromMutable(RTree rTree)
-  {
-    if (rTree.getSize() == 0) {
-      return new ImmutableRTree();
+    public static ImmutableRTree newImmutableFromMutable(RTree rTree)
+    {
+        if (rTree.getSize() == 0) {
+            return new ImmutableRTree();
+        }
+        ByteBuffer buffer = ByteBuffer.wrap(new byte[calcNumBytes(rTree)]);
+
+        buffer.put(VERSION);
+        buffer.putInt(rTree.getNumDims());
+        int spaceUsed = rTree.getRoot().storeInByteBuffer(buffer, buffer.position());
+        buffer.position(0);
+        return new ImmutableRTree(buffer.asReadOnlyBuffer());
     }
 
-    ByteBuffer buffer = ByteBuffer.wrap(new byte[calcNumBytes(rTree)]);
+    private static int calcNumBytes(RTree tree)
+    {
+        int total = 1 + Ints.BYTES; // VERSION and numDims
 
-    buffer.put(VERSION);
-    buffer.putInt(rTree.getNumDims());
-    rTree.getRoot().storeInByteBuffer(buffer, buffer.position());
+        total += calcNodeBytes(tree.getRoot());
 
-    buffer.position(0);
-    return new ImmutableRTree(buffer.asReadOnlyBuffer());
-  }
-
-  private static int calcNumBytes(RTree tree)
-  {
-    int total = 1 + Ints.BYTES; // VERSION and numDims
-
-    total += calcNodeBytes(tree.getRoot());
-
-    return total;
-  }
-
-  private static int calcNodeBytes(Node node)
-  {
-    int total = 0;
-
-    // find size of this node
-    total += node.getSizeInBytes();
-
-    // recursively find sizes of child nodes
-    for (Node child : node.getChildren()) {
-      if (node.isLeaf()) {
-        total += child.getSizeInBytes();
-      } else {
-        total += calcNodeBytes(child);
-      }
+        return total;
     }
 
-    return total;
-  }
+    private static int calcNodeBytes(Node node)
+    {
+        int total = 0;
 
-  private final int numDims;
-  private final ImmutableNode root;
-  private final ByteBuffer data;
+        // find size of this node
+        total += node.getSizeInBytes();
 
-  private final SearchStrategy defaultSearchStrategy = new GutmanSearchStrategy();
+        // recursively find sizes of child nodes
+        for (Node child : node.getChildren()) {
+            if (node.isLeaf()) {
+                total += child.getSizeInBytes();
+            } else {
+                total += calcNodeBytes(child);
+            }
+        }
 
-  public ImmutableRTree()
-  {
-    this.numDims = 0;
-    this.data = ByteBuffer.wrap(new byte[]{});
-    this.root = null;
-  }
+        return total;
+    }
 
-  public ImmutableRTree(ByteBuffer data)
-  {
-    final int initPosition = data.position();
+    private final int numDims;
+    private final ImmutableNode root;
+    private final ByteBuffer data;
 
-    Preconditions.checkArgument(data.get(0) == VERSION, "Mismatching versions");
+    private final SearchStrategy defaultSearchStrategy = new GutmanSearchStrategy();
 
-    this.numDims = data.getInt(1 + initPosition) & 0x7FFF;
-    this.data = data;
-    this.root = new ImmutableNode(numDims, initPosition, 1 + Ints.BYTES, data);
-  }
+    public ImmutableRTree()
+    {
+        this.numDims = 0;
+        this.data = ByteBuffer.wrap(new byte[]{});
+        this.root = null;
+    }
 
-  public int size()
-  {
-    return data.capacity();
-  }
+    public ImmutableRTree(ByteBuffer data)
+    {
+        final int initPosition = data.position();
 
-  public ImmutableNode getRoot()
-  {
-    return root;
-  }
+        Preconditions.checkArgument(data.get(0) == VERSION, "Mismatching versions");
 
-  public int getNumDims()
-  {
-    return numDims;
-  }
+        this.numDims = data.getInt(1 + initPosition) & 0x7FFF;
+        this.data = data;
+        this.root = new ImmutableNode(numDims, initPosition, 1 + Ints.BYTES, data);
+    }
 
-  public Iterable<ImmutableConciseSet> search(Bound bound)
-  {
-    Preconditions.checkArgument(bound.getNumDims() == numDims);
+    public int size()
+    {
+        return data.capacity();
+    }
 
-    return defaultSearchStrategy.search(root, bound);
-  }
+    public ImmutableNode getRoot()
+    {
+        return root;
+    }
 
-  public Iterable<ImmutableConciseSet> search(SearchStrategy strategy, Bound bound)
-  {
-    Preconditions.checkArgument(bound.getNumDims() == numDims);
+    public int getNumDims()
+    {
+        return numDims;
+    }
 
-    return strategy.search(root, bound);
-  }
+    public Iterable<ImmutableRoaringBitmap> search(Bound bound)
+    {
+        Preconditions.checkArgument(bound.getNumDims() == numDims);
 
-  public byte[] toBytes()
-  {
-    ByteBuffer buf = ByteBuffer.allocate(data.capacity());
-    buf.put(data.asReadOnlyBuffer());
-    return buf.array();
-  }
+        return defaultSearchStrategy.search(root, bound);
+    }
 
-  public int compareTo(ImmutableRTree other)
-  {
-    return this.data.compareTo(other.data);
-  }
+    public Iterable<ImmutableRoaringBitmap> search(SearchStrategy strategy, Bound bound)
+    {
+        Preconditions.checkArgument(bound.getNumDims() == numDims);
+
+        return strategy.search(root, bound);
+    }
+
+    public byte[] toBytes()
+    {
+        ByteBuffer buf = ByteBuffer.allocate(data.capacity());
+        buf.put(data.asReadOnlyBuffer());
+        return buf.array();
+    }
+
+    public int compareTo(ImmutableRTree other)
+    {
+        return this.data.compareTo(other.data);
+    }
 }
