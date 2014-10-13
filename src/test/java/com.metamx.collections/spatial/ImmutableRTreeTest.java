@@ -7,6 +7,7 @@ import com.google.common.collect.Sets;
 import com.metamx.collections.spatial.search.RadiusBound;
 import com.metamx.collections.spatial.search.RectangularBound;
 import com.metamx.collections.spatial.split.LinearGutmanSplitStrategy;
+import it.uniroma3.mat.extendedset.intset.ConciseSet;
 import it.uniroma3.mat.extendedset.intset.ImmutableConciseSet;
 import it.uniroma3.mat.extendedset.intset.IntSet;
 import junit.framework.Assert;
@@ -169,6 +170,20 @@ public class ImmutableRTreeTest
     while (iter.hasNext()) {
       Assert.assertTrue(expected.contains(iter.next()));
     }
+  }
+
+  @Test
+  public void testEmptyConciseSet()
+  {
+    RTree tree = new RTree(2, new LinearGutmanSplitStrategy(0, 50));
+    tree.insert(new float[]{0.0f, 0.0f}, new ConciseSet());
+
+    ImmutableRTree searchTree = ImmutableRTree.newImmutableFromMutable(tree);
+    Iterable<ImmutableConciseSet> points = searchTree.search(
+        new RadiusBound(new float[]{0.0f, 0.0f}, 5)
+    );
+    ImmutableConciseSet finalSet = ImmutableConciseSet.union(points);
+    Assert.assertEquals(finalSet.size(), 0);
   }
 
   @Test
