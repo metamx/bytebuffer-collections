@@ -10,6 +10,10 @@ import org.roaringbitmap.buffer.MutableRoaringBitmap;
 public class WrappedRoaringBitmap extends GenericBitmap {
     
     MutableRoaringBitmap core;
+    
+    protected WrappedRoaringBitmap() {
+        core = new MutableRoaringBitmap();
+    }
 
     @Override
     public void clear() {
