@@ -1,9 +1,11 @@
 package com.metamx.collections.spatial;
 
 import com.google.common.base.Preconditions;
+import com.metamx.collections.spatial.bitmap.GenericBitmap;
 import com.metamx.collections.spatial.split.LinearGutmanSplitStrategy;
 import com.metamx.collections.spatial.split.SplitStrategy;
-import it.uniroma3.mat.extendedset.intset.ConciseSet;
+//import it.uniroma3.mat.extendedset.intset.ConciseSet;
+
 
 import java.util.Arrays;
 
@@ -60,7 +62,7 @@ public class RTree
     insertInner(new Point(coords, entry));
   }
 
-  public void insert(float[] coords, ConciseSet entry)
+  public void insert(float[] coords, GenericBitmap entry)
   {
     Preconditions.checkArgument(coords.length == numDims);
     insertInner(new Point(coords, entry));

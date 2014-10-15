@@ -5,24 +5,25 @@ import com.google.common.base.Predicate;
 import com.google.common.collect.Iterables;
 import com.metamx.collections.spatial.ImmutableNode;
 import com.metamx.collections.spatial.ImmutablePoint;
-import it.uniroma3.mat.extendedset.intset.ImmutableConciseSet;
+//import it.uniroma3.mat.extendedset.intset.ImmutableConciseSet;
+import com.metamx.collections.spatial.bitmap.ImmutableGenericBitmap;
 
 /**
  */
 public class GutmanSearchStrategy implements SearchStrategy
 {
   @Override
-  public Iterable<ImmutableConciseSet> search(ImmutableNode node, Bound bound)
+  public Iterable<ImmutableGenericBitmap> search(ImmutableNode node, Bound bound)
   {
     if (bound.getLimit() > 0) {
       return Iterables.transform(
           breadthFirstSearch(node, bound),
-          new Function<ImmutableNode, ImmutableConciseSet>()
+          new Function<ImmutableNode, ImmutableGenericBitmap>()
           {
             @Override
-            public ImmutableConciseSet apply(ImmutableNode immutableNode)
+            public ImmutableGenericBitmap apply(ImmutableNode immutableNode)
             {
-              return immutableNode.getImmutableConciseSet();
+              return immutableNode.getImmutableBitmap();
             }
           }
       );
@@ -30,12 +31,12 @@ public class GutmanSearchStrategy implements SearchStrategy
 
     return Iterables.transform(
         depthFirstSearch(node, bound),
-        new Function<ImmutablePoint, ImmutableConciseSet>()
+        new Function<ImmutablePoint, ImmutableGenericBitmap>()
         {
           @Override
-          public ImmutableConciseSet apply(ImmutablePoint immutablePoint)
+          public ImmutableGenericBitmap apply(ImmutablePoint immutablePoint)
           {
-            return immutablePoint.getImmutableConciseSet();
+            return immutablePoint.getImmutableBitmap();
           }
         }
     );

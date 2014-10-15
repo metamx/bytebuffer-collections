@@ -27,4 +27,5 @@ public class ImmutablePoint extends ImmutableNode
     // should never get here
     throw new UnsupportedOperationException();
   }
+
 }

@@ -97,7 +97,7 @@ public class RTreeUtils
                   "%scoords: %s, conciseSet: %s%n",
                   makeDashes(level),
                   jsonMapper.writeValueAsString(point.getCoords()),
-                  point.getConciseSet()
+                  point.getBitmap()
               );
       }
     } else {
@@ -172,7 +172,7 @@ public class RTreeUtils
                   "%scoords: %s, conciseSet: %s%n",
                   makeDashes(level),
                   jsonMapper.writeValueAsString(point.getCoords()),
-                  point.getImmutableConciseSet()
+                  point.getImmutableBitmap()
               );
       }
     } else {

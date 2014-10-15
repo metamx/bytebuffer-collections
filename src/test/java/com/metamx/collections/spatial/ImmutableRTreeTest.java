@@ -4,13 +4,18 @@ import com.google.common.base.Stopwatch;
 import com.google.common.base.Throwables;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Sets;
+import com.metamx.collections.spatial.bitmap.ImmutableGenericBitmap;
+import com.metamx.collections.spatial.bitmap.WrappedConciseBitmap;
+import com.metamx.collections.spatial.bitmap.WrappedImmutableConciseBitmap;
 import com.metamx.collections.spatial.search.RadiusBound;
 import com.metamx.collections.spatial.search.RectangularBound;
 import com.metamx.collections.spatial.split.LinearGutmanSplitStrategy;
+
 import it.uniroma3.mat.extendedset.intset.ConciseSet;
 import it.uniroma3.mat.extendedset.intset.ImmutableConciseSet;
 import it.uniroma3.mat.extendedset.intset.IntSet;
 import junit.framework.Assert;
+
 import org.junit.Test;
 
 import java.nio.ByteBuffer;
@@ -35,8 +40,8 @@ public class ImmutableRTreeTest
     ImmutableRTree firstTree = ImmutableRTree.newImmutableFromMutable(tree);
     ByteBuffer buffer = ByteBuffer.wrap(firstTree.toBytes());
     ImmutableRTree secondTree = new ImmutableRTree(buffer);
-    Iterable<ImmutableConciseSet> points = secondTree.search(new RadiusBound(new float[]{0, 0}, 10));
-    ImmutableConciseSet finalSet = ImmutableConciseSet.union(points);
+    Iterable<ImmutableGenericBitmap> points = secondTree.search(new RadiusBound(new float[]{0, 0}, 10));
+    ImmutableConciseSet finalSet = ImmutableConciseSet.union(WrappedImmutableConciseBitmap.unwrap(points));
     Assert.assertTrue(finalSet.size() >= 5);
 
     Set<Integer> expected = Sets.newHashSet(1, 2, 3, 4, 5);
@@ -64,8 +69,8 @@ public class ImmutableRTreeTest
     Assert.assertEquals(tree.getRoot().getChildren().size(), 10);
 
     ImmutableRTree searchTree = ImmutableRTree.newImmutableFromMutable(tree);
-    Iterable<ImmutableConciseSet> points = searchTree.search(new RadiusBound(new float[]{0, 0}, 5));
-    ImmutableConciseSet finalSet = ImmutableConciseSet.union(points);
+    Iterable<ImmutableGenericBitmap> points = searchTree.search(new RadiusBound(new float[]{0, 0}, 5));
+    ImmutableConciseSet finalSet = ImmutableConciseSet.union(WrappedImmutableConciseBitmap.unwrap(points));
     Assert.assertTrue(finalSet.size() >= 5);
 
     Set<Integer> expected = Sets.newHashSet(1, 2, 3, 4, 5);
@@ -94,8 +99,8 @@ public class ImmutableRTreeTest
     }
 
     ImmutableRTree searchTree = ImmutableRTree.newImmutableFromMutable(tree);
-    Iterable<ImmutableConciseSet> points = searchTree.search(new RadiusBound(new float[]{0, 0}, 5));
-    ImmutableConciseSet finalSet = ImmutableConciseSet.union(points);
+    Iterable<ImmutableGenericBitmap> points = searchTree.search(new RadiusBound(new float[]{0, 0}, 5));
+    ImmutableConciseSet finalSet = ImmutableConciseSet.union(WrappedImmutableConciseBitmap.unwrap(points));
     Assert.assertTrue(finalSet.size() >= 5);
 
     Set<Integer> expected = Sets.newHashSet(1, 2, 3, 4, 5);
@@ -124,13 +129,13 @@ public class ImmutableRTreeTest
     }
 
     ImmutableRTree searchTree = ImmutableRTree.newImmutableFromMutable(tree);
-    Iterable<ImmutableConciseSet> points = searchTree.search(
+    Iterable<ImmutableGenericBitmap> points = searchTree.search(
         new RectangularBound(
             new float[]{0, 0},
             new float[]{9, 9}
         )
     );
-    ImmutableConciseSet finalSet = ImmutableConciseSet.union(points);
+    ImmutableConciseSet finalSet = ImmutableConciseSet.union(WrappedImmutableConciseBitmap.unwrap(points));
     Assert.assertTrue(finalSet.size() >= 5);
 
     Set<Integer> expected = Sets.newHashSet(0, 1, 2, 3, 4);
@@ -159,10 +164,10 @@ public class ImmutableRTreeTest
     }
 
     ImmutableRTree searchTree = ImmutableRTree.newImmutableFromMutable(tree);
-    Iterable<ImmutableConciseSet> points = searchTree.search(
+    Iterable<ImmutableGenericBitmap> points = searchTree.search(
         new RadiusBound(new float[]{0.0f, 0.0f}, 5)
     );
-    ImmutableConciseSet finalSet = ImmutableConciseSet.union(points);
+    ImmutableConciseSet finalSet = ImmutableConciseSet.union(WrappedImmutableConciseBitmap.unwrap(points));
     Assert.assertTrue(finalSet.size() >= 3);
 
     Set<Integer> expected = Sets.newHashSet(0, 1, 2);
@@ -176,13 +181,13 @@ public class ImmutableRTreeTest
   public void testEmptyConciseSet()
   {
     RTree tree = new RTree(2, new LinearGutmanSplitStrategy(0, 50));
-    tree.insert(new float[]{0.0f, 0.0f}, new ConciseSet());
+    tree.insert(new float[]{0.0f, 0.0f}, new WrappedConciseBitmap());
 
     ImmutableRTree searchTree = ImmutableRTree.newImmutableFromMutable(tree);
-    Iterable<ImmutableConciseSet> points = searchTree.search(
+    Iterable<ImmutableGenericBitmap> points = searchTree.search(
         new RadiusBound(new float[]{0.0f, 0.0f}, 5)
     );
-    ImmutableConciseSet finalSet = ImmutableConciseSet.union(points);
+    ImmutableConciseSet finalSet = ImmutableConciseSet.union(WrappedImmutableConciseBitmap.unwrap(points));
     Assert.assertEquals(finalSet.size(), 0);
   }
 
@@ -205,8 +210,8 @@ public class ImmutableRTreeTest
     }
 
     ImmutableRTree searchTree = ImmutableRTree.newImmutableFromMutable(tree);
-    Iterable<ImmutableConciseSet> points = searchTree.search(new RadiusBound(new float[]{0, 0}, 5, 2));
-    ImmutableConciseSet finalSet = ImmutableConciseSet.union(points);
+    Iterable<ImmutableGenericBitmap> points = searchTree.search(new RadiusBound(new float[]{0, 0}, 5, 2));
+    ImmutableConciseSet finalSet = ImmutableConciseSet.union(WrappedImmutableConciseBitmap.unwrap(points));
     Assert.assertTrue(finalSet.size() >= 5);
 
     Set<Integer> expected = Sets.newHashSet(1, 2, 3, 4, 5);
@@ -244,7 +249,7 @@ public class ImmutableRTreeTest
 
         stopwatch.reset().start();
 
-        Iterable<ImmutableConciseSet> points = searchTree.search(new RadiusBound(new float[]{50, 50}, radius));
+        Iterable<ImmutableGenericBitmap> points = searchTree.search(new RadiusBound(new float[]{50, 50}, radius));
 
         Iterables.size(points);
         stop = stopwatch.elapsedMillis();
@@ -253,7 +258,7 @@ public class ImmutableRTreeTest
 
         stopwatch.reset().start();
 
-        ImmutableConciseSet finalSet = ImmutableConciseSet.union(points);
+        ImmutableConciseSet finalSet = ImmutableConciseSet.union(WrappedImmutableConciseBitmap.unwrap(points));
 
         stop = stopwatch.elapsedMillis();
         System.out.printf("[%,d]: union of %,d points in %,d ms%n", numPoints, finalSet.size(), stop);
@@ -293,7 +298,7 @@ public class ImmutableRTreeTest
 
         stopwatch.reset().start();
 
-        Iterable<ImmutableConciseSet> points = searchTree.search(
+        Iterable<ImmutableGenericBitmap> points = searchTree.search(
             new RectangularBound(
                 new float[]{40, 40},
                 new float[]{60, 60},
@@ -308,7 +313,7 @@ public class ImmutableRTreeTest
 
         stopwatch.reset().start();
 
-        ImmutableConciseSet finalSet = ImmutableConciseSet.union(points);
+        ImmutableConciseSet finalSet = ImmutableConciseSet.union(WrappedImmutableConciseBitmap.unwrap(points));
 
         stop = stopwatch.elapsedMillis();
         System.out.printf("[%,d]: union of %,d points in %,d ms%n", numPoints, finalSet.size(), stop);

@@ -2,10 +2,12 @@ package com.metamx.collections.spatial;
 
 import com.google.common.base.Preconditions;
 import com.google.common.primitives.Ints;
+import com.metamx.collections.spatial.bitmap.ImmutableGenericBitmap;
 import com.metamx.collections.spatial.search.Bound;
 import com.metamx.collections.spatial.search.GutmanSearchStrategy;
 import com.metamx.collections.spatial.search.SearchStrategy;
-import it.uniroma3.mat.extendedset.intset.ImmutableConciseSet;
+//import it.uniroma3.mat.extendedset.intset.ImmutableConciseSet;
+
 
 import java.nio.ByteBuffer;
 
@@ -99,14 +101,14 @@ public class ImmutableRTree
     return numDims;
   }
 
-  public Iterable<ImmutableConciseSet> search(Bound bound)
+  public Iterable<ImmutableGenericBitmap> search(Bound bound)
   {
     Preconditions.checkArgument(bound.getNumDims() == numDims);
 
     return defaultSearchStrategy.search(root, bound);
   }
 
-  public Iterable<ImmutableConciseSet> search(SearchStrategy strategy, Bound bound)
+  public Iterable<ImmutableGenericBitmap> search(SearchStrategy strategy, Bound bound)
   {
     Preconditions.checkArgument(bound.getNumDims() == numDims);
 

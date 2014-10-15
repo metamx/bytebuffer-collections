@@ -2,7 +2,10 @@ package com.metamx.collections.spatial;
 
 import com.google.common.primitives.Floats;
 import com.google.common.primitives.Ints;
-import it.uniroma3.mat.extendedset.intset.ImmutableConciseSet;
+//import it.uniroma3.mat.extendedset.intset.ImmutableConciseSet;
+
+import com.metamx.collections.spatial.bitmap.ImmutableGenericBitmap;
+import com.metamx.collections.spatial.bitmap.WrappedImmutableConciseBitmap;
 
 import java.nio.ByteBuffer;
 import java.util.Iterator;
@@ -115,14 +118,14 @@ public class ImmutableNode
     return getCoords(initialOffset + offsetFromInitial + HEADER_NUM_BYTES + numDims * Floats.BYTES);
   }
 
-  public ImmutableConciseSet getImmutableConciseSet()
+  public ImmutableGenericBitmap getImmutableBitmap()
   {
     final int sizePosition = initialOffset + offsetFromInitial + HEADER_NUM_BYTES + 2 * numDims * Floats.BYTES;
     int numBytes = data.getInt(sizePosition);
     data.position(sizePosition + Ints.BYTES);
     ByteBuffer tmpBuffer = data.slice();
     tmpBuffer.limit(numBytes);
-    return new ImmutableConciseSet(tmpBuffer.asReadOnlyBuffer());
+    return new WrappedImmutableConciseBitmap(tmpBuffer.asReadOnlyBuffer());
   }
 
   public Iterable<ImmutableNode> getChildren()

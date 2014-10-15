@@ -4,8 +4,11 @@ import com.google.common.base.Preconditions;
 import com.google.common.collect.Lists;
 import com.google.common.primitives.Floats;
 import com.google.common.primitives.Ints;
-import it.uniroma3.mat.extendedset.intset.ConciseSet;
-import it.uniroma3.mat.extendedset.intset.ImmutableConciseSet;
+//import it.uniroma3.mat.extendedset.intset.ConciseSet;
+//import it.uniroma3.mat.extendedset.intset.ImmutableConciseSet;
+
+import com.metamx.collections.spatial.bitmap.GenericBitmap;
+import com.metamx.collections.spatial.bitmap.WrappedConciseBitmap;
 
 import java.nio.ByteBuffer;
 import java.util.Arrays;
@@ -20,7 +23,7 @@ public class Node
 
   private final List<Node> children;
   private final boolean isLeaf;
-  private final ConciseSet conciseSet;
+  private final GenericBitmap conciseSet;
 
   private Node parent;
 
@@ -32,7 +35,7 @@ public class Node
         Lists.<Node>newArrayList(),
         isLeaf,
         null,
-        new ConciseSet()
+        new WrappedConciseBitmap()
     );
   }
 
@@ -42,7 +45,7 @@ public class Node
       List<Node> children,
       boolean isLeaf,
       Node parent,
-      ConciseSet conciseSet
+      GenericBitmap conciseSet
   )
   {
     Preconditions.checkArgument(minCoordinates.length == maxCoordinates.length);
@@ -153,14 +156,14 @@ public class Node
     return retVal;
   }
 
-  public ConciseSet getConciseSet()
+  public GenericBitmap getBitmap()
   {
     return conciseSet;
   }
 
   public void addToConciseSet(Node node)
   {
-    conciseSet.addAll(node.getConciseSet());
+    conciseSet.or(node.getBitmap());
   }
 
   public void clear()
@@ -174,7 +177,7 @@ public class Node
     return ImmutableNode.HEADER_NUM_BYTES
            + 2 * getNumDims() * Floats.BYTES
            + Ints.BYTES // size of Concise set
-           + conciseSet.getWords().length * Ints.BYTES
+           + conciseSet.getSizeInBytes()
            + getChildren().size() * Ints.BYTES;
   }
 
@@ -188,7 +191,7 @@ public class Node
     for (float v : getMaxCoordinates()) {
       buffer.putFloat(v);
     }
-    byte[] bytes = ImmutableConciseSet.newImmutableFromMutable(conciseSet).toBytes();
+    byte[] bytes = conciseSet.toImmutable().toBytes();
     buffer.putInt(bytes.length);
     buffer.put(bytes);
 
