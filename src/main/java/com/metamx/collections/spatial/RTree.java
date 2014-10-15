@@ -1,10 +1,12 @@
 package com.metamx.collections.spatial;
 
 import com.google.common.base.Preconditions;
+import com.metamx.collections.spatial.bitmap.BitmapFactory;
 import com.metamx.collections.spatial.bitmap.GenericBitmap;
 import com.metamx.collections.spatial.split.LinearGutmanSplitStrategy;
 import com.metamx.collections.spatial.split.SplitStrategy;
 //import it.uniroma3.mat.extendedset.intset.ConciseSet;
+
 
 
 import java.util.Arrays;
@@ -23,16 +25,19 @@ public class RTree
   private Node root;
 
   private volatile int size;
+  
+  protected BitmapFactory bf;
 
-  public RTree()
+  public RTree(BitmapFactory b)
   {
-    this(0, new LinearGutmanSplitStrategy(0, 0));
+    this(0, new LinearGutmanSplitStrategy(0, 0,b),b);
   }
 
-  public RTree(int numDims, SplitStrategy splitStrategy)
+  public RTree(int numDims, SplitStrategy splitStrategy, BitmapFactory b)
   {
     this.numDims = numDims;
     this.splitStrategy = splitStrategy;
+    this.bf = b;
     this.root = buildRoot(true);
   }
 
@@ -59,7 +64,7 @@ public class RTree
   public void insert(float[] coords, int entry)
   {
     Preconditions.checkArgument(coords.length == numDims);
-    insertInner(new Point(coords, entry));
+    insertInner(new Point(coords, entry, bf));
   }
 
   public void insert(float[] coords, GenericBitmap entry)
@@ -108,7 +113,7 @@ public class RTree
     Arrays.fill(initMinCoords, -Float.MAX_VALUE);
     Arrays.fill(initMaxCoords, Float.MAX_VALUE);
 
-    return new Node(initMinCoords, initMaxCoords, isLeaf);
+    return new Node(initMinCoords, initMaxCoords, isLeaf,bf);
   }
 
   private void insertInner(Point point)

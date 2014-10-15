@@ -1,6 +1,7 @@
 package com.metamx.collections.spatial.split;
 
 import com.metamx.collections.spatial.Node;
+import com.metamx.collections.spatial.bitmap.BitmapFactory;
 
 import java.util.List;
 
@@ -8,9 +9,9 @@ import java.util.List;
  */
 public class LinearGutmanSplitStrategy extends GutmanSplitStrategy
 {
-  public LinearGutmanSplitStrategy(int minNumChildren, int maxNumChildren)
+  public LinearGutmanSplitStrategy(int minNumChildren, int maxNumChildren, BitmapFactory bf)
   {
-    super(minNumChildren, maxNumChildren);
+    super(minNumChildren, maxNumChildren, bf);
   }
 
   /**

@@ -3,6 +3,7 @@ package com.metamx.collections.spatial.split;
 import com.google.common.collect.Lists;
 import com.metamx.collections.spatial.Node;
 import com.metamx.collections.spatial.RTreeUtils;
+import com.metamx.collections.spatial.bitmap.BitmapFactory;
 import com.metamx.collections.spatial.bitmap.WrappedConciseBitmap;
 
 import it.uniroma3.mat.extendedset.intset.ConciseSet;
@@ -16,11 +17,13 @@ public abstract class GutmanSplitStrategy implements SplitStrategy
 {
   private final int minNumChildren;
   private final int maxNumChildren;
+  private final BitmapFactory bf;
 
-  protected GutmanSplitStrategy(int minNumChildren, int maxNumChildren)
+  protected GutmanSplitStrategy(int minNumChildren, int maxNumChildren, BitmapFactory b)
   {
     this.minNumChildren = minNumChildren;
     this.maxNumChildren = maxNumChildren;
+    this.bf = b;
   }
 
   @Override
@@ -61,7 +64,7 @@ public abstract class GutmanSplitStrategy implements SplitStrategy
         Lists.newArrayList(seeds[1]),
         node.isLeaf(),
         node.getParent(),
-        new WrappedConciseBitmap()
+        bf.getEmptyBitmap()
     );
     group1.addToConciseSet(seeds[1]);
     if (node.getParent() != null) {

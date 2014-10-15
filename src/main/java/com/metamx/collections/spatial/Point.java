@@ -6,6 +6,7 @@ import com.google.common.primitives.Ints;
 //import it.uniroma3.mat.extendedset.intset.ConciseSet;
 //import it.uniroma3.mat.extendedset.intset.ImmutableConciseSet;
 
+import com.metamx.collections.spatial.bitmap.BitmapFactory;
 import com.metamx.collections.spatial.bitmap.GenericBitmap;
 import com.metamx.collections.spatial.bitmap.WrappedConciseBitmap;
 
@@ -17,9 +18,9 @@ import java.util.List;
  */
 public class Point extends Node
 {
-  private static GenericBitmap makeBitmap(int entry)
+  private static GenericBitmap makeBitmap(int entry, BitmapFactory bf)
   {
-    GenericBitmap retVal = new WrappedConciseBitmap();
+    GenericBitmap retVal = bf.getEmptyBitmap();
     retVal.add(entry);
     return retVal;
   }
@@ -27,12 +28,12 @@ public class Point extends Node
   private final float[] coords;
   private final GenericBitmap conciseSet;
 
-  public Point(float[] coords, int entry)
+  public Point(float[] coords, int entry, BitmapFactory bf)
   {
-    super(coords, Arrays.copyOf(coords, coords.length), Lists.<Node>newArrayList(), true, null, makeBitmap(entry));
+    super(coords, Arrays.copyOf(coords, coords.length), Lists.<Node>newArrayList(), true, null, makeBitmap(entry,bf));
 
     this.coords = coords;
-    this.conciseSet = new WrappedConciseBitmap();
+    this.conciseSet = bf.getEmptyBitmap();
     this.conciseSet.add(entry);
   }
 

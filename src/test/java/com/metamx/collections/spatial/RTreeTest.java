@@ -1,7 +1,11 @@
 package com.metamx.collections.spatial;
 
+import com.metamx.collections.spatial.bitmap.BitmapFactory;
+import com.metamx.collections.spatial.bitmap.ConciseBitmapFactory;
 import com.metamx.collections.spatial.split.LinearGutmanSplitStrategy;
+
 import junit.framework.Assert;
+
 import org.junit.Before;
 import org.junit.Test;
 
@@ -17,7 +21,8 @@ public class RTreeTest
   @Before
   public void setUp() throws Exception
   {
-    tree = new RTree(2, new LinearGutmanSplitStrategy(0, 50));
+    BitmapFactory bf = new ConciseBitmapFactory();
+    tree = new RTree(2, new LinearGutmanSplitStrategy(0, 50, bf), bf );
   }
 
   @Test

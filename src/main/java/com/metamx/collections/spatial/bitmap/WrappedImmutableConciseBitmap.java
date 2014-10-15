@@ -9,23 +9,16 @@ import it.uniroma3.mat.extendedset.intset.IntSet.IntIterator;
 public class WrappedImmutableConciseBitmap extends ImmutableGenericBitmap {
     public ImmutableConciseSet core;
     
-    public WrappedImmutableConciseBitmap(ByteBuffer b) {
+    private WrappedImmutableConciseBitmap() {
+        
+    }
+    
+    protected WrappedImmutableConciseBitmap(ByteBuffer b) {
         core = new ImmutableConciseSet(b.asReadOnlyBuffer());
     }
     
     public WrappedImmutableConciseBitmap(ImmutableConciseSet c) {
         core = c;
-    }
-
-    @Override
-    public byte[] toBytes() {
-        return core.toBytes();
-    }
-
-
-    @Override
-    public int size() {
-        return core.size();
     }
     
     public static Iterable<ImmutableConciseSet> unwrap(final Iterable<ImmutableGenericBitmap> b){

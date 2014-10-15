@@ -5,7 +5,6 @@ import com.google.common.base.Predicate;
 import com.google.common.collect.Iterables;
 import com.metamx.collections.spatial.ImmutableNode;
 import com.metamx.collections.spatial.ImmutablePoint;
-//import it.uniroma3.mat.extendedset.intset.ImmutableConciseSet;
 import com.metamx.collections.spatial.bitmap.ImmutableGenericBitmap;
 
 /**

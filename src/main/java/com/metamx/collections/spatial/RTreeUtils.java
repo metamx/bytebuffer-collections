@@ -3,6 +3,7 @@ package com.metamx.collections.spatial;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.base.Preconditions;
 import com.google.common.base.Throwables;
+import com.metamx.collections.spatial.bitmap.BitmapFactory;
 
 /**
  */
@@ -66,11 +67,11 @@ public class RTreeUtils
     }
   }
 
-  public static void print(ImmutableRTree tree)
+  public static void print(ImmutableRTree tree, BitmapFactory bf)
   {
     System.out.printf("numDims : %d%n", tree.getNumDims());
     try {
-      printNode(tree.getRoot(), 0);
+      printNode(tree.getRoot(), 0, bf);
     }
     catch (Exception e) {
       throw Throwables.propagate(e);
@@ -152,7 +153,7 @@ public class RTreeUtils
     return true;
   }
 
-  private static void printNode(ImmutableNode node, int level) throws Exception
+  private static void printNode(ImmutableNode node, int level, BitmapFactory bf) throws Exception
   {
     System.out.printf(
         "%sminCoords: %s, maxCoords: %s, numChildren: %d, isLeaf: %s%n",
@@ -178,7 +179,7 @@ public class RTreeUtils
     } else {
       level++;
       for (ImmutableNode immutableNode : node.getChildren()) {
-        printNode(immutableNode, level);
+        printNode(immutableNode, level,bf);
       }
     }
   }

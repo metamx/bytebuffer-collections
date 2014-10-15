@@ -7,6 +7,7 @@ import com.google.common.primitives.Ints;
 //import it.uniroma3.mat.extendedset.intset.ConciseSet;
 //import it.uniroma3.mat.extendedset.intset.ImmutableConciseSet;
 
+import com.metamx.collections.spatial.bitmap.BitmapFactory;
 import com.metamx.collections.spatial.bitmap.GenericBitmap;
 import com.metamx.collections.spatial.bitmap.WrappedConciseBitmap;
 
@@ -27,7 +28,7 @@ public class Node
 
   private Node parent;
 
-  public Node(float[] minCoordinates, float[] maxCoordinates, boolean isLeaf)
+  public Node(float[] minCoordinates, float[] maxCoordinates, boolean isLeaf, BitmapFactory bf)
   {
     this(
         minCoordinates,
@@ -35,7 +36,7 @@ public class Node
         Lists.<Node>newArrayList(),
         isLeaf,
         null,
-        new WrappedConciseBitmap()
+        bf.getEmptyBitmap()
     );
   }
 
@@ -191,10 +192,7 @@ public class Node
     for (float v : getMaxCoordinates()) {
       buffer.putFloat(v);
     }
-    byte[] bytes = conciseSet.toImmutable().toBytes();
-    buffer.putInt(bytes.length);
-    buffer.put(bytes);
-
+    conciseSet.serialize(buffer);
     position = buffer.position();
     int childStartOffset = position + getChildren().size() * Ints.BYTES;
     for (Node child : getChildren()) {

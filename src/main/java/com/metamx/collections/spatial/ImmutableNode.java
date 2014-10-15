@@ -4,6 +4,7 @@ import com.google.common.primitives.Floats;
 import com.google.common.primitives.Ints;
 //import it.uniroma3.mat.extendedset.intset.ImmutableConciseSet;
 
+import com.metamx.collections.spatial.bitmap.BitmapFactory;
 import com.metamx.collections.spatial.bitmap.ImmutableGenericBitmap;
 import com.metamx.collections.spatial.bitmap.WrappedImmutableConciseBitmap;
 
@@ -36,9 +37,12 @@ public class ImmutableNode
   private final int childrenOffset;
 
   private final ByteBuffer data;
+  
+  protected final BitmapFactory bf;
 
-  public ImmutableNode(int numDims, int initialOffset, int offsetFromInitial, ByteBuffer data)
+  public ImmutableNode( int numDims, int initialOffset, int offsetFromInitial, ByteBuffer data, BitmapFactory b)
   {
+    this.bf = b;
     this.numDims = numDims;
     this.initialOffset = initialOffset;
     this.offsetFromInitial = offsetFromInitial;
@@ -63,9 +67,11 @@ public class ImmutableNode
       int offsetFromInitial,
       short numChildren,
       boolean leaf,
-      ByteBuffer data
+      ByteBuffer data,
+      BitmapFactory b
   )
   {
+    this.bf = b;  
     this.numDims = numDims;
     this.initialOffset = initialOffset;
     this.offsetFromInitial = offsetFromInitial;
@@ -125,7 +131,7 @@ public class ImmutableNode
     data.position(sizePosition + Ints.BYTES);
     ByteBuffer tmpBuffer = data.slice();
     tmpBuffer.limit(numBytes);
-    return new WrappedImmutableConciseBitmap(tmpBuffer.asReadOnlyBuffer());
+    return bf.mapImmutableBitmap(tmpBuffer.asReadOnlyBuffer());
   }
 
   public Iterable<ImmutableNode> getChildren()
@@ -153,14 +159,14 @@ public class ImmutableNode
                   numDims,
                   initialOffset,
                   data.getInt(childrenOffset + (count++) * Ints.BYTES),
-                  data
+                  data, bf
               );
             }
             return new ImmutableNode(
                 numDims,
                 initialOffset,
                 data.getInt(childrenOffset + (count++) * Ints.BYTES),
-                data
+                data, bf
             );
           }
 

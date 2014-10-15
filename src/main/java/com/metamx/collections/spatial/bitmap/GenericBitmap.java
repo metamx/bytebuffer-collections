@@ -1,5 +1,7 @@
 package com.metamx.collections.spatial.bitmap;
 
+import java.nio.ByteBuffer;
+
 public abstract class GenericBitmap {
 
     public abstract void clear();
@@ -8,11 +10,11 @@ public abstract class GenericBitmap {
 
     public abstract int getSizeInBytes();
 
-    public abstract ImmutableGenericBitmap toImmutable();
-
     public abstract void add(int entry);
     
     public abstract int size();
+
+    public abstract void serialize(ByteBuffer buffer);
 
 
 }

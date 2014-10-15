@@ -4,6 +4,8 @@ import com.google.common.base.Stopwatch;
 import com.google.common.base.Throwables;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Sets;
+import com.metamx.collections.spatial.bitmap.BitmapFactory;
+import com.metamx.collections.spatial.bitmap.ConciseBitmapFactory;
 import com.metamx.collections.spatial.bitmap.ImmutableGenericBitmap;
 import com.metamx.collections.spatial.bitmap.WrappedConciseBitmap;
 import com.metamx.collections.spatial.bitmap.WrappedImmutableConciseBitmap;
@@ -29,7 +31,8 @@ public class ImmutableRTreeTest
   @Test
   public void testToAndFromByteBuffer()
   {
-    RTree tree = new RTree(2, new LinearGutmanSplitStrategy(0, 50));
+    BitmapFactory bf = new ConciseBitmapFactory();
+    RTree tree = new RTree(2, new LinearGutmanSplitStrategy(0, 50, bf), bf);
 
     tree.insert(new float[]{0, 0}, 1);
     tree.insert(new float[]{1, 1}, 2);
@@ -39,7 +42,7 @@ public class ImmutableRTreeTest
 
     ImmutableRTree firstTree = ImmutableRTree.newImmutableFromMutable(tree);
     ByteBuffer buffer = ByteBuffer.wrap(firstTree.toBytes());
-    ImmutableRTree secondTree = new ImmutableRTree(buffer);
+    ImmutableRTree secondTree = new ImmutableRTree(buffer, bf);
     Iterable<ImmutableGenericBitmap> points = secondTree.search(new RadiusBound(new float[]{0, 0}, 10));
     ImmutableConciseSet finalSet = ImmutableConciseSet.union(WrappedImmutableConciseBitmap.unwrap(points));
     Assert.assertTrue(finalSet.size() >= 5);
@@ -54,7 +57,8 @@ public class ImmutableRTreeTest
   @Test
   public void testSearchNoSplit()
   {
-    RTree tree = new RTree(2, new LinearGutmanSplitStrategy(0, 50));
+    BitmapFactory bf = new ConciseBitmapFactory();
+    RTree tree = new RTree(2, new LinearGutmanSplitStrategy(0, 50, bf), bf);
     tree.insert(new float[]{0, 0}, 1);
     tree.insert(new float[]{10, 10}, 10);
     tree.insert(new float[]{1, 3}, 2);
@@ -83,7 +87,8 @@ public class ImmutableRTreeTest
   @Test
   public void testSearchWithSplit()
   {
-    RTree tree = new RTree(2, new LinearGutmanSplitStrategy(0, 50));
+    BitmapFactory bf = new ConciseBitmapFactory(); 
+    RTree tree = new RTree(2, new LinearGutmanSplitStrategy(0, 50, bf), bf);
     tree.insert(new float[]{0, 0}, 1);
     tree.insert(new float[]{1, 3}, 2);
     tree.insert(new float[]{4, 2}, 3);
@@ -113,7 +118,8 @@ public class ImmutableRTreeTest
   @Test
   public void testSearchWithSplit2()
   {
-    RTree tree = new RTree(2, new LinearGutmanSplitStrategy(0, 50));
+    BitmapFactory bf = new ConciseBitmapFactory();
+    RTree tree = new RTree(2, new LinearGutmanSplitStrategy(0, 50, bf), bf);
     tree.insert(new float[]{0.0f, 0.0f}, 0);
     tree.insert(new float[]{1.0f, 3.0f}, 1);
     tree.insert(new float[]{4.0f, 2.0f}, 2);
@@ -148,7 +154,8 @@ public class ImmutableRTreeTest
   @Test
   public void testSearchWithSplit3()
   {
-    RTree tree = new RTree(2, new LinearGutmanSplitStrategy(0, 50));
+    BitmapFactory bf = new ConciseBitmapFactory();
+    RTree tree = new RTree(2, new LinearGutmanSplitStrategy(0, 50, bf), bf);
     tree.insert(new float[]{0.0f, 0.0f}, 0);
     tree.insert(new float[]{1.0f, 3.0f}, 1);
     tree.insert(new float[]{4.0f, 2.0f}, 2);
@@ -180,8 +187,9 @@ public class ImmutableRTreeTest
   @Test
   public void testEmptyConciseSet()
   {
-    RTree tree = new RTree(2, new LinearGutmanSplitStrategy(0, 50));
-    tree.insert(new float[]{0.0f, 0.0f}, new WrappedConciseBitmap());
+    BitmapFactory bf = new ConciseBitmapFactory();
+    RTree tree = new RTree(2, new LinearGutmanSplitStrategy(0, 50, bf), bf);
+    tree.insert(new float[]{0.0f, 0.0f}, bf.getEmptyBitmap());
 
     ImmutableRTree searchTree = ImmutableRTree.newImmutableFromMutable(tree);
     Iterable<ImmutableGenericBitmap> points = searchTree.search(
@@ -194,7 +202,8 @@ public class ImmutableRTreeTest
   @Test
   public void testSearchWithSplitLimitedBound()
   {
-    RTree tree = new RTree(2, new LinearGutmanSplitStrategy(0, 50));
+    BitmapFactory bf = new ConciseBitmapFactory();
+    RTree tree = new RTree(2, new LinearGutmanSplitStrategy(0, 50, bf), bf);
     tree.insert(new float[]{0, 0}, 1);
     tree.insert(new float[]{1, 3}, 2);
     tree.insert(new float[]{4, 2}, 3);
@@ -231,7 +240,8 @@ public class ImmutableRTreeTest
 
     for (int numPoints = start; numPoints <= end; numPoints *= factor) {
       try {
-        RTree tree = new RTree(2, new LinearGutmanSplitStrategy(0, 50));
+        BitmapFactory bf = new ConciseBitmapFactory();
+        RTree tree = new RTree(2, new LinearGutmanSplitStrategy(0, 50, bf), bf);
 
         Stopwatch stopwatch = new Stopwatch().start();
         Random rand = new Random();
@@ -280,7 +290,8 @@ public class ImmutableRTreeTest
 
     for (int numPoints = start; numPoints <= end; numPoints *= factor) {
       try {
-        RTree tree = new RTree(2, new LinearGutmanSplitStrategy(0, 50));
+        BitmapFactory bf = new ConciseBitmapFactory();
+        RTree tree = new RTree(2, new LinearGutmanSplitStrategy(0, 50, bf), bf);
 
         Stopwatch stopwatch = new Stopwatch().start();
         Random rand = new Random();
