@@ -61,6 +61,11 @@ public class WrappedImmutableRoaringBitmap extends ImmutableGenericBitmap
 				final Iterator<ImmutableGenericBitmap> i = b.iterator();
 				return new Iterator<ImmutableRoaringBitmap>() {
 
+                    @Override
+                    public void remove() {
+                       i.remove();
+                    }
+
 					@Override
 					public boolean hasNext() {
 						return i.hasNext();

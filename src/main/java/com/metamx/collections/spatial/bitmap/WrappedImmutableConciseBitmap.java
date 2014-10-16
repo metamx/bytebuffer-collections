@@ -59,6 +59,11 @@ public class WrappedImmutableConciseBitmap extends ImmutableGenericBitmap
 			public Iterator<ImmutableConciseSet> iterator() {
 				final Iterator<ImmutableGenericBitmap> i = b.iterator();
 				return new Iterator<ImmutableConciseSet>() {
+					@Override
+					public void remove() {
+						i.remove();
+					}
+
 
 					@Override
 					public boolean hasNext() {
