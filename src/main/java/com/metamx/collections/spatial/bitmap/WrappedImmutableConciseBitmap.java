@@ -4,46 +4,82 @@ import java.nio.ByteBuffer;
 import java.util.Iterator;
 
 import it.uniroma3.mat.extendedset.intset.ImmutableConciseSet;
-import it.uniroma3.mat.extendedset.intset.IntSet.IntIterator;
 
-public class WrappedImmutableConciseBitmap extends ImmutableGenericBitmap {
-    public ImmutableConciseSet core;
-    
-    private WrappedImmutableConciseBitmap() {
-        
-    }
-    
-    protected WrappedImmutableConciseBitmap(ByteBuffer b) {
-        core = new ImmutableConciseSet(b.asReadOnlyBuffer());
-    }
-    
-    public WrappedImmutableConciseBitmap(ImmutableConciseSet c) {
-        core = c;
-    }
-    
-    public static Iterable<ImmutableConciseSet> unwrap(final Iterable<ImmutableGenericBitmap> b){
-        return new Iterable<ImmutableConciseSet>() {
+public class WrappedImmutableConciseBitmap extends ImmutableGenericBitmap
+{
 
-            @Override
-            public Iterator<ImmutableConciseSet> iterator() {
-                final Iterator<ImmutableGenericBitmap> i = b.iterator();
-                return new Iterator<ImmutableConciseSet>() {
+	/**
+	 * Underlying bitmap.
+	 */
+	public ImmutableConciseSet core;
 
-                    @Override
-                    public boolean hasNext() {
-                        return i.hasNext();
-                    }
+	@SuppressWarnings("unused")
+	private WrappedImmutableConciseBitmap() {
 
-                    @Override
-                    public ImmutableConciseSet next() {
-                        return ((WrappedImmutableConciseBitmap) i.next()).core;
-                    }
-                    
-                };
-            }
-            
-        };
-        
-    }
+	}
+
+	protected WrappedImmutableConciseBitmap(ByteBuffer b) {
+		core = new ImmutableConciseSet(b.asReadOnlyBuffer());
+	}
+
+	/**
+	 * Wrap an ImmutableConciseSet
+	 * 
+	 * @param c
+	 *          bitmap to be wrapped
+	 */
+	public WrappedImmutableConciseBitmap(ImmutableConciseSet c) {
+		core = c;
+	}
+
+	/**
+	 * Compute the union (bitwise-OR) of a set of bitmaps. They are assumed to be
+	 * instances of WrappedImmutableConciseBitmap otherwise a ClassCastException
+	 * is thrown.
+	 * 
+	 * This is a convenience method.
+	 * 
+	 * @param b
+	 *          input ImmutableGenericBitmap objects
+	 * @throws ClassCastException
+	 *           if one of the ImmutableGenericBitmap objects if not an instance
+	 *           of WrappedImmutableConciseBitmap
+	 * @return the union.
+	 */
+	public static ImmutableConciseSet union(Iterable<ImmutableGenericBitmap> b)
+			throws ClassCastException {
+		return ImmutableConciseSet.union(WrappedImmutableConciseBitmap.unwrap(b));
+	}
+
+	protected static Iterable<ImmutableConciseSet> unwrap(
+			final Iterable<ImmutableGenericBitmap> b) {
+		return new Iterable<ImmutableConciseSet>() {
+
+			@Override
+			public Iterator<ImmutableConciseSet> iterator() {
+				final Iterator<ImmutableGenericBitmap> i = b.iterator();
+				return new Iterator<ImmutableConciseSet>() {
+
+					@Override
+					public boolean hasNext() {
+						return i.hasNext();
+					}
+
+					@Override
+					public ImmutableConciseSet next() {
+						return ((WrappedImmutableConciseBitmap) i.next()).core;
+					}
+
+				};
+			}
+
+		};
+
+	}
+
+	@Override
+	public String toString() {
+		return getClass().getSimpleName() + core.toString();
+	}
 
 }

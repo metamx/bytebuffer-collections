@@ -1,6 +1,5 @@
 package com.metamx.collections.spatial;
 
-import com.google.common.collect.Lists;
 import com.metamx.collections.spatial.bitmap.BitmapFactory;
 
 import java.nio.ByteBuffer;

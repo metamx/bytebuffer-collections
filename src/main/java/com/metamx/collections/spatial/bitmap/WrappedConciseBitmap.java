@@ -8,10 +8,17 @@ import it.uniroma3.mat.extendedset.intset.ConciseSet;
 import it.uniroma3.mat.extendedset.intset.ImmutableConciseSet;
 
 public class WrappedConciseBitmap extends GenericBitmap {
-    
+
+	/**
+	 * Underlying bitmap.
+	 */
     public ConciseSet core;
     
-    protected WrappedConciseBitmap() {
+
+    /**
+     * Create a new WrappedConciseBitmap wrapping an empty  ConciseSet
+     */
+    public WrappedConciseBitmap() {
         core = new ConciseSet();
     }
 
@@ -29,7 +36,7 @@ public class WrappedConciseBitmap extends GenericBitmap {
 
     @Override
     public int getSizeInBytes() {
-        return core.getWords().length * Ints.BYTES;
+        return core.getWords().length * Ints.BYTES + Ints.BYTES;
     }
 
 
@@ -50,4 +57,8 @@ public class WrappedConciseBitmap extends GenericBitmap {
         buffer.put(bytes);
     }
 
+    @Override
+    public String toString() {
+        return getClass().getSimpleName()+core.toString();
+    }
 }

@@ -4,10 +4,6 @@ import com.google.common.collect.Lists;
 import com.metamx.collections.spatial.Node;
 import com.metamx.collections.spatial.RTreeUtils;
 import com.metamx.collections.spatial.bitmap.BitmapFactory;
-import com.metamx.collections.spatial.bitmap.WrappedConciseBitmap;
-
-import it.uniroma3.mat.extendedset.intset.ConciseSet;
-
 import java.util.Arrays;
 import java.util.List;
 

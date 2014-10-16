@@ -1,16 +1,8 @@
 package com.metamx.collections.spatial;
 
 import com.google.common.collect.Lists;
-import com.google.common.primitives.Floats;
-import com.google.common.primitives.Ints;
-//import it.uniroma3.mat.extendedset.intset.ConciseSet;
-//import it.uniroma3.mat.extendedset.intset.ImmutableConciseSet;
-
 import com.metamx.collections.spatial.bitmap.BitmapFactory;
 import com.metamx.collections.spatial.bitmap.GenericBitmap;
-import com.metamx.collections.spatial.bitmap.WrappedConciseBitmap;
-
-import java.nio.ByteBuffer;
 import java.util.Arrays;
 import java.util.List;
 

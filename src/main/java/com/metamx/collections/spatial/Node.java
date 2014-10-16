@@ -4,12 +4,9 @@ import com.google.common.base.Preconditions;
 import com.google.common.collect.Lists;
 import com.google.common.primitives.Floats;
 import com.google.common.primitives.Ints;
-//import it.uniroma3.mat.extendedset.intset.ConciseSet;
-//import it.uniroma3.mat.extendedset.intset.ImmutableConciseSet;
 
 import com.metamx.collections.spatial.bitmap.BitmapFactory;
 import com.metamx.collections.spatial.bitmap.GenericBitmap;
-import com.metamx.collections.spatial.bitmap.WrappedConciseBitmap;
 
 import java.nio.ByteBuffer;
 import java.util.Arrays;
@@ -177,8 +174,7 @@ public class Node
   {
     return ImmutableNode.HEADER_NUM_BYTES
            + 2 * getNumDims() * Floats.BYTES
-           + Ints.BYTES // size of Concise set
-           + conciseSet.getSizeInBytes()
+           + conciseSet.getSizeInBytes() + Ints.BYTES
            + getChildren().size() * Ints.BYTES;
   }
 
@@ -193,12 +189,12 @@ public class Node
       buffer.putFloat(v);
     }
     conciseSet.serialize(buffer);
-    position = buffer.position();
-    int childStartOffset = position + getChildren().size() * Ints.BYTES;
+    int pos = buffer.position();// better not to assign the parameter needlessly
+    int childStartOffset = pos + getChildren().size() * Ints.BYTES;
     for (Node child : getChildren()) {
-      buffer.putInt(position, childStartOffset);
+      buffer.putInt(pos, childStartOffset);
       childStartOffset = child.storeInByteBuffer(buffer, childStartOffset);
-      position += Ints.BYTES;
+      pos += Ints.BYTES;
     }
 
     return childStartOffset;

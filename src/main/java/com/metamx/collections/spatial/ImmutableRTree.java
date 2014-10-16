@@ -11,6 +11,7 @@ import com.metamx.collections.spatial.search.SearchStrategy;
 
 
 
+
 import java.nio.ByteBuffer;
 
 /**
@@ -79,9 +80,7 @@ public class ImmutableRTree
   public ImmutableRTree(ByteBuffer data, BitmapFactory bf)
   {
     final int initPosition = data.position();
-
     Preconditions.checkArgument(data.get(0) == VERSION, "Mismatching versions");
-
     this.numDims = data.getInt(1 + initPosition) & 0x7FFF;
     this.data = data;
     this.root = new ImmutableNode(numDims, initPosition, 1 + Ints.BYTES, data, bf);
@@ -118,9 +117,11 @@ public class ImmutableRTree
 
   public byte[] toBytes()
   {
-    ByteBuffer buf = ByteBuffer.allocate(data.capacity());
-    buf.put(data.asReadOnlyBuffer());
-    return buf.array();
+    ByteBuffer buf = data.duplicate();
+    buf.position(0);
+    byte[] b = new byte[buf.remaining()];
+    buf.get(b);
+    return b;
   }
 
   public int compareTo(ImmutableRTree other)
