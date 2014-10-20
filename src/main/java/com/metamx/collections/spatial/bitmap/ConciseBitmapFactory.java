@@ -42,6 +42,10 @@ public class ConciseBitmapFactory extends BitmapFactory {
   			public Iterator<ImmutableConciseSet> iterator() {
   				final Iterator<ImmutableGenericBitmap> i = b.iterator();
   				return new Iterator<ImmutableConciseSet>() {
+                    @Override
+                    public void remove() { 
+                        i.remove();
+                    }
 
   					@Override
   					public boolean hasNext() {

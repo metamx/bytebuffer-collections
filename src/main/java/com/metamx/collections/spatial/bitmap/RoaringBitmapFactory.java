@@ -41,6 +41,10 @@ public class RoaringBitmapFactory extends BitmapFactory
 			public Iterator<ImmutableRoaringBitmap> iterator() {
 				final Iterator<ImmutableGenericBitmap> i = b.iterator();
 				return new Iterator<ImmutableRoaringBitmap>() {
+                    @Override 
+                    public void remove() {
+                        i.remove();
+                    }
 
 					@Override
 					public boolean hasNext() {
