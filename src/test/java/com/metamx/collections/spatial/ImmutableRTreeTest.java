@@ -46,10 +46,10 @@ public class ImmutableRTreeTest
     ByteBuffer buffer = ByteBuffer.wrap(firstTree.toBytes());
     ImmutableRTree secondTree = new ImmutableRTree(buffer, bf);
     Iterable<ImmutableGenericBitmap> points = secondTree.search(new RadiusBound(new float[]{0, 0}, 10));
-    ImmutableConciseSet finalSet = WrappedImmutableConciseBitmap.union(points);
+    ImmutableGenericBitmap finalSet = bf.union(points);
     Assert.assertTrue(finalSet.size() >= 5);
     Set<Integer> expected = Sets.newHashSet(1, 2, 3, 4, 5);
-    IntSet.IntIterator iter = finalSet.iterator();
+    IntIterator iter = finalSet.iterator();
     while (iter.hasNext()) {
       Assert.assertTrue(expected.contains(iter.next()));
     }
@@ -71,11 +71,12 @@ public class ImmutableRTreeTest
     ByteBuffer buffer = ByteBuffer.wrap(firstTree.toBytes());
     ImmutableRTree secondTree = new ImmutableRTree(buffer, bf);
     Iterable<ImmutableGenericBitmap> points = secondTree.search(new RadiusBound(new float[]{0, 0}, 10));   
-    ImmutableRoaringBitmap finalSet = WrappedImmutableRoaringBitmap.union(points);
-    Assert.assertTrue(finalSet.getCardinality() >= 5);
+    ImmutableGenericBitmap finalSet = bf.union(points);
+
+    Assert.assertTrue(finalSet.size() >= 5);
 
     Set<Integer> expected = Sets.newHashSet(1, 2, 3, 4, 5);
-    IntIterator iter = finalSet.getIntIterator();
+    IntIterator iter = finalSet.iterator();
     while (iter.hasNext()) {
       Assert.assertTrue(expected.contains(iter.next()));
     }
@@ -101,11 +102,11 @@ public class ImmutableRTreeTest
 
     ImmutableRTree searchTree = ImmutableRTree.newImmutableFromMutable(tree);
     Iterable<ImmutableGenericBitmap> points = searchTree.search(new RadiusBound(new float[]{0, 0}, 5));
-    ImmutableConciseSet finalSet = WrappedImmutableConciseBitmap.union(points);
+    ImmutableGenericBitmap finalSet = bf.union(points);
     Assert.assertTrue(finalSet.size() >= 5);
 
     Set<Integer> expected = Sets.newHashSet(1, 2, 3, 4, 5);
-    IntSet.IntIterator iter = finalSet.iterator();
+    IntIterator iter = finalSet.iterator();
     while (iter.hasNext()) {
       Assert.assertTrue(expected.contains(iter.next()));
     }
@@ -131,11 +132,11 @@ public class ImmutableRTreeTest
 
     ImmutableRTree searchTree = ImmutableRTree.newImmutableFromMutable(tree);
     Iterable<ImmutableGenericBitmap> points = searchTree.search(new RadiusBound(new float[]{0, 0}, 5));
-    ImmutableRoaringBitmap finalSet = WrappedImmutableRoaringBitmap.union(points);
-    Assert.assertTrue(finalSet.getCardinality() >= 5);
+    ImmutableGenericBitmap finalSet = bf.union(points);
+    Assert.assertTrue(finalSet.size() >= 5);
 
     Set<Integer> expected = Sets.newHashSet(1, 2, 3, 4, 5);
-    IntIterator iter = finalSet.getIntIterator();
+    IntIterator iter = finalSet.iterator();
     while (iter.hasNext()) {
       Assert.assertTrue(expected.contains(iter.next()));
     }
@@ -162,11 +163,11 @@ public class ImmutableRTreeTest
 
     ImmutableRTree searchTree = ImmutableRTree.newImmutableFromMutable(tree);
     Iterable<ImmutableGenericBitmap> points = searchTree.search(new RadiusBound(new float[]{0, 0}, 5));
-    ImmutableConciseSet finalSet = WrappedImmutableConciseBitmap.union(points);
+    ImmutableGenericBitmap finalSet = bf.union(points);
     Assert.assertTrue(finalSet.size() >= 5);
 
     Set<Integer> expected = Sets.newHashSet(1, 2, 3, 4, 5);
-    IntSet.IntIterator iter = finalSet.iterator();
+    IntIterator iter = finalSet.iterator();
     while (iter.hasNext()) {
       Assert.assertTrue(expected.contains(iter.next()));
     }
@@ -193,11 +194,11 @@ public class ImmutableRTreeTest
 
     ImmutableRTree searchTree = ImmutableRTree.newImmutableFromMutable(tree);
     Iterable<ImmutableGenericBitmap> points = searchTree.search(new RadiusBound(new float[]{0, 0}, 5));
-    ImmutableRoaringBitmap finalSet = WrappedImmutableRoaringBitmap.union(points);
-    Assert.assertTrue(finalSet.getCardinality() >= 5);
+    ImmutableGenericBitmap finalSet = bf.union(points);
+    Assert.assertTrue(finalSet.size() >= 5);
 
     Set<Integer> expected = Sets.newHashSet(1, 2, 3, 4, 5);
-    IntIterator iter = finalSet.getIntIterator();
+    IntIterator iter = finalSet.iterator();
     while (iter.hasNext()) {
       Assert.assertTrue(expected.contains(iter.next()));
     }
@@ -230,11 +231,11 @@ public class ImmutableRTreeTest
             new float[]{9, 9}
         )
     );
-    ImmutableConciseSet finalSet = WrappedImmutableConciseBitmap.union(points);
+    ImmutableGenericBitmap finalSet = bf.union(points);
     Assert.assertTrue(finalSet.size() >= 5);
 
     Set<Integer> expected = Sets.newHashSet(0, 1, 2, 3, 4);
-    IntSet.IntIterator iter = finalSet.iterator();
+    IntIterator iter = finalSet.iterator();
     while (iter.hasNext()) {
       Assert.assertTrue(expected.contains(iter.next()));
     }
@@ -266,11 +267,11 @@ public class ImmutableRTreeTest
             new float[]{9, 9}
         )
     );
-    ImmutableRoaringBitmap finalSet = WrappedImmutableRoaringBitmap.union(points);
-    Assert.assertTrue(finalSet.getCardinality() >= 5);
+    ImmutableGenericBitmap finalSet = bf.union(points);
+    Assert.assertTrue(finalSet.size() >= 5);
 
     Set<Integer> expected = Sets.newHashSet(0, 1, 2, 3, 4);
-    IntIterator iter = finalSet.getIntIterator();
+    IntIterator iter = finalSet.iterator();
     while (iter.hasNext()) {
       Assert.assertTrue(expected.contains(iter.next()));
     }
@@ -299,11 +300,11 @@ public class ImmutableRTreeTest
     Iterable<ImmutableGenericBitmap> points = searchTree.search(
         new RadiusBound(new float[]{0.0f, 0.0f}, 5)
     );
-    ImmutableConciseSet finalSet = WrappedImmutableConciseBitmap.union(points);
+    ImmutableGenericBitmap finalSet = bf.union(points);
     Assert.assertTrue(finalSet.size() >= 3);
 
     Set<Integer> expected = Sets.newHashSet(0, 1, 2);
-    IntSet.IntIterator iter = finalSet.iterator();
+    IntIterator iter = finalSet.iterator();
     while (iter.hasNext()) {
       Assert.assertTrue(expected.contains(iter.next()));
     }
@@ -332,11 +333,11 @@ public class ImmutableRTreeTest
     Iterable<ImmutableGenericBitmap> points = searchTree.search(
         new RadiusBound(new float[]{0.0f, 0.0f}, 5)
     );
-    ImmutableRoaringBitmap finalSet = WrappedImmutableRoaringBitmap.union(points);
-    Assert.assertTrue(finalSet.getCardinality() >= 3);
+    ImmutableGenericBitmap finalSet = bf.union(points);
+    Assert.assertTrue(finalSet.size() >= 3);
 
     Set<Integer> expected = Sets.newHashSet(0, 1, 2);
-    IntIterator iter = finalSet.getIntIterator();
+    IntIterator iter = finalSet.iterator();
     while (iter.hasNext()) {
       Assert.assertTrue(expected.contains(iter.next()));
     }
@@ -353,7 +354,7 @@ public class ImmutableRTreeTest
     Iterable<ImmutableGenericBitmap> points = searchTree.search(
         new RadiusBound(new float[]{0.0f, 0.0f}, 5)
     );
-    ImmutableConciseSet finalSet = WrappedImmutableConciseBitmap.union(points);
+    ImmutableGenericBitmap finalSet = bf.union(points);
     Assert.assertEquals(finalSet.size(), 0);
   }
 
@@ -368,8 +369,8 @@ public class ImmutableRTreeTest
     Iterable<ImmutableGenericBitmap> points = searchTree.search(
         new RadiusBound(new float[]{0.0f, 0.0f}, 5)
     );
-    ImmutableRoaringBitmap finalSet = WrappedImmutableRoaringBitmap.union(points);
-    Assert.assertEquals(finalSet.getCardinality(), 0);
+    ImmutableGenericBitmap finalSet = bf.union(points);
+    Assert.assertEquals(finalSet.size(), 0);
     Assert.assertTrue(finalSet.isEmpty());
   }
 
@@ -394,11 +395,11 @@ public class ImmutableRTreeTest
 
     ImmutableRTree searchTree = ImmutableRTree.newImmutableFromMutable(tree);
     Iterable<ImmutableGenericBitmap> points = searchTree.search(new RadiusBound(new float[]{0, 0}, 5, 2));
-    ImmutableConciseSet finalSet = WrappedImmutableConciseBitmap.union(points);
+    ImmutableGenericBitmap finalSet = bf.union(points);
     Assert.assertTrue(finalSet.size() >= 5);
 
     Set<Integer> expected = Sets.newHashSet(1, 2, 3, 4, 5);
-    IntSet.IntIterator iter = finalSet.iterator();
+    IntIterator iter = finalSet.iterator();
     while (iter.hasNext()) {
       Assert.assertTrue(expected.contains(iter.next()));
     }
@@ -426,11 +427,11 @@ public class ImmutableRTreeTest
 
     ImmutableRTree searchTree = ImmutableRTree.newImmutableFromMutable(tree);
     Iterable<ImmutableGenericBitmap> points = searchTree.search(new RadiusBound(new float[]{0, 0}, 5, 2));
-    ImmutableRoaringBitmap finalSet = WrappedImmutableRoaringBitmap.union(points);
-    Assert.assertTrue(finalSet.getCardinality() >= 5);
+    ImmutableGenericBitmap finalSet = bf.union(points);
+    Assert.assertTrue(finalSet.size() >= 5);
 
     Set<Integer> expected = Sets.newHashSet(1, 2, 3, 4, 5);
-    IntIterator iter = finalSet.getIntIterator();
+    IntIterator iter = finalSet.iterator();
     while (iter.hasNext()) {
       Assert.assertTrue(expected.contains(iter.next()));
     }
@@ -473,7 +474,7 @@ public class ImmutableRTreeTest
 
         stopwatch.reset().start();
 
-        ImmutableConciseSet finalSet = WrappedImmutableConciseBitmap.union(points);
+        ImmutableGenericBitmap finalSet = bf.union(points);
 
         stop = stopwatch.elapsedMillis();
         System.out.printf("[%,d]: union of %,d points in %,d ms%n", numPoints, finalSet.size(), stop);
@@ -529,7 +530,7 @@ public class ImmutableRTreeTest
 
         stopwatch.reset().start();
 
-        ImmutableConciseSet finalSet = WrappedImmutableConciseBitmap.union(points);
+        ImmutableGenericBitmap finalSet = bf.union(points);
 
         stop = stopwatch.elapsedMillis();
         System.out.printf("[%,d]: union of %,d points in %,d ms%n", numPoints, finalSet.size(), stop);

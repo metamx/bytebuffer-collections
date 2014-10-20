@@ -5,9 +5,10 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.nio.ByteBuffer;
 
+import org.roaringbitmap.IntIterator;
 import org.roaringbitmap.buffer.MutableRoaringBitmap;
 
-public class WrappedRoaringBitmap extends GenericBitmap
+public class WrappedRoaringBitmap implements GenericBitmap
 {
 
 	/**
@@ -34,6 +35,29 @@ public class WrappedRoaringBitmap extends GenericBitmap
 		core.or(othercore);
 	}
 
+	@Override
+	public void and(GenericBitmap bitmap) {
+		WrappedRoaringBitmap other = (WrappedRoaringBitmap) bitmap;
+		MutableRoaringBitmap othercore = other.core;
+		core.and(othercore);
+	}
+	
+
+	@Override
+	public void andNot(GenericBitmap bitmap) {
+		WrappedRoaringBitmap other = (WrappedRoaringBitmap) bitmap;
+		MutableRoaringBitmap othercore = other.core;
+		core.andNot(othercore);
+	}
+	
+
+	@Override
+	public void xor(GenericBitmap bitmap) {
+		WrappedRoaringBitmap other = (WrappedRoaringBitmap) bitmap;
+		MutableRoaringBitmap othercore = other.core;
+		core.xor(othercore);
+	}
+	
 	@Override
 	public int getSizeInBytes() {
 		return core.serializedSizeInBytes();
@@ -94,5 +118,42 @@ public class WrappedRoaringBitmap extends GenericBitmap
 	public String toString() {
 		return getClass().getSimpleName() + core.toString();
 	}
+
+	@Override
+	public void remove(int entry) {
+		core.remove(entry);
+	}
+
+	@Override
+	public IntIterator iterator() {
+		return core.getIntIterator();
+	}
+
+	@Override
+	public boolean isEmpty() {
+		return core.isEmpty();
+	}
+
+	@Override
+	public ImmutableGenericBitmap union(ImmutableGenericBitmap bitmap) {
+		WrappedRoaringBitmap other = (WrappedRoaringBitmap) bitmap;
+		MutableRoaringBitmap othercore = other.core;
+		return new WrappedImmutableRoaringBitmap(MutableRoaringBitmap.or(core, othercore));
+	}
+
+	@Override
+	public ImmutableGenericBitmap intersection(ImmutableGenericBitmap bitmap) {
+		WrappedRoaringBitmap other = (WrappedRoaringBitmap) bitmap;
+		MutableRoaringBitmap othercore = other.core;
+		return new WrappedImmutableRoaringBitmap(MutableRoaringBitmap.and(core, othercore));
+	}
+
+	@Override
+	public ImmutableGenericBitmap difference(ImmutableGenericBitmap bitmap) {
+		WrappedRoaringBitmap other = (WrappedRoaringBitmap) bitmap;
+		MutableRoaringBitmap othercore = other.core;
+		return new WrappedImmutableRoaringBitmap(MutableRoaringBitmap.andNot(core, othercore));
+	}
+
 
 }

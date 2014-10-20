@@ -1,13 +1,11 @@
 package com.metamx.collections.spatial.bitmap;
 
 import java.nio.ByteBuffer;
-import java.util.Iterator;
 
-import org.roaringbitmap.buffer.BufferFastAggregation;
+import org.roaringbitmap.IntIterator;
 import org.roaringbitmap.buffer.ImmutableRoaringBitmap;
-import org.roaringbitmap.buffer.MutableRoaringBitmap;
 
-public class WrappedImmutableRoaringBitmap extends ImmutableGenericBitmap
+public class WrappedImmutableRoaringBitmap implements ImmutableGenericBitmap
 {
 
 	/**
@@ -33,53 +31,45 @@ public class WrappedImmutableRoaringBitmap extends ImmutableGenericBitmap
 		core = c;
 	}
 
-	/**
-	 * Compute the union (bitwise-OR) of a set of bitmaps. They are assumed to be
-	 * instances of WrappedImmutableRoaringBitmap otherwise a ClassCastException
-	 * is thrown.
-	 * 
-	 * This is a convenience method.
-	 * 
-	 * @param b
-	 *          input ImmutableGenericBitmap objects
-	 * @throws ClassCastException
-	 *           if one of the ImmutableGenericBitmap objects if not an instance
-	 *           of WrappedImmutableRoaringBitmap
-	 * @return the union.
-	 */
-	public static MutableRoaringBitmap union(Iterable<ImmutableGenericBitmap> b) {
-		return BufferFastAggregation.horizontal_or(WrappedImmutableRoaringBitmap
-				.unwrap(b).iterator());
-	}
-
-	protected static Iterable<ImmutableRoaringBitmap> unwrap(
-			final Iterable<ImmutableGenericBitmap> b) {
-		return new Iterable<ImmutableRoaringBitmap>() {
-
-			@Override
-			public Iterator<ImmutableRoaringBitmap> iterator() {
-				final Iterator<ImmutableGenericBitmap> i = b.iterator();
-				return new Iterator<ImmutableRoaringBitmap>() {
-
-					@Override
-					public boolean hasNext() {
-						return i.hasNext();
-					}
-
-					@Override
-					public ImmutableRoaringBitmap next() {
-						return ((WrappedImmutableRoaringBitmap) i.next()).core;
-					}
-
-				};
-			}
-
-		};
-
-	}
 
 	@Override
 	public String toString() {
 		return getClass().getSimpleName() + core.toString();
+	}
+
+	@Override
+	public IntIterator iterator() {
+		return core.getIntIterator();
+	}
+
+	@Override
+	public int size() {
+		return core.getCardinality();
+	}
+
+	@Override
+	public boolean isEmpty() {
+		return core.isEmpty();
+	}
+	
+	@Override
+	public ImmutableGenericBitmap union(ImmutableGenericBitmap bitmap) {
+		WrappedImmutableRoaringBitmap other = (WrappedImmutableRoaringBitmap) bitmap;
+		ImmutableRoaringBitmap othercore = other.core;
+		return new WrappedImmutableRoaringBitmap(ImmutableRoaringBitmap.or(core, othercore));
+	}
+
+	@Override
+	public ImmutableGenericBitmap intersection(ImmutableGenericBitmap bitmap) {
+		WrappedImmutableRoaringBitmap other = (WrappedImmutableRoaringBitmap) bitmap;
+		ImmutableRoaringBitmap othercore = other.core;
+		return new WrappedImmutableRoaringBitmap(ImmutableRoaringBitmap.and(core, othercore));
+	}
+
+	@Override
+	public ImmutableGenericBitmap difference(ImmutableGenericBitmap bitmap) {
+		WrappedImmutableRoaringBitmap other = (WrappedImmutableRoaringBitmap) bitmap;
+		ImmutableRoaringBitmap othercore = other.core;
+		return new WrappedImmutableRoaringBitmap(ImmutableRoaringBitmap.andNot(core, othercore));
 	}
 }

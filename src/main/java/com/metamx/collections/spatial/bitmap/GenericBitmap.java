@@ -6,13 +6,13 @@ import java.nio.ByteBuffer;
  * This class is meant to represent a simple wrapper around a bitmap class.
  * 
  */
-public abstract class GenericBitmap
+public interface GenericBitmap extends ImmutableGenericBitmap
 {
 
 	/**
 	 * Empties the content of this bitmap.
 	 */
-	public abstract void clear();
+	public  void clear();
 
 	/**
 	 * Compute the bitwise-or of this bitmap with another bitmap. The current
@@ -23,15 +23,51 @@ public abstract class GenericBitmap
 	 * @param bitmap
 	 *          other bitmap
 	 */
-	public abstract void or(GenericBitmap bitmap);
+	public void or(GenericBitmap bitmap);
 
+
+	/**
+	 * Compute the bitwise-and of this bitmap with another bitmap. The current
+	 * bitmap is modified whereas the other bitmap is left intact.
+	 * 
+	 * Note that the other bitmap should be of the same class instance.
+	 * 
+	 * @param bitmap
+	 *          other bitmap
+	 */
+	public void and(GenericBitmap bitmap);
+	
+
+	/**
+	 * Compute the bitwise-xor of this bitmap with another bitmap. The current
+	 * bitmap is modified whereas the other bitmap is left intact.
+	 * 
+	 * Note that the other bitmap should be of the same class instance.
+	 * 
+	 * @param bitmap
+	 *          other bitmap
+	 */
+	public void xor(GenericBitmap bitmap);
+
+	/**
+	 * Compute the bitwise-andNot of this bitmap with another bitmap. The current
+	 * bitmap is modified whereas the other bitmap is left intact.
+	 * 
+	 * Note that the other bitmap should be of the same class instance.
+	 * 
+	 * @param bitmap
+	 *          other bitmap
+	 */
+	public void andNot(GenericBitmap bitmap);
+
+	
 	/**
 	 * Return the size in bytes for the purpose of serialization to a ByteBuffer.
 	 * Note that this is distinct from the memory usage.
 	 * 
 	 * @return the total set in bytes
 	 */
-	public abstract int getSizeInBytes();
+	public int getSizeInBytes();
 
 	/**
 	 * Add the specified integer to the bitmap. This is equivalent to setting the
@@ -40,13 +76,18 @@ public abstract class GenericBitmap
 	 * @param entry
 	 *          integer to be added
 	 */
-	public abstract void add(int entry);
+	public void add(int entry);
 
 	/**
+	 * Remove the specified integer to the bitmap. This is equivalent to setting the
+	 * ith bit to the value 1.
 	 * 
-	 * @return The number of bits set to true in this bitmap
+	 * @param entry
+	 *          integer to be remove
 	 */
-	public abstract int size();
+	public void remove(int entry);
+
+	
 
 	/**
 	 * Write out a serialized version of the bitmap to the ByteBuffer. We preprend
@@ -60,6 +101,7 @@ public abstract class GenericBitmap
 	 * @param buffer
 	 *          where we write
 	 */
-	public abstract void serialize(ByteBuffer buffer);
+	public void serialize(ByteBuffer buffer);
+
 
 }

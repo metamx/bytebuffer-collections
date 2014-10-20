@@ -25,4 +25,35 @@ public abstract class BitmapFactory
 	 * @return the new bitmap
 	 */
 	public abstract ImmutableGenericBitmap mapImmutableBitmap(ByteBuffer b);
+
+	/**
+	 * Compute the union (bitwise-OR) of a set of bitmaps. They are assumed to be
+	 * instances of of the proper WrappedConciseBitmap otherwise a ClassCastException
+	 * is thrown.
+	 * 
+	 * 
+	 * @param b
+	 *          input ImmutableGenericBitmap objects
+	 * @throws ClassCastException
+	 *           if one of the ImmutableGenericBitmap objects if not an instance
+	 *           of WrappedImmutableConciseBitmap
+	 * @return the union.
+	 */
+	public abstract ImmutableGenericBitmap union(Iterable<ImmutableGenericBitmap> b);
+
+	/**
+	 * Compute the intersection (bitwise-AND) of a set of bitmaps. They are assumed to be
+	 * instances of of the proper WrappedConciseBitmap otherwise a ClassCastException
+	 * is thrown.
+	 * 
+	 * 
+	 * @param b
+	 *          input ImmutableGenericBitmap objects
+	 * @throws ClassCastException
+	 *           if one of the ImmutableGenericBitmap objects if not an instance
+	 *           of WrappedImmutableConciseBitmap
+	 * @return the union.
+	 */
+	public abstract ImmutableGenericBitmap intersection(Iterable<ImmutableGenericBitmap> b) ;
+
 }

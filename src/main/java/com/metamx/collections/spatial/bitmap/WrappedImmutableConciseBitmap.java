@@ -1,11 +1,13 @@
 package com.metamx.collections.spatial.bitmap;
 
 import java.nio.ByteBuffer;
-import java.util.Iterator;
+
+import org.roaringbitmap.IntIterator;
 
 import it.uniroma3.mat.extendedset.intset.ImmutableConciseSet;
+import it.uniroma3.mat.extendedset.intset.IntSet;
 
-public class WrappedImmutableConciseBitmap extends ImmutableGenericBitmap
+public class WrappedImmutableConciseBitmap implements ImmutableGenericBitmap
 {
 
 	/**
@@ -32,54 +34,65 @@ public class WrappedImmutableConciseBitmap extends ImmutableGenericBitmap
 		core = c;
 	}
 
-	/**
-	 * Compute the union (bitwise-OR) of a set of bitmaps. They are assumed to be
-	 * instances of WrappedImmutableConciseBitmap otherwise a ClassCastException
-	 * is thrown.
-	 * 
-	 * This is a convenience method.
-	 * 
-	 * @param b
-	 *          input ImmutableGenericBitmap objects
-	 * @throws ClassCastException
-	 *           if one of the ImmutableGenericBitmap objects if not an instance
-	 *           of WrappedImmutableConciseBitmap
-	 * @return the union.
-	 */
-	public static ImmutableConciseSet union(Iterable<ImmutableGenericBitmap> b)
-			throws ClassCastException {
-		return ImmutableConciseSet.union(WrappedImmutableConciseBitmap.unwrap(b));
-	}
 
-	protected static Iterable<ImmutableConciseSet> unwrap(
-			final Iterable<ImmutableGenericBitmap> b) {
-		return new Iterable<ImmutableConciseSet>() {
-
-			@Override
-			public Iterator<ImmutableConciseSet> iterator() {
-				final Iterator<ImmutableGenericBitmap> i = b.iterator();
-				return new Iterator<ImmutableConciseSet>() {
-
-					@Override
-					public boolean hasNext() {
-						return i.hasNext();
-					}
-
-					@Override
-					public ImmutableConciseSet next() {
-						return ((WrappedImmutableConciseBitmap) i.next()).core;
-					}
-
-				};
-			}
-
-		};
-
-	}
 
 	@Override
 	public String toString() {
 		return getClass().getSimpleName() + core.toString();
+	}
+
+	@Override
+	public IntIterator iterator() {
+		final IntSet.IntIterator i = core.iterator();
+		return new IntIterator() {
+			
+			@Override
+			public IntIterator clone() {
+				throw new RuntimeException("clone is not supported on ConciseSet iterator");
+			}
+
+			@Override
+			public boolean hasNext() {
+				return i.hasNext();
+			}
+
+			@Override
+			public int next() {
+				return i.next();
+			}
+			
+		};
+	}
+
+	@Override
+	public int size() {
+		return core.size();
+	}
+
+	@Override
+	public boolean isEmpty() {
+		return core.size() == 0;
+	}
+
+	@Override
+	public ImmutableGenericBitmap union(ImmutableGenericBitmap bitmap) {
+		WrappedImmutableConciseBitmap other = (WrappedImmutableConciseBitmap) bitmap;
+		ImmutableConciseSet othercore = other.core;
+		return new WrappedImmutableConciseBitmap( ImmutableConciseSet.union(core,othercore));
+	}
+
+	@Override
+	public ImmutableGenericBitmap intersection(ImmutableGenericBitmap bitmap) {
+		WrappedImmutableConciseBitmap other = (WrappedImmutableConciseBitmap) bitmap;
+		ImmutableConciseSet othercore = other.core;
+		return new WrappedImmutableConciseBitmap( ImmutableConciseSet.intersection(core,othercore));
+	}
+
+	@Override
+	public ImmutableGenericBitmap difference(ImmutableGenericBitmap bitmap) {
+		WrappedImmutableConciseBitmap other = (WrappedImmutableConciseBitmap) bitmap;
+		ImmutableConciseSet othercore = other.core;
+		return new WrappedImmutableConciseBitmap( ImmutableConciseSet.intersection(core,ImmutableConciseSet.complement(othercore)));
 	}
 
 }
