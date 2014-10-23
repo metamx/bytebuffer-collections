@@ -1,7 +1,10 @@
 package com.metamx.collections.spatial;
 
+import CompressedBitmaps.ImmutableGenericBitmap;
+
 import com.google.common.primitives.Floats;
 import com.google.common.primitives.Ints;
+
 import org.roaringbitmap.buffer.ImmutableRoaringBitmap;
 
 import java.nio.ByteBuffer;
@@ -31,10 +34,10 @@ public class ImmutableNode
   private final boolean isLeaf;
   private final int conciseSetSize;
   private final int childrenOffset;
-
   private final ByteBuffer data;
+  protected final ImmutableGenericBitmap bitmap;
 
-  public ImmutableNode(int numDims, int initialOffset, int offsetFromInitial, ByteBuffer data)
+  public ImmutableNode(int numDims, int initialOffset, int offsetFromInitial, ByteBuffer data, ImmutableGenericBitmap bitmap)
   {
     this.numDims = numDims;
     this.initialOffset = initialOffset;
@@ -52,6 +55,7 @@ public class ImmutableNode
                           + conciseSetSize;
 
     this.data = data;
+    this.bitmap = bitmap;
   }
 
   public ImmutableNode(
@@ -60,7 +64,8 @@ public class ImmutableNode
       int offsetFromInitial,
       short numChildren,
       boolean leaf,
-      ByteBuffer data
+      ByteBuffer data,
+      ImmutableGenericBitmap bitmap
   )
   {
     this.numDims = numDims;
@@ -78,6 +83,7 @@ public class ImmutableNode
                           + conciseSetSize;
 
     this.data = data;
+    this.bitmap = bitmap;
   }
 
   public int getInitialOffset()
@@ -115,14 +121,14 @@ public class ImmutableNode
     return getCoords(initialOffset + offsetFromInitial + HEADER_NUM_BYTES + numDims * Floats.BYTES);
   }
 
-  public ImmutableRoaringBitmap getImmutableRoaringBitmap()
+  public ImmutableGenericBitmap getImmutableRoaringBitmap()
   {
       final int sizePosition = initialOffset + offsetFromInitial + HEADER_NUM_BYTES + 2 * numDims * Floats.BYTES;
       int numBytes = data.getInt(sizePosition);
       data.position(sizePosition + Ints.BYTES);
       ByteBuffer tmpBuffer = data.slice();
       tmpBuffer.limit(numBytes);
-      return new ImmutableRoaringBitmap(tmpBuffer.asReadOnlyBuffer());
+      return this.bitmap.getImmutableBitmap(tmpBuffer.asReadOnlyBuffer());
   }
 
   public Iterable<ImmutableNode> getChildren()
@@ -150,14 +156,16 @@ public class ImmutableNode
                   numDims,
                   initialOffset,
                   data.getInt(childrenOffset + (count++) * Ints.BYTES),
-                  data
+                  data,
+                  bitmap
               );
             }
             return new ImmutableNode(
                 numDims,
                 initialOffset,
                 data.getInt(childrenOffset + (count++) * Ints.BYTES),
-                data
+                data,
+                bitmap
             );
           }
 

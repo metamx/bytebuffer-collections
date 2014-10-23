@@ -1,11 +1,11 @@
 package com.metamx.collections.spatial;
 
+import CompressedBitmaps.GenericBitmap;
+import CompressedBitmaps.ImmutableGenericBitmap;
+
 import com.google.common.base.Preconditions;
-
-
 import com.metamx.collections.spatial.split.LinearGutmanSplitStrategy;
 import com.metamx.collections.spatial.split.SplitStrategy;
-import it.uniroma3.mat.extendedset.intset.ConciseSet;
 
 import java.util.Arrays;
 
@@ -21,21 +21,21 @@ public class RTree
 {
     private final int numDims;
     private final SplitStrategy splitStrategy;
-
     private Node root;
-
     private volatile int size;
+    protected GenericBitmap bitmap;
 
-    public RTree()
+    public RTree(GenericBitmap bitmap)
     {
-        this(0, new LinearGutmanSplitStrategy(0, 0));
+        this(0, new LinearGutmanSplitStrategy(0, 0), bitmap);
     }
 
-    public RTree(int numDims, SplitStrategy splitStrategy)
+    public RTree(int numDims, SplitStrategy splitStrategy, GenericBitmap bitmap)
     {
         this.numDims = numDims;
         this.splitStrategy = splitStrategy;
         this.root = buildRoot(true);
+        this.bitmap = bitmap;
     }
 
     /**

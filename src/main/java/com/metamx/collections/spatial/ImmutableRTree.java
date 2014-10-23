@@ -1,10 +1,13 @@
 package com.metamx.collections.spatial;
 
+import CompressedBitmaps.ImmutableGenericBitmap;
+
 import com.google.common.base.Preconditions;
 import com.google.common.primitives.Ints;
 import com.metamx.collections.spatial.search.Bound;
 import com.metamx.collections.spatial.search.GutmanSearchStrategy;
 import com.metamx.collections.spatial.search.SearchStrategy;
+
 import org.roaringbitmap.buffer.ImmutableRoaringBitmap;
 
 import java.nio.ByteBuffer;
@@ -27,7 +30,7 @@ public class ImmutableRTree
         buffer.putInt(rTree.getNumDims());
         int spaceUsed = rTree.getRoot().storeInByteBuffer(buffer, buffer.position());
         buffer.position(0);
-        return new ImmutableRTree(buffer.asReadOnlyBuffer());
+        return new ImmutableRTree(buffer.asReadOnlyBuffer(), rTree.bitmap.toImmutableGenericBitmap());
     }
 
     private static int calcNumBytes(RTree tree)
@@ -71,7 +74,7 @@ public class ImmutableRTree
         this.root = null;
     }
 
-    public ImmutableRTree(ByteBuffer data)
+    public ImmutableRTree(ByteBuffer data, ImmutableGenericBitmap bitmap)
     {
         final int initPosition = data.position();
 
@@ -79,7 +82,7 @@ public class ImmutableRTree
 
         this.numDims = data.getInt(1 + initPosition) & 0x7FFF;
         this.data = data;
-        this.root = new ImmutableNode(numDims, initPosition, 1 + Ints.BYTES, data);
+        this.root = new ImmutableNode(numDims, initPosition, 1 + Ints.BYTES, data, bitmap);
     }
 
     public int size()
