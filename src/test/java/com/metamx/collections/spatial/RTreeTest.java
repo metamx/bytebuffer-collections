@@ -1,7 +1,12 @@
 package com.metamx.collections.spatial;
 
+import com.metamx.collections.spatial.bitmap.BitmapFactory;
+import com.metamx.collections.spatial.bitmap.ConciseBitmapFactory;
+import com.metamx.collections.spatial.bitmap.RoaringBitmapFactory;
 import com.metamx.collections.spatial.split.LinearGutmanSplitStrategy;
+
 import junit.framework.Assert;
+
 import org.junit.Before;
 import org.junit.Test;
 
@@ -13,11 +18,16 @@ import java.util.Random;
 public class RTreeTest
 {
   private RTree tree;
+  private RTree roaringtree;
 
   @Before
   public void setUp() throws Exception
   {
-    tree = new RTree(2, new LinearGutmanSplitStrategy(0, 50));
+    BitmapFactory bf = new ConciseBitmapFactory();
+    tree = new RTree(2, new LinearGutmanSplitStrategy(0, 50, bf), bf );
+    BitmapFactory rbf = new RoaringBitmapFactory();
+    roaringtree = new RTree(2, new LinearGutmanSplitStrategy(0, 50, rbf), rbf );
+
   }
 
   @Test
@@ -54,6 +64,17 @@ public class RTreeTest
   }
 
   @Test
+  public void testInsertDuplicatesNoSplitRoaring()
+  {
+    roaringtree.insert(new float[]{1, 1}, 1);
+    roaringtree.insert(new float[]{1, 1}, 1);
+    roaringtree.insert(new float[]{1, 1}, 1);
+
+    Assert.assertEquals(roaringtree.getRoot().getChildren().size(), 3);
+  }
+
+  
+  @Test
   public void testSplitOccurs()
   {
     Random rand = new Random();
@@ -63,4 +84,16 @@ public class RTreeTest
 
     Assert.assertTrue(tree.getRoot().getChildren().size() > 1);
   }
+
+  @Test
+  public void testSplitOccursRoaring()
+  {
+    Random rand = new Random();
+    for (int i = 0; i < 100; i++) {
+      roaringtree.insert(new float[]{rand.nextFloat(), rand.nextFloat()}, i);
+    }
+
+    Assert.assertTrue(roaringtree.getRoot().getChildren().size() > 1);
+  }
+
 }

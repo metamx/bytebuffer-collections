@@ -2,7 +2,9 @@ package com.metamx.collections.spatial;
 
 import com.google.common.primitives.Floats;
 import com.google.common.primitives.Ints;
-import it.uniroma3.mat.extendedset.intset.ImmutableConciseSet;
+
+import com.metamx.collections.spatial.bitmap.BitmapFactory;
+import com.metamx.collections.spatial.bitmap.ImmutableGenericBitmap;
 
 import java.nio.ByteBuffer;
 import java.util.Iterator;
@@ -29,13 +31,15 @@ public class ImmutableNode
 
   private final short numChildren;
   private final boolean isLeaf;
-  private final int conciseSetSize;
   private final int childrenOffset;
 
   private final ByteBuffer data;
+  
+  protected final BitmapFactory bf;
 
-  public ImmutableNode(int numDims, int initialOffset, int offsetFromInitial, ByteBuffer data)
+  public ImmutableNode( int numDims, int initialOffset, int offsetFromInitial, ByteBuffer data, BitmapFactory b)
   {
+    this.bf = b;
     this.numDims = numDims;
     this.initialOffset = initialOffset;
     this.offsetFromInitial = offsetFromInitial;
@@ -43,7 +47,7 @@ public class ImmutableNode
     this.isLeaf = (header & 0x8000) != 0;
     this.numChildren = (short) (header & 0x7FFF);
     final int sizePosition = initialOffset + offsetFromInitial + HEADER_NUM_BYTES + 2 * numDims * Floats.BYTES;
-    this.conciseSetSize = data.getInt(sizePosition);
+    int conciseSetSize = data.getInt(sizePosition);
     this.childrenOffset = initialOffset
                           + offsetFromInitial
                           + HEADER_NUM_BYTES
@@ -60,16 +64,18 @@ public class ImmutableNode
       int offsetFromInitial,
       short numChildren,
       boolean leaf,
-      ByteBuffer data
+      ByteBuffer data,
+      BitmapFactory b
   )
   {
+    this.bf = b;  
     this.numDims = numDims;
     this.initialOffset = initialOffset;
     this.offsetFromInitial = offsetFromInitial;
     this.numChildren = numChildren;
     this.isLeaf = leaf;
     final int sizePosition = initialOffset + offsetFromInitial + HEADER_NUM_BYTES + 2 * numDims * Floats.BYTES;
-    this.conciseSetSize = data.getInt(sizePosition);
+    int  conciseSetSize = data.getInt(sizePosition);
     this.childrenOffset = initialOffset
                           + offsetFromInitial
                           + HEADER_NUM_BYTES
@@ -115,14 +121,14 @@ public class ImmutableNode
     return getCoords(initialOffset + offsetFromInitial + HEADER_NUM_BYTES + numDims * Floats.BYTES);
   }
 
-  public ImmutableConciseSet getImmutableConciseSet()
+  public ImmutableGenericBitmap getImmutableBitmap()
   {
     final int sizePosition = initialOffset + offsetFromInitial + HEADER_NUM_BYTES + 2 * numDims * Floats.BYTES;
     int numBytes = data.getInt(sizePosition);
     data.position(sizePosition + Ints.BYTES);
     ByteBuffer tmpBuffer = data.slice();
     tmpBuffer.limit(numBytes);
-    return new ImmutableConciseSet(tmpBuffer.asReadOnlyBuffer());
+    return bf.mapImmutableBitmap(tmpBuffer.asReadOnlyBuffer());
   }
 
   public Iterable<ImmutableNode> getChildren()
@@ -150,14 +156,14 @@ public class ImmutableNode
                   numDims,
                   initialOffset,
                   data.getInt(childrenOffset + (count++) * Ints.BYTES),
-                  data
+                  data, bf
               );
             }
             return new ImmutableNode(
                 numDims,
                 initialOffset,
                 data.getInt(childrenOffset + (count++) * Ints.BYTES),
-                data
+                data, bf
             );
           }
 

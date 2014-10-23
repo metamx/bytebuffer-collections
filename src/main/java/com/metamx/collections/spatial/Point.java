@@ -1,12 +1,8 @@
 package com.metamx.collections.spatial;
 
 import com.google.common.collect.Lists;
-import com.google.common.primitives.Floats;
-import com.google.common.primitives.Ints;
-import it.uniroma3.mat.extendedset.intset.ConciseSet;
-import it.uniroma3.mat.extendedset.intset.ImmutableConciseSet;
-
-import java.nio.ByteBuffer;
+import com.metamx.collections.spatial.bitmap.BitmapFactory;
+import com.metamx.collections.spatial.bitmap.GenericBitmap;
 import java.util.Arrays;
 import java.util.List;
 
@@ -14,26 +10,26 @@ import java.util.List;
  */
 public class Point extends Node
 {
-  private static ConciseSet makeConciseSet(int entry)
+  private static GenericBitmap makeBitmap(int entry, BitmapFactory bf)
   {
-    ConciseSet retVal = new ConciseSet();
+    GenericBitmap retVal = bf.getEmptyBitmap();
     retVal.add(entry);
     return retVal;
   }
 
   private final float[] coords;
-  private final ConciseSet conciseSet;
+  private final GenericBitmap conciseSet;
 
-  public Point(float[] coords, int entry)
+  public Point(float[] coords, int entry, BitmapFactory bf)
   {
-    super(coords, Arrays.copyOf(coords, coords.length), Lists.<Node>newArrayList(), true, null, makeConciseSet(entry));
+    super(coords, Arrays.copyOf(coords, coords.length), Lists.<Node>newArrayList(), true, null, makeBitmap(entry,bf));
 
     this.coords = coords;
-    this.conciseSet = new ConciseSet();
+    this.conciseSet = bf.getEmptyBitmap();
     this.conciseSet.add(entry);
   }
 
-  public Point(float[] coords, ConciseSet entry)
+  public Point(float[] coords, GenericBitmap entry)
   {
     super(coords, Arrays.copyOf(coords, coords.length), Lists.<Node>newArrayList(), true, null, entry);
 
@@ -47,7 +43,7 @@ public class Point extends Node
   }
 
   @Override
-  public ConciseSet getConciseSet()
+  public GenericBitmap getBitmap()
   {
     return conciseSet;
   }

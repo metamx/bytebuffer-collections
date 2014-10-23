@@ -4,8 +4,9 @@ import com.google.common.base.Preconditions;
 import com.google.common.collect.Lists;
 import com.google.common.primitives.Floats;
 import com.google.common.primitives.Ints;
-import it.uniroma3.mat.extendedset.intset.ConciseSet;
-import it.uniroma3.mat.extendedset.intset.ImmutableConciseSet;
+
+import com.metamx.collections.spatial.bitmap.BitmapFactory;
+import com.metamx.collections.spatial.bitmap.GenericBitmap;
 
 import java.nio.ByteBuffer;
 import java.util.Arrays;
@@ -20,11 +21,11 @@ public class Node
 
   private final List<Node> children;
   private final boolean isLeaf;
-  private final ConciseSet conciseSet;
+  private final GenericBitmap conciseSet;
 
   private Node parent;
 
-  public Node(float[] minCoordinates, float[] maxCoordinates, boolean isLeaf)
+  public Node(float[] minCoordinates, float[] maxCoordinates, boolean isLeaf, BitmapFactory bf)
   {
     this(
         minCoordinates,
@@ -32,7 +33,7 @@ public class Node
         Lists.<Node>newArrayList(),
         isLeaf,
         null,
-        new ConciseSet()
+        bf.getEmptyBitmap()
     );
   }
 
@@ -42,7 +43,7 @@ public class Node
       List<Node> children,
       boolean isLeaf,
       Node parent,
-      ConciseSet conciseSet
+      GenericBitmap conciseSet
   )
   {
     Preconditions.checkArgument(minCoordinates.length == maxCoordinates.length);
@@ -153,14 +154,14 @@ public class Node
     return retVal;
   }
 
-  public ConciseSet getConciseSet()
+  public GenericBitmap getBitmap()
   {
     return conciseSet;
   }
 
   public void addToConciseSet(Node node)
   {
-    conciseSet.addAll(node.getConciseSet());
+    conciseSet.or(node.getBitmap());
   }
 
   public void clear()
@@ -173,8 +174,7 @@ public class Node
   {
     return ImmutableNode.HEADER_NUM_BYTES
            + 2 * getNumDims() * Floats.BYTES
-           + Ints.BYTES // size of Concise set
-           + conciseSet.getWords().length * Ints.BYTES
+           + conciseSet.getSizeInBytes() + Ints.BYTES
            + getChildren().size() * Ints.BYTES;
   }
 
@@ -188,16 +188,13 @@ public class Node
     for (float v : getMaxCoordinates()) {
       buffer.putFloat(v);
     }
-    byte[] bytes = ImmutableConciseSet.newImmutableFromMutable(conciseSet).toBytes();
-    buffer.putInt(bytes.length);
-    buffer.put(bytes);
-
-    position = buffer.position();
-    int childStartOffset = position + getChildren().size() * Ints.BYTES;
+    conciseSet.serialize(buffer);
+    int pos = buffer.position();// better not to assign the parameter needlessly
+    int childStartOffset = pos + getChildren().size() * Ints.BYTES;
     for (Node child : getChildren()) {
-      buffer.putInt(position, childStartOffset);
+      buffer.putInt(pos, childStartOffset);
       childStartOffset = child.storeInByteBuffer(buffer, childStartOffset);
-      position += Ints.BYTES;
+      pos += Ints.BYTES;
     }
 
     return childStartOffset;
