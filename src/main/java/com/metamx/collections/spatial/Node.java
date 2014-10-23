@@ -4,9 +4,8 @@ import com.google.common.base.Preconditions;
 import com.google.common.collect.Lists;
 import com.google.common.primitives.Floats;
 import com.google.common.primitives.Ints;
-
-import com.metamx.collections.spatial.bitmap.BitmapFactory;
-import com.metamx.collections.spatial.bitmap.GenericBitmap;
+import com.metamx.collections.bitmap.BitmapFactory;
+import com.metamx.collections.bitmap.GenericBitmap;
 
 import java.nio.ByteBuffer;
 import java.util.Arrays;
@@ -21,11 +20,11 @@ public class Node
 
   private final List<Node> children;
   private final boolean isLeaf;
-  private final GenericBitmap conciseSet;
+  private final GenericBitmap invertedIndex;
 
   private Node parent;
 
-  public Node(float[] minCoordinates, float[] maxCoordinates, boolean isLeaf, BitmapFactory bf)
+  public Node(float[] minCoordinates, float[] maxCoordinates, boolean isLeaf, BitmapFactory bitmapIndex)
   {
     this(
         minCoordinates,
@@ -33,7 +32,7 @@ public class Node
         Lists.<Node>newArrayList(),
         isLeaf,
         null,
-        bf.getEmptyBitmap()
+        bitmapIndex.getEmptyBitmap()
     );
   }
 
@@ -43,7 +42,7 @@ public class Node
       List<Node> children,
       boolean isLeaf,
       Node parent,
-      GenericBitmap conciseSet
+      GenericBitmap invertedIndex
   )
   {
     Preconditions.checkArgument(minCoordinates.length == maxCoordinates.length);
@@ -55,7 +54,7 @@ public class Node
       child.setParent(this);
     }
     this.isLeaf = isLeaf;
-    this.conciseSet = conciseSet;
+    this.invertedIndex = invertedIndex;
     this.parent = parent;
   }
 
@@ -156,25 +155,25 @@ public class Node
 
   public GenericBitmap getBitmap()
   {
-    return conciseSet;
+    return invertedIndex;
   }
 
-  public void addToConciseSet(Node node)
+  public void addToInvertedIndex(Node node)
   {
-    conciseSet.or(node.getBitmap());
+    invertedIndex.or(node.getBitmap());
   }
 
   public void clear()
   {
     children.clear();
-    conciseSet.clear();
+    invertedIndex.clear();
   }
 
   public int getSizeInBytes()
   {
     return ImmutableNode.HEADER_NUM_BYTES
            + 2 * getNumDims() * Floats.BYTES
-           + conciseSet.getSizeInBytes() + Ints.BYTES
+           + invertedIndex.getSizeInBytes() + Ints.BYTES
            + getChildren().size() * Ints.BYTES;
   }
 
@@ -188,7 +187,7 @@ public class Node
     for (float v : getMaxCoordinates()) {
       buffer.putFloat(v);
     }
-    conciseSet.serialize(buffer);
+    invertedIndex.serialize(buffer);
     int pos = buffer.position();// better not to assign the parameter needlessly
     int childStartOffset = pos + getChildren().size() * Ints.BYTES;
     for (Node child : getChildren()) {

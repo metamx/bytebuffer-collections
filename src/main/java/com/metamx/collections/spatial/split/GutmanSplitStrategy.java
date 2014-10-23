@@ -3,7 +3,7 @@ package com.metamx.collections.spatial.split;
 import com.google.common.collect.Lists;
 import com.metamx.collections.spatial.Node;
 import com.metamx.collections.spatial.RTreeUtils;
-import com.metamx.collections.spatial.bitmap.BitmapFactory;
+import com.metamx.collections.bitmap.BitmapFactory;
 import java.util.Arrays;
 import java.util.List;
 
@@ -52,7 +52,7 @@ public abstract class GutmanSplitStrategy implements SplitStrategy
 
     node.clear();
     node.addChild(seeds[0]);
-    node.addToConciseSet(seeds[0]);
+    node.addToInvertedIndex(seeds[0]);
 
     Node group1 = new Node(
         Arrays.copyOf(seeds[1].getMinCoordinates(), seeds[1].getMinCoordinates().length),
@@ -62,7 +62,7 @@ public abstract class GutmanSplitStrategy implements SplitStrategy
         node.getParent(),
         bf.getEmptyBitmap()
     );
-    group1.addToConciseSet(seeds[1]);
+    group1.addToInvertedIndex(seeds[1]);
     if (node.getParent() != null) {
       node.getParent().addChild(group1);
     }
@@ -76,7 +76,7 @@ public abstract class GutmanSplitStrategy implements SplitStrategy
       for (Node group : groups) {
         if (group.getChildren().size() + children.size() <= minNumChildren) {
           for (Node child : group.getChildren()) {
-            group.addToConciseSet(child);
+            group.addToInvertedIndex(child);
             group.addChild(child);
           }
           RTreeUtils.enclose(groups);
@@ -101,7 +101,7 @@ public abstract class GutmanSplitStrategy implements SplitStrategy
         optimal = groups[1];
       }
 
-      optimal.addToConciseSet(nextToAssign);
+      optimal.addToInvertedIndex(nextToAssign);
       optimal.addChild(nextToAssign);
       optimal.enclose();
     }

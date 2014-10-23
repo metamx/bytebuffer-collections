@@ -3,7 +3,6 @@ package com.metamx.collections.spatial;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.base.Preconditions;
 import com.google.common.base.Throwables;
-import com.metamx.collections.spatial.bitmap.BitmapFactory;
 
 /**
  */
@@ -67,11 +66,11 @@ public class RTreeUtils
     }
   }
 
-  public static void print(ImmutableRTree tree, BitmapFactory bf)
+  public static void print(ImmutableRTree tree)
   {
     System.out.printf("numDims : %d%n", tree.getNumDims());
     try {
-      printNode(tree.getRoot(), 0, bf);
+      printNode(tree.getRoot(), 0);
     }
     catch (Exception e) {
       throw Throwables.propagate(e);
@@ -94,12 +93,12 @@ public class RTreeUtils
       for (Node child : node.getChildren()) {
         Point point = (Point) (child);
         System.out
-              .printf(
-                  "%scoords: %s, conciseSet: %s%n",
-                  makeDashes(level),
-                  jsonMapper.writeValueAsString(point.getCoords()),
-                  point.getBitmap()
-              );
+            .printf(
+                "%scoords: %s, conciseSet: %s%n",
+                makeDashes(level),
+                jsonMapper.writeValueAsString(point.getCoords()),
+                point.getBitmap()
+            );
       }
     } else {
       level++;
@@ -112,12 +111,12 @@ public class RTreeUtils
   public static boolean verifyEnclose(Node node)
   {
     for (Node child : node.getChildren()) {
-        for (int i = 0; i < node.getNumDims(); i++) {
-          if (child.getMinCoordinates()[i] < node.getMinCoordinates()[i]
-              || child.getMaxCoordinates()[i] > node.getMaxCoordinates()[i]) {
-            return false;
-          }
+      for (int i = 0; i < node.getNumDims(); i++) {
+        if (child.getMinCoordinates()[i] < node.getMinCoordinates()[i]
+            || child.getMaxCoordinates()[i] > node.getMaxCoordinates()[i]) {
+          return false;
         }
+      }
     }
 
     if (!node.isLeaf()) {
@@ -134,12 +133,12 @@ public class RTreeUtils
   public static boolean verifyEnclose(ImmutableNode node)
   {
     for (ImmutableNode child : node.getChildren()) {
-        for (int i = 0; i < node.getNumDims(); i++) {
-          if (child.getMinCoordinates()[i] < node.getMinCoordinates()[i]
-              || child.getMaxCoordinates()[i] > node.getMaxCoordinates()[i]) {
-            return false;
-          }
+      for (int i = 0; i < node.getNumDims(); i++) {
+        if (child.getMinCoordinates()[i] < node.getMinCoordinates()[i]
+            || child.getMaxCoordinates()[i] > node.getMaxCoordinates()[i]) {
+          return false;
         }
+      }
     }
 
     if (!node.isLeaf()) {
@@ -153,7 +152,7 @@ public class RTreeUtils
     return true;
   }
 
-  private static void printNode(ImmutableNode node, int level, BitmapFactory bf) throws Exception
+  private static void printNode(ImmutableNode node, int level) throws Exception
   {
     System.out.printf(
         "%sminCoords: %s, maxCoords: %s, numChildren: %d, isLeaf: %s%n",
@@ -169,17 +168,17 @@ public class RTreeUtils
       for (ImmutableNode immutableNode : node.getChildren()) {
         ImmutablePoint point = new ImmutablePoint(immutableNode);
         System.out
-              .printf(
-                  "%scoords: %s, conciseSet: %s%n",
-                  makeDashes(level),
-                  jsonMapper.writeValueAsString(point.getCoords()),
-                  point.getImmutableBitmap()
-              );
+            .printf(
+                "%scoords: %s, conciseSet: %s%n",
+                makeDashes(level),
+                jsonMapper.writeValueAsString(point.getCoords()),
+                point.getImmutableBitmap()
+            );
       }
     } else {
       level++;
       for (ImmutableNode immutableNode : node.getChildren()) {
-        printNode(immutableNode, level,bf);
+        printNode(immutableNode, level);
       }
     }
   }

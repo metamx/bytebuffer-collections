@@ -3,9 +3,9 @@ package com.metamx.collections.spatial.split;
 import com.metamx.collections.spatial.Node;
 import com.metamx.collections.spatial.Point;
 import com.metamx.collections.spatial.RTree;
-import com.metamx.collections.spatial.bitmap.BitmapFactory;
-import com.metamx.collections.spatial.bitmap.ConciseBitmapFactory;
-import com.metamx.collections.spatial.bitmap.RoaringBitmapFactory;
+import com.metamx.collections.bitmap.BitmapFactory;
+import com.metamx.collections.bitmap.ConciseBitmapFactory;
+import com.metamx.collections.bitmap.RoaringBitmapFactory;
 
 import junit.framework.Assert;
 

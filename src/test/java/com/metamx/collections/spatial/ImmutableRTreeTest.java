@@ -4,18 +4,16 @@ import com.google.common.base.Stopwatch;
 import com.google.common.base.Throwables;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Sets;
-import com.metamx.collections.spatial.bitmap.BitmapFactory;
-import com.metamx.collections.spatial.bitmap.ConciseBitmapFactory;
-import com.metamx.collections.spatial.bitmap.ImmutableGenericBitmap;
-import com.metamx.collections.spatial.bitmap.RoaringBitmapFactory;
-import com.metamx.collections.spatial.bitmap.WrappedImmutableConciseBitmap;
-import com.metamx.collections.spatial.bitmap.WrappedImmutableRoaringBitmap;
+import com.metamx.collections.bitmap.BitmapFactory;
+import com.metamx.collections.bitmap.ConciseBitmapFactory;
+import com.metamx.collections.bitmap.ImmutableGenericBitmap;
+import com.metamx.collections.bitmap.RoaringBitmapFactory;
+import com.metamx.collections.bitmap.WrappedImmutableConciseBitmap;
+import com.metamx.collections.bitmap.WrappedImmutableRoaringBitmap;
 import com.metamx.collections.spatial.search.RadiusBound;
 import com.metamx.collections.spatial.search.RectangularBound;
 import com.metamx.collections.spatial.split.LinearGutmanSplitStrategy;
 
-import it.uniroma3.mat.extendedset.intset.ImmutableConciseSet;
-import it.uniroma3.mat.extendedset.intset.IntSet;
 import junit.framework.Assert;
 
 import org.junit.Test;

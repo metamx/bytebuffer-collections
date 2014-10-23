@@ -1,18 +1,15 @@
 package com.metamx.collections.spatial;
 
 import com.google.common.base.Preconditions;
-import com.metamx.collections.spatial.bitmap.BitmapFactory;
-import com.metamx.collections.spatial.bitmap.GenericBitmap;
+import com.metamx.collections.bitmap.BitmapFactory;
+import com.metamx.collections.bitmap.GenericBitmap;
 import com.metamx.collections.spatial.split.LinearGutmanSplitStrategy;
 import com.metamx.collections.spatial.split.SplitStrategy;
-//import it.uniroma3.mat.extendedset.intset.ConciseSet;
-
-
 
 import java.util.Arrays;
 
 /**
- * This RTree has been optimized to work with Concise Sets.
+ * This RTree has been optimized to work with bitmap inverted indexes.
  * <p/>
  * This code will probably make a lot more sense if you read:
  * http://www.sai.msu.su/~megera/postgres/gist/papers/gutman-rtree.pdf
@@ -23,22 +20,26 @@ public class RTree
   private final SplitStrategy splitStrategy;
 
   private Node root;
+  private final BitmapFactory bitmapFactory;
 
   private volatile int size;
-  
-  protected final BitmapFactory bf;
 
-  public RTree(BitmapFactory b)
+  public RTree(BitmapFactory bitmapFactory)
   {
-    this(0, new LinearGutmanSplitStrategy(0, 0,b),b);
+    this(0, new LinearGutmanSplitStrategy(0, 0, bitmapFactory), bitmapFactory);
   }
 
-  public RTree(int numDims, SplitStrategy splitStrategy, BitmapFactory b)
+  public RTree(int numDims, SplitStrategy splitStrategy, BitmapFactory bitmapFactory)
   {
     this.numDims = numDims;
     this.splitStrategy = splitStrategy;
-    this.bf = b;
+    this.bitmapFactory = bitmapFactory;
     this.root = buildRoot(true);
+  }
+
+  public BitmapFactory getBitmapFactory()
+  {
+    return bitmapFactory;
   }
 
   /**
@@ -64,7 +65,7 @@ public class RTree
   public void insert(float[] coords, int entry)
   {
     Preconditions.checkArgument(coords.length == numDims);
-    insertInner(new Point(coords, entry, bf));
+    insertInner(new Point(coords, entry, bitmapFactory));
   }
 
   public void insert(float[] coords, GenericBitmap entry)
@@ -113,7 +114,7 @@ public class RTree
     Arrays.fill(initMinCoords, -Float.MAX_VALUE);
     Arrays.fill(initMaxCoords, Float.MAX_VALUE);
 
-    return new Node(initMinCoords, initMaxCoords, isLeaf,bf);
+    return new Node(initMinCoords, initMaxCoords, isLeaf, bitmapFactory);
   }
 
   private void insertInner(Point point)
@@ -154,14 +155,14 @@ public class RTree
    */
   private Node chooseLeaf(Node node, Point point)
   {
-    node.addToConciseSet(point);
+    node.addToInvertedIndex(point);
 
     if (node.isLeaf()) {
       return node;
     }
 
     double minCost = Double.MAX_VALUE;
-    Node optimal = node.getChildren().get(0);//was: null and slightly unsafe
+    Node optimal = node.getChildren().get(0); //was: null and slightly unsafe
     for (Node child : node.getChildren()) {
       double cost = RTreeUtils.getExpansionCost(child, point);
       if (cost < minCost) {
