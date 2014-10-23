@@ -2,14 +2,14 @@ package com.metamx.collections.spatial.bitmap;
 
 import java.nio.ByteBuffer;
 
-public abstract class BitmapFactory
+public interface BitmapFactory
 {
 	/**
 	 * Create a new empty bitmap
 	 * 
 	 * @return the new bitmap
 	 */
-	public abstract GenericBitmap getEmptyBitmap();
+	public GenericBitmap getEmptyBitmap();
 
 	/**
 	 * Given a ByteBuffer pointing at a serialized version of a bitmap,
@@ -24,7 +24,7 @@ public abstract class BitmapFactory
 	 *          the input byte buffer
 	 * @return the new bitmap
 	 */
-	public abstract ImmutableGenericBitmap mapImmutableBitmap(ByteBuffer b);
+	public ImmutableGenericBitmap mapImmutableBitmap(ByteBuffer b);
 
 	/**
 	 * Compute the union (bitwise-OR) of a set of bitmaps. They are assumed to be

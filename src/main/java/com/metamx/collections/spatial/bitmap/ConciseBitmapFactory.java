@@ -9,7 +9,7 @@ import java.util.Iterator;
  * As the name suggests, this class instantiates bitmaps of the types
  * WrappedConciseBitmap and WrappedImmutableConciseBitmap.
  */
-public class ConciseBitmapFactory extends BitmapFactory {
+public class ConciseBitmapFactory implements BitmapFactory {
 
     @Override
     public GenericBitmap getEmptyBitmap() {

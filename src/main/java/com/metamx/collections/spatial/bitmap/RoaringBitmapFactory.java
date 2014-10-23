@@ -10,7 +10,7 @@ import org.roaringbitmap.buffer.ImmutableRoaringBitmap;
  * As the name suggests, this class instantiates bitmaps of the types
  * WrappedRoaringBitmap and WrappedImmutableRoaringBitmap.
  */
-public class RoaringBitmapFactory extends BitmapFactory
+public class RoaringBitmapFactory implements BitmapFactory
 {
 	@Override
 	public GenericBitmap getEmptyBitmap() {
