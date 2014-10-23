@@ -34,33 +34,33 @@ public class ConciseBitmapFactory implements BitmapFactory {
   		return new WrappedImmutableConciseBitmap(ImmutableConciseSet.intersection(unwrap(b)));
   	}
 
-  	private static Iterable<ImmutableConciseSet> unwrap(
-  			final Iterable<ImmutableGenericBitmap> b) {
-  		return new Iterable<ImmutableConciseSet>() {
+	private static Iterable<ImmutableConciseSet> unwrap(
+			final Iterable<ImmutableGenericBitmap> b) {
+		return new Iterable<ImmutableConciseSet>() {
 
-  			@Override
-  			public Iterator<ImmutableConciseSet> iterator() {
-  				final Iterator<ImmutableGenericBitmap> i = b.iterator();
-  				return new Iterator<ImmutableConciseSet>() {
-                    @Override
-                    public void remove() { 
-                        i.remove();
-                    }
+			@Override
+			public Iterator<ImmutableConciseSet> iterator() {
+				final Iterator<ImmutableGenericBitmap> i = b.iterator();
+				return new Iterator<ImmutableConciseSet>() {
+					@Override
+					public void remove() {
+						i.remove();
+					}
 
-  					@Override
-  					public boolean hasNext() {
-  						return i.hasNext();
-  					}
+					@Override
+					public boolean hasNext() {
+						return i.hasNext();
+					}
 
-  					@Override
-  					public ImmutableConciseSet next() {
-  						return ((WrappedImmutableConciseBitmap) i.next()).core;
-  					}
+					@Override
+					public ImmutableConciseSet next() {
+						return ((WrappedImmutableConciseBitmap) i.next()).core;
+					}
 
-  				};
-  			}
+				};
+			}
 
-  		};
+		};
 
-  	}
+	}
 }
