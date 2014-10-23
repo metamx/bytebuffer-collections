@@ -7,11 +7,6 @@ import com.metamx.collections.spatial.bitmap.ImmutableGenericBitmap;
 import com.metamx.collections.spatial.search.Bound;
 import com.metamx.collections.spatial.search.GutmanSearchStrategy;
 import com.metamx.collections.spatial.search.SearchStrategy;
-//import it.uniroma3.mat.extendedset.intset.ImmutableConciseSet;
-
-
-
-
 import java.nio.ByteBuffer;
 
 /**
