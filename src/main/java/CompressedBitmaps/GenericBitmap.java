@@ -2,11 +2,13 @@ package CompressedBitmaps;
 
 import java.nio.ByteBuffer;
 
+import org.roaringbitmap.IntIterator;
+
 /**
  * This class is meant to represent a simple wrapper around a bitmap class.
  * 
  */
-public interface GenericBitmap extends ImmutableGenericBitmap
+public interface GenericBitmap
 {
 
 	public ImmutableGenericBitmap toImmutableGenericBitmap();
@@ -104,6 +106,12 @@ public interface GenericBitmap extends ImmutableGenericBitmap
 	 *          where we write
 	 */
 	public void serialize(ByteBuffer buffer);
+	
+	public int size();
+	
+	public IntIterator iterator();
+	
+	public boolean isEmpty();
 
 
 }

@@ -1,13 +1,14 @@
 package CompressedBitmaps;
 
 import java.nio.ByteBuffer;
+import java.util.Iterator;
 
 import org.roaringbitmap.IntIterator;
+import org.roaringbitmap.buffer.BufferFastAggregation;
 import org.roaringbitmap.buffer.ImmutableRoaringBitmap;
 
 public class WrappedImmutableRoaringBitmap implements ImmutableGenericBitmap
 {
-
 	/**
 	 * Underlying bitmap.
 	 */
@@ -76,5 +77,44 @@ public class WrappedImmutableRoaringBitmap implements ImmutableGenericBitmap
 	@Override
 	public ImmutableGenericBitmap getImmutableBitmap(ByteBuffer buffer) {
 		return new WrappedImmutableRoaringBitmap(buffer);
+	}
+
+	@Override
+	public ImmutableGenericBitmap union(Iterable<ImmutableGenericBitmap> b) {
+		 return	new WrappedImmutableRoaringBitmap(BufferFastAggregation.horizontal_or(unwrap(b).iterator()));
+	}
+
+	@Override
+	public  ImmutableGenericBitmap intersection(Iterable<ImmutableGenericBitmap> b) {
+		return	new WrappedImmutableRoaringBitmap(BufferFastAggregation.and(unwrap(b).iterator()));
+	}
+
+	
+	private static Iterable<ImmutableRoaringBitmap> unwrap(
+			final Iterable<ImmutableGenericBitmap> b) {
+		return new Iterable<ImmutableRoaringBitmap>() {
+
+			@Override
+			public Iterator<ImmutableRoaringBitmap> iterator() {
+				final Iterator<ImmutableGenericBitmap> i = b.iterator();
+				return new Iterator<ImmutableRoaringBitmap>() {
+                    @Override 
+                    public void remove() {
+                        i.remove();
+                    }
+
+					@Override
+					public boolean hasNext() {
+						return i.hasNext();
+					}
+
+					@Override
+					public ImmutableRoaringBitmap next() {
+						return ((WrappedImmutableRoaringBitmap) i.next()).core;
+					}
+
+				};
+			}
+		};
 	}
 }

@@ -136,33 +136,6 @@ public class WrappedRoaringBitmap implements GenericBitmap
 	}
 
 	@Override
-	public ImmutableGenericBitmap union(ImmutableGenericBitmap bitmap) {
-		WrappedRoaringBitmap other = (WrappedRoaringBitmap) bitmap;
-		MutableRoaringBitmap othercore = other.core;
-		return new WrappedImmutableRoaringBitmap(MutableRoaringBitmap.or(core, othercore));
-	}
-
-	@Override
-	public ImmutableGenericBitmap intersection(ImmutableGenericBitmap bitmap) {
-		WrappedRoaringBitmap other = (WrappedRoaringBitmap) bitmap;
-		MutableRoaringBitmap othercore = other.core;
-		return new WrappedImmutableRoaringBitmap(MutableRoaringBitmap.and(core, othercore));
-	}
-
-	@Override
-	public ImmutableGenericBitmap difference(ImmutableGenericBitmap bitmap) {
-		WrappedRoaringBitmap other = (WrappedRoaringBitmap) bitmap;
-		MutableRoaringBitmap othercore = other.core;
-		return new WrappedImmutableRoaringBitmap(MutableRoaringBitmap.andNot(core, othercore));
-	}
-
-	@Override
-	public ImmutableGenericBitmap getImmutableBitmap(ByteBuffer buffer) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
 	public ImmutableGenericBitmap toImmutableGenericBitmap() {
 		return new WrappedImmutableRoaringBitmap(this.core.toImmutableRoaringBitmap());
 	}

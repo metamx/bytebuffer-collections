@@ -1,9 +1,13 @@
 package com.metamx.collections.spatial.split;
 
+import CompressedBitmaps.WrappedRoaringBitmap;
+
 import com.metamx.collections.spatial.Node;
 import com.metamx.collections.spatial.Point;
 import com.metamx.collections.spatial.RTree;
+
 import junit.framework.Assert;
+
 import org.junit.Test;
 
 import java.util.Random;
@@ -35,7 +39,8 @@ public class LinearGutmanSplitStrategyTest
   @Test
   public void testNumChildrenSize()
   {
-    RTree tree = new RTree(2, new LinearGutmanSplitStrategy(0, 50));
+	WrappedRoaringBitmap rb = new WrappedRoaringBitmap();  
+    RTree tree = new RTree(2, new LinearGutmanSplitStrategy(0, 50), rb);
     Random rand = new Random();
     for (int i = 0; i < 100; i++) {
       tree.insert(new float[]{rand.nextFloat(), rand.nextFloat()}, i);

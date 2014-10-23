@@ -131,33 +131,6 @@ public class WrappedConciseBitmap implements GenericBitmap {
 		}
 
 		@Override
-		public ImmutableGenericBitmap union(ImmutableGenericBitmap bitmap) {
-			WrappedConciseBitmap other = (WrappedConciseBitmap) bitmap;
-			ConciseSet othercore = other.core;
-			return new WrappedConciseBitmap( core.clone().union(othercore));
-		}
-
-		@Override
-		public ImmutableGenericBitmap intersection(ImmutableGenericBitmap bitmap) {
-			WrappedConciseBitmap other = (WrappedConciseBitmap) bitmap;
-			ConciseSet othercore = other.core;
-			return new WrappedConciseBitmap( core.clone().intersection(othercore));
-		}
-
-		@Override
-		public ImmutableGenericBitmap difference(ImmutableGenericBitmap bitmap) {
-			WrappedConciseBitmap other = (WrappedConciseBitmap) bitmap;
-			ConciseSet othercore = other.core;
-			return new WrappedConciseBitmap( core.clone().difference(othercore));
-		}
-
-		@Override
-		public ImmutableGenericBitmap getImmutableBitmap(ByteBuffer buffer) {
-			// TODO Auto-generated method stub
-			return null;
-		}
-
-		@Override
 		public ImmutableGenericBitmap toImmutableGenericBitmap() {
 			return new WrappedImmutableConciseBitmap(ImmutableConciseSet.newImmutableFromMutable(core));
 		}

@@ -100,14 +100,14 @@ public class ImmutableRTree
         return numDims;
     }
 
-    public Iterable<ImmutableRoaringBitmap> search(Bound bound)
+    public Iterable<ImmutableGenericBitmap> search(Bound bound)
     {
         Preconditions.checkArgument(bound.getNumDims() == numDims);
 
         return defaultSearchStrategy.search(root, bound);
     }
 
-    public Iterable<ImmutableRoaringBitmap> search(SearchStrategy strategy, Bound bound)
+    public Iterable<ImmutableGenericBitmap> search(SearchStrategy strategy, Bound bound)
     {
         Preconditions.checkArgument(bound.getNumDims() == numDims);
 

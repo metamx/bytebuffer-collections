@@ -1,10 +1,13 @@
 package com.metamx.collections.spatial.search;
 
+import CompressedBitmaps.ImmutableGenericBitmap;
+
 import com.google.common.base.Function;
 import com.google.common.base.Predicate;
 import com.google.common.collect.Iterables;
 import com.metamx.collections.spatial.ImmutableNode;
 import com.metamx.collections.spatial.ImmutablePoint;
+
 import org.roaringbitmap.buffer.ImmutableRoaringBitmap;
 
 /**
@@ -12,15 +15,15 @@ import org.roaringbitmap.buffer.ImmutableRoaringBitmap;
 public class GutmanSearchStrategy implements SearchStrategy
 {
     @Override
-    public Iterable<ImmutableRoaringBitmap> search(ImmutableNode node, Bound bound)
+    public Iterable<ImmutableGenericBitmap> search(ImmutableNode node, Bound bound)
     {
         if (bound.getLimit() > 0) {
             return Iterables.transform(
                     breadthFirstSearch(node, bound),
-                    new Function<ImmutableNode, ImmutableRoaringBitmap>()
+                    new Function<ImmutableNode, ImmutableGenericBitmap>()
                     {
                         @Override
-                        public ImmutableRoaringBitmap apply(ImmutableNode immutableNode)
+                        public ImmutableGenericBitmap apply(ImmutableNode immutableNode)
                         {
                             return immutableNode.getImmutableRoaringBitmap();
                         }
@@ -30,10 +33,10 @@ public class GutmanSearchStrategy implements SearchStrategy
 
         return Iterables.transform(
                 depthFirstSearch(node, bound),
-                new Function<ImmutablePoint, ImmutableRoaringBitmap>()
+                new Function<ImmutablePoint, ImmutableGenericBitmap>()
                 {
                     @Override
-                    public ImmutableRoaringBitmap apply(ImmutablePoint immutablePoint)
+                    public ImmutableGenericBitmap apply(ImmutablePoint immutablePoint)
                     {
                         return immutablePoint.getImmutableRoaringBitmap();
                     }

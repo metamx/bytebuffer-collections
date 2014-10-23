@@ -1,6 +1,7 @@
 package CompressedBitmaps;
 
 import java.nio.ByteBuffer;
+import java.util.Iterator;
 
 import org.roaringbitmap.IntIterator;
 
@@ -99,5 +100,48 @@ public class WrappedImmutableConciseBitmap implements ImmutableGenericBitmap
 	public ImmutableGenericBitmap getImmutableBitmap(ByteBuffer buffer) {
 		return new WrappedImmutableConciseBitmap(buffer);
 	}
+	
+	@Override
+  	public ImmutableGenericBitmap union(Iterable<ImmutableGenericBitmap> b)
+  			throws ClassCastException {
+  		return new WrappedImmutableConciseBitmap(ImmutableConciseSet.union(unwrap(b)));
+  	}
+    
+
+    @Override
+  	public ImmutableGenericBitmap intersection(Iterable<ImmutableGenericBitmap> b)
+  			throws ClassCastException {
+    	return new WrappedImmutableConciseBitmap(ImmutableConciseSet.intersection(unwrap(b)));
+  	}
+
+  	private static Iterable<ImmutableConciseSet> unwrap(
+  			final Iterable<ImmutableGenericBitmap> b) {
+  		return new Iterable<ImmutableConciseSet>() {
+
+  			@Override
+  			public Iterator<ImmutableConciseSet> iterator() {
+  				final Iterator<ImmutableGenericBitmap> i = b.iterator();
+  				return new Iterator<ImmutableConciseSet>() {
+                    @Override
+                    public void remove() { 
+                        i.remove();
+                    }
+
+  					@Override
+  					public boolean hasNext() {
+  						return i.hasNext();
+  					}
+
+  					@Override
+  					public ImmutableConciseSet next() {
+  						return ((WrappedImmutableConciseBitmap) i.next()).core;
+  					}
+
+  				};
+  			}
+
+  		};
+
+  	}
 
 }
