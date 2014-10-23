@@ -26,7 +26,7 @@ public class RTree
 
   private volatile int size;
   
-  protected BitmapFactory bf;
+  protected final BitmapFactory bf;
 
   public RTree(BitmapFactory b)
   {
