@@ -72,7 +72,7 @@ public class BitmapBenchmarkTest
       }
       concise[i] = ImmutableConciseSet.newImmutableFromMutable(c);
       int size = r.serializedSizeInBytes();
-      ByteBuffer buf = ByteBuffer.allocateDirect(size);
+      ByteBuffer buf = ByteBuffer.allocate(size);
       final ByteArrayOutputStream out = new ByteArrayOutputStream(size);
       r.serialize(new DataOutputStream(out));
       buf.put(out.toByteArray());
