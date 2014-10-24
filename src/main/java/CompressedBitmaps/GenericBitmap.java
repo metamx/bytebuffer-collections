@@ -81,6 +81,8 @@ public interface GenericBitmap
 	 *          integer to be added
 	 */
 	public void add(int entry);
+	
+	public GenericBitmap getEmptyWrappedBitmap();
 
 	/**
 	 * Remove the specified integer to the bitmap. This is equivalent to setting the
@@ -90,8 +92,6 @@ public interface GenericBitmap
 	 *          integer to be remove
 	 */
 	public void remove(int entry);
-
-	
 
 	/**
 	 * Write out a serialized version of the bitmap to the ByteBuffer. We preprend

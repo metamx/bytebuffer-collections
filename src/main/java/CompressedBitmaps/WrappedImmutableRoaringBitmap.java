@@ -117,4 +117,8 @@ public class WrappedImmutableRoaringBitmap implements ImmutableGenericBitmap
 			}
 		};
 	}
+
+	public ImmutableRoaringBitmap getCore() {
+		return this.core;
+	}
 }

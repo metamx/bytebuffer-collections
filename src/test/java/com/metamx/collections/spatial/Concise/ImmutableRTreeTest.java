@@ -1,7 +1,9 @@
-package com.metamx.collections.spatial;
+package com.metamx.collections.spatial.Concise;
 
+import CompressedBitmaps.GenericBitmap;
 import CompressedBitmaps.ImmutableGenericBitmap;
 import CompressedBitmaps.WrappedConciseBitmap;
+import CompressedBitmaps.WrappedImmutableConciseBitmap;
 import CompressedBitmaps.WrappedImmutableRoaringBitmap;
 import CompressedBitmaps.WrappedRoaringBitmap;
 
@@ -9,6 +11,8 @@ import com.google.common.base.Stopwatch;
 import com.google.common.base.Throwables;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Sets;
+import com.metamx.collections.spatial.ImmutableRTree;
+import com.metamx.collections.spatial.RTree;
 import com.metamx.collections.spatial.search.RadiusBound;
 import com.metamx.collections.spatial.search.RectangularBound;
 import com.metamx.collections.spatial.split.LinearGutmanSplitStrategy;
@@ -33,8 +37,8 @@ public class ImmutableRTreeTest
     @Test
     public void testToAndFromByteBuffer()
     {
-    	WrappedRoaringBitmap rb = new WrappedRoaringBitmap();
-        RTree tree = new RTree(2, new LinearGutmanSplitStrategy(0, 50), rb);
+    	WrappedConciseBitmap cs = new WrappedConciseBitmap();
+        RTree tree = new RTree(2, new LinearGutmanSplitStrategy(0, 50, cs), cs);
         tree.insert(new float[]{0, 0}, 1);
         tree.insert(new float[]{1, 1}, 2);
         tree.insert(new float[]{2, 2}, 3);
@@ -42,10 +46,10 @@ public class ImmutableRTreeTest
         tree.insert(new float[]{4, 4}, 5);
         ImmutableRTree firstTree = ImmutableRTree.newImmutableFromMutable(tree);
         ByteBuffer buffer = ByteBuffer.wrap(firstTree.toBytes());
-        ImmutableGenericBitmap irb = rb.toImmutableGenericBitmap();
-        ImmutableRTree secondTree = new ImmutableRTree(buffer, irb);
+        ImmutableGenericBitmap ics = cs.toImmutableGenericBitmap();
+        ImmutableRTree secondTree = new ImmutableRTree(buffer, ics);
         Iterable<ImmutableGenericBitmap> points = secondTree.search(new RadiusBound(new float[]{0, 0}, 10));
-        ImmutableGenericBitmap finalSet = irb.union(points);
+        ImmutableGenericBitmap finalSet = ics.union(points);
         
         Assert.assertTrue(finalSet.size() >= 5);
 
@@ -59,8 +63,8 @@ public class ImmutableRTreeTest
     @Test
     public void testSearchNoSplit()
     {
-    	WrappedRoaringBitmap rb = new WrappedRoaringBitmap();
-        RTree tree = new RTree(2, new LinearGutmanSplitStrategy(0, 50), rb);
+    	WrappedConciseBitmap cs = new WrappedConciseBitmap();
+        RTree tree = new RTree(2, new LinearGutmanSplitStrategy(0, 50, cs), cs);
         tree.insert(new float[]{0, 0}, 1);
         tree.insert(new float[]{10, 10}, 10);
         tree.insert(new float[]{1, 3}, 2);
@@ -74,10 +78,10 @@ public class ImmutableRTreeTest
 
         Assert.assertEquals(tree.getRoot().getChildren().size(), 10);
         
-        ImmutableGenericBitmap irb = rb.toImmutableGenericBitmap();
+        ImmutableGenericBitmap ics = cs.toImmutableGenericBitmap();
         ImmutableRTree searchTree = ImmutableRTree.newImmutableFromMutable(tree);
         Iterable<ImmutableGenericBitmap> points = searchTree.search(new RadiusBound(new float[]{0, 0}, 5));
-        ImmutableGenericBitmap finalSet = irb.union(points);
+        ImmutableGenericBitmap finalSet = ics.union(points);
         
         Assert.assertTrue(finalSet.size() >= 5);
 
@@ -91,8 +95,8 @@ public class ImmutableRTreeTest
     @Test
     public void testSearchWithSplit()
     {
-    	WrappedRoaringBitmap rb = new WrappedRoaringBitmap();
-        RTree tree = new RTree(2, new LinearGutmanSplitStrategy(0, 50), rb);
+    	WrappedConciseBitmap cs = new WrappedConciseBitmap();
+        RTree tree = new RTree(2, new LinearGutmanSplitStrategy(0, 50, cs), cs);
         tree.insert(new float[]{0, 0}, 1);
         tree.insert(new float[]{1, 3}, 2);
         tree.insert(new float[]{4, 2}, 3);
@@ -107,10 +111,10 @@ public class ImmutableRTreeTest
             );
         }
 
-        ImmutableGenericBitmap irb = rb.toImmutableGenericBitmap();
+        ImmutableGenericBitmap ics = cs.toImmutableGenericBitmap();
         ImmutableRTree searchTree = ImmutableRTree.newImmutableFromMutable(tree);
         Iterable<ImmutableGenericBitmap> points = searchTree.search(new RadiusBound(new float[]{0, 0}, 5));
-        ImmutableGenericBitmap finalSet = irb.union(points);
+        ImmutableGenericBitmap finalSet = ics.union(points);
         
         Assert.assertTrue(finalSet.size() >= 5);
 
@@ -124,8 +128,8 @@ public class ImmutableRTreeTest
     @Test
     public void testSearchWithSplit2()
     {
-    	WrappedRoaringBitmap rb = new WrappedRoaringBitmap();
-        RTree tree = new RTree(2, new LinearGutmanSplitStrategy(0, 50), rb);
+    	WrappedConciseBitmap cs = new WrappedConciseBitmap();
+        RTree tree = new RTree(2, new LinearGutmanSplitStrategy(0, 50, cs), cs);
         tree.insert(new float[]{0.0f, 0.0f}, 0);
         tree.insert(new float[]{1.0f, 3.0f}, 1);
         tree.insert(new float[]{4.0f, 2.0f}, 2);
@@ -140,7 +144,7 @@ public class ImmutableRTreeTest
             );
         }
 
-        ImmutableGenericBitmap irb = rb.toImmutableGenericBitmap();
+        ImmutableGenericBitmap ics = cs.toImmutableGenericBitmap();
         ImmutableRTree searchTree = ImmutableRTree.newImmutableFromMutable(tree);
         Iterable<ImmutableGenericBitmap> points = searchTree.search(
                 new RectangularBound(
@@ -148,7 +152,7 @@ public class ImmutableRTreeTest
                     new float[]{9, 9}
                 )
             );
-        ImmutableGenericBitmap finalSet = irb.union(points);
+        ImmutableGenericBitmap finalSet = ics.union(points);
        
         Assert.assertTrue(finalSet.size() >= 5);
 
@@ -162,8 +166,8 @@ public class ImmutableRTreeTest
     @Test
     public void testSearchWithSplit3()
     {
-    	WrappedRoaringBitmap rb = new WrappedRoaringBitmap();
-        RTree tree = new RTree(2, new LinearGutmanSplitStrategy(0, 50), rb);
+    	WrappedConciseBitmap cs = new WrappedConciseBitmap();
+        RTree tree = new RTree(2, new LinearGutmanSplitStrategy(0, 50, cs), cs);
         tree.insert(new float[]{0.0f, 0.0f}, 0);
         tree.insert(new float[]{1.0f, 3.0f}, 1);
         tree.insert(new float[]{4.0f, 2.0f}, 2);
@@ -177,12 +181,12 @@ public class ImmutableRTreeTest
                     i
             );
         }
-        ImmutableGenericBitmap irb = rb.toImmutableGenericBitmap();
+        ImmutableGenericBitmap ics = cs.toImmutableGenericBitmap();
         ImmutableRTree searchTree = ImmutableRTree.newImmutableFromMutable(tree);
         Iterable<ImmutableGenericBitmap> points = searchTree.search(
                 new RadiusBound(new float[]{0.0f, 0.0f}, 5)
         	    );
-        ImmutableGenericBitmap finalSet = irb.union(points);
+        ImmutableGenericBitmap finalSet = ics.union(points);
        
         Assert.assertTrue(finalSet.size() >= 3);
 
@@ -197,8 +201,8 @@ public class ImmutableRTreeTest
     @Test
     public void testSearchWithSplitLimitedBound()
     {
-    	WrappedRoaringBitmap rb = new WrappedRoaringBitmap();
-        RTree tree = new RTree(2, new LinearGutmanSplitStrategy(0, 50), rb);
+    	WrappedConciseBitmap cs = new WrappedConciseBitmap();
+        RTree tree = new RTree(2, new LinearGutmanSplitStrategy(0, 50, cs), cs);
         tree.insert(new float[]{0, 0}, 1);
         tree.insert(new float[]{1, 3}, 2);
         tree.insert(new float[]{4, 2}, 3);
@@ -213,10 +217,10 @@ public class ImmutableRTreeTest
             );
         }
 
-        ImmutableGenericBitmap irb = rb.toImmutableGenericBitmap();
+        ImmutableGenericBitmap ics = new WrappedImmutableConciseBitmap(null);
         ImmutableRTree searchTree = ImmutableRTree.newImmutableFromMutable(tree);
         Iterable<ImmutableGenericBitmap> points = searchTree.search(new RadiusBound(new float[]{0, 0}, 5, 2));
-        ImmutableGenericBitmap finalSet = irb.union(points);
+        ImmutableGenericBitmap finalSet = ics.union(points);
        
         Assert.assertTrue(finalSet.size() >= 5);
 
@@ -228,6 +232,7 @@ public class ImmutableRTreeTest
     }
 
     //@Test
+    
     public void showBenchmarks()
     {
         final int start = 1;
@@ -237,8 +242,8 @@ public class ImmutableRTreeTest
 
         for (int numPoints = start; numPoints <= end; numPoints *= factor) {
             try {
-            	WrappedRoaringBitmap rb = new WrappedRoaringBitmap();
-                RTree tree = new RTree(2, new LinearGutmanSplitStrategy(0, 50), rb);
+            	WrappedConciseBitmap cs = new WrappedConciseBitmap();
+                RTree tree = new RTree(2, new LinearGutmanSplitStrategy(0, 50, cs), cs);
 
                 Stopwatch stopwatch = new Stopwatch().start();
                 Random rand = new Random();
@@ -249,7 +254,7 @@ public class ImmutableRTreeTest
                 System.out.printf("[%,d]: insert = %,d ms%n", numPoints, stop);
 
                 stopwatch.reset().start();
-                ImmutableGenericBitmap irb = rb.toImmutableGenericBitmap();
+                ImmutableGenericBitmap irb = cs.toImmutableGenericBitmap();
                 ImmutableRTree searchTree = ImmutableRTree.newImmutableFromMutable(tree);
                 stop = stopwatch.elapsedMillis();
                 System.out.printf("[%,d]: size = %,d bytes%n", numPoints, searchTree.toBytes().length);
@@ -294,8 +299,8 @@ public class ImmutableRTreeTest
 
         for (int numPoints = start; numPoints <= end; numPoints *= factor) {
             try {
-            	WrappedRoaringBitmap rb = new WrappedRoaringBitmap();
-                RTree tree = new RTree(2, new LinearGutmanSplitStrategy(0, 50), rb);
+            	GenericBitmap cs = new WrappedConciseBitmap();
+                RTree tree = new RTree(2, new LinearGutmanSplitStrategy(0, 50,cs), cs);
 
                 Stopwatch stopwatch = new Stopwatch().start();
                 Random rand = new Random();
@@ -306,7 +311,7 @@ public class ImmutableRTreeTest
                 System.out.printf("[%,d]: insert = %,d ms%n", numPoints, stop);
 
                 stopwatch.reset().start();
-                ImmutableGenericBitmap irb = rb.toImmutableGenericBitmap();
+                ImmutableGenericBitmap ics = cs.toImmutableGenericBitmap();
                 ImmutableRTree searchTree = ImmutableRTree.newImmutableFromMutable(tree);
                 stop = stopwatch.elapsedMillis();
                 System.out.printf("[%,d]: size = %,d bytes%n", numPoints, searchTree.toBytes().length);
@@ -329,7 +334,7 @@ public class ImmutableRTreeTest
 
                 stopwatch.reset().start();
 
-                ImmutableGenericBitmap finalSet = irb.union(points);
+                ImmutableGenericBitmap finalSet = ics.union(points);
 
                 stop = stopwatch.elapsedMillis();
                 System.out.printf("[%,d]: union of %,d points in %,d ms%n", numPoints, finalSet.size(), stop);

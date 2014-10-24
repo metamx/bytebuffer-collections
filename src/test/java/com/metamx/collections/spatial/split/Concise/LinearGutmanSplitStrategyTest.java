@@ -1,10 +1,12 @@
-package com.metamx.collections.spatial.split;
+package com.metamx.collections.spatial.split.Concise;
 
+import CompressedBitmaps.WrappedConciseBitmap;
 import CompressedBitmaps.WrappedRoaringBitmap;
 
 import com.metamx.collections.spatial.Node;
 import com.metamx.collections.spatial.Point;
 import com.metamx.collections.spatial.RTree;
+import com.metamx.collections.spatial.split.LinearGutmanSplitStrategy;
 
 import junit.framework.Assert;
 
@@ -19,14 +21,15 @@ public class LinearGutmanSplitStrategyTest
   @Test
   public void testPickSeeds() throws Exception
   {
-    LinearGutmanSplitStrategy strategy = new LinearGutmanSplitStrategy(0, 50);
-    Node node = new Node(new float[2], new float[2], true);
+	WrappedConciseBitmap cs = new WrappedConciseBitmap();
+    LinearGutmanSplitStrategy strategy = new LinearGutmanSplitStrategy(0, 50, cs);
+    Node node = new Node(new float[2], new float[2], true, cs);
 
-    node.addChild(new Point(new float[]{3, 7}, 1));
-    node.addChild(new Point(new float[]{1, 6}, 1));
-    node.addChild(new Point(new float[]{9, 8}, 1));
-    node.addChild(new Point(new float[]{2, 5}, 1));
-    node.addChild(new Point(new float[]{4, 4}, 1));
+    node.addChild(new Point(new float[]{3, 7}, 1, cs.getEmptyWrappedBitmap()));
+    node.addChild(new Point(new float[]{1, 6}, 1, cs.getEmptyWrappedBitmap()));
+    node.addChild(new Point(new float[]{9, 8}, 1, cs.getEmptyWrappedBitmap()));
+    node.addChild(new Point(new float[]{2, 5}, 1, cs.getEmptyWrappedBitmap()));
+    node.addChild(new Point(new float[]{4, 4}, 1, cs.getEmptyWrappedBitmap()));
     node.enclose();
 
     Node[] groups = strategy.split(node);
@@ -39,8 +42,8 @@ public class LinearGutmanSplitStrategyTest
   @Test
   public void testNumChildrenSize()
   {
-	WrappedRoaringBitmap rb = new WrappedRoaringBitmap();  
-    RTree tree = new RTree(2, new LinearGutmanSplitStrategy(0, 50), rb);
+	WrappedConciseBitmap cs = new WrappedConciseBitmap();  
+    RTree tree = new RTree(2, new LinearGutmanSplitStrategy(0, 50, cs), cs);
     Random rand = new Random();
     for (int i = 0; i < 100; i++) {
       tree.insert(new float[]{rand.nextFloat(), rand.nextFloat()}, i);

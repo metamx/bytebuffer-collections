@@ -1,7 +1,8 @@
-package com.metamx.collections.spatial;
+package com.metamx.collections.spatial.Roaring;
 
 import CompressedBitmaps.WrappedRoaringBitmap;
 
+import com.metamx.collections.spatial.RTree;
 import com.metamx.collections.spatial.split.LinearGutmanSplitStrategy;
 
 import junit.framework.Assert;
@@ -22,7 +23,7 @@ public class RTreeTest
     public void setUp() throws Exception
     {
     	WrappedRoaringBitmap rb = new WrappedRoaringBitmap();
-        tree = new RTree(2, new LinearGutmanSplitStrategy(0, 50), rb);
+        tree = new RTree(2, new LinearGutmanSplitStrategy(0, 50, rb), rb);
     }
 
     @Test

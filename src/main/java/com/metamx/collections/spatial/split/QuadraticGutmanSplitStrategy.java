@@ -1,16 +1,19 @@
 package com.metamx.collections.spatial.split;
 
+import CompressedBitmaps.GenericBitmap;
+
 import com.metamx.collections.spatial.Node;
 import com.metamx.collections.spatial.RTreeUtils;
+
 import java.util.List;
 
 /**
  */
 public class QuadraticGutmanSplitStrategy extends GutmanSplitStrategy
 {
-  public QuadraticGutmanSplitStrategy(int minNumChildren, int maxNumChildren)
+  public QuadraticGutmanSplitStrategy(int minNumChildren, int maxNumChildren, GenericBitmap bitmap)
   {
-    super(minNumChildren, maxNumChildren);
+    super(minNumChildren, maxNumChildren, bitmap);
   }
 
   @Override

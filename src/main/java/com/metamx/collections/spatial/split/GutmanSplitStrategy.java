@@ -1,12 +1,18 @@
 package com.metamx.collections.spatial.split;
 
+import CompressedBitmaps.GenericBitmap;
+import CompressedBitmaps.ImmutableGenericBitmap;
+
 import com.google.common.collect.Lists;
 import com.metamx.collections.spatial.Node;
 
+import java.nio.ByteBuffer;
 import java.util.Arrays;
 import java.util.List;
 
 import com.metamx.collections.spatial.RTreeUtils;
+
+import org.roaringbitmap.IntIterator;
 import org.roaringbitmap.buffer.MutableRoaringBitmap;
 
 /**
@@ -15,11 +21,13 @@ public abstract class GutmanSplitStrategy implements SplitStrategy
 {
     private final int minNumChildren;
     private final int maxNumChildren;
+    private final GenericBitmap bitmap;
 
-    protected GutmanSplitStrategy(int minNumChildren, int maxNumChildren)
+    protected GutmanSplitStrategy(int minNumChildren, int maxNumChildren, GenericBitmap bitmap)
     {
         this.minNumChildren = minNumChildren;
         this.maxNumChildren = maxNumChildren;
+        this.bitmap = bitmap;
     }
 
     @Override
@@ -52,7 +60,7 @@ public abstract class GutmanSplitStrategy implements SplitStrategy
 
         node.clear();
         node.addChild(seeds[0]);
-        node.addToRoaringBitmap(seeds[0]);
+        node.addToBitmap(seeds[0]);
 
         Node group1 = new Node(
                 Arrays.copyOf(seeds[1].getMinCoordinates(), seeds[1].getMinCoordinates().length),
@@ -60,9 +68,9 @@ public abstract class GutmanSplitStrategy implements SplitStrategy
                 Lists.newArrayList(seeds[1]),
                 node.isLeaf(),
                 node.getParent(),
-                new MutableRoaringBitmap()
+                this.bitmap.getEmptyWrappedBitmap()
         );
-        group1.addToRoaringBitmap(seeds[1]);
+        group1.addToBitmap(seeds[1]);
         if (node.getParent() != null) {
             node.getParent().addChild(group1);
         }
@@ -76,7 +84,7 @@ public abstract class GutmanSplitStrategy implements SplitStrategy
             for (Node group : groups) {
                 if (group.getChildren().size() + children.size() <= minNumChildren) {
                     for (Node child : group.getChildren()) {
-                        group.addToRoaringBitmap(child);
+                        group.addToBitmap(child);
                         group.addChild(child);
                     }
                     RTreeUtils.enclose(groups);
@@ -101,7 +109,7 @@ public abstract class GutmanSplitStrategy implements SplitStrategy
                 optimal = groups[1];
             }
 
-            optimal.addToRoaringBitmap(nextToAssign);
+            optimal.addToBitmap(nextToAssign);
             optimal.addChild(nextToAssign);
             optimal.enclose();
         }

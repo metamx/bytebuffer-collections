@@ -1,5 +1,7 @@
 package com.metamx.collections.spatial;
 
+import CompressedBitmaps.GenericBitmap;
+
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Lists;
 import com.google.common.primitives.Floats;
@@ -23,10 +25,10 @@ public class Node
 
     private final List<Node> children;
     private final boolean isLeaf;
-    private final MutableRoaringBitmap roaring;
+    private final GenericBitmap bitmap;
     private Node parent;
 
-    public Node(float[] minCoordinates, float[] maxCoordinates, boolean isLeaf)
+    public Node(float[] minCoordinates, float[] maxCoordinates, boolean isLeaf, GenericBitmap bitmap)
     {
         this(
                 minCoordinates,
@@ -34,8 +36,7 @@ public class Node
                 Lists.<Node>newArrayList(),
                 isLeaf,
                 null,
-                //new ConciseSet()
-                new MutableRoaringBitmap()
+                bitmap
         );
     }
 
@@ -45,7 +46,7 @@ public class Node
             List<Node> children,
             boolean isLeaf,
             Node parent,
-            MutableRoaringBitmap roaring
+            GenericBitmap bitmap
     )
     {
         Preconditions.checkArgument(minCoordinates.length == maxCoordinates.length);
@@ -57,7 +58,7 @@ public class Node
             child.setParent(this);
         }
         this.isLeaf = isLeaf;
-        this.roaring = roaring;
+        this.bitmap = bitmap;
         this.parent = parent;
     }
 
@@ -160,24 +161,24 @@ public class Node
     {
       return conciseSet;
     }*/
-    public MutableRoaringBitmap getRoaringBitmap()
+    public GenericBitmap getBitmap()
     {
-        return this.roaring;
+        return this.bitmap;
     }
 
     /*public void addToConciseSet(Node node)
     {
       conciseSet.addAll(node.getConciseSet());
     }*/
-    public void addToRoaringBitmap(Node node)
+    public void addToBitmap(Node node)
     {
-        this.roaring.or(node.getRoaringBitmap());
+        this.bitmap.or(node.getBitmap());
     }
 
     public void clear()
     {
         children.clear();
-        roaring.clear();
+        this.bitmap.clear();
     }
 
     public int getSizeInBytes()
@@ -185,7 +186,7 @@ public class Node
         return ImmutableNode.HEADER_NUM_BYTES
                 + 2 * getNumDims() * Floats.BYTES
                 + Ints.BYTES // size of set
-                + roaring.serializedSizeInBytes()//conciseSet.getWords().length * Ints.BYTES
+                + this.bitmap.getSizeInBytes()
                 + getChildren().size() * Ints.BYTES;
     }
 
@@ -199,18 +200,8 @@ public class Node
         for (float v : getMaxCoordinates()) {
             buffer.putFloat(v);
         }
-        buffer.putInt(roaring.serializedSizeInBytes());
-        try {
-            this.roaring.serialize(new DataOutputStream(new OutputStream(){
-                ByteBuffer mBB;
-                OutputStream init(ByteBuffer mbb) {mBB=mbb; return this;}
-                public void close() {}
-                public void flush() {}
-                public void write(int b) {mBB.put((byte) b);}
-                public void write(byte[] b) {}
-                public void write(byte[] b, int off, int l) {}
-            }.init(buffer)));
-        } catch (IOException e) {e.printStackTrace();}
+        
+        this.bitmap.serialize(buffer);
 
         position = buffer.position();
         int childStartOffset = position + getChildren().size() * Ints.BYTES;

@@ -1,5 +1,7 @@
 package com.metamx.collections.spatial;
 
+import CompressedBitmaps.GenericBitmap;
+
 import com.google.common.collect.Lists;
 import com.google.common.primitives.Floats;
 import com.google.common.primitives.Ints;
@@ -18,31 +20,30 @@ import org.roaringbitmap.buffer.MutableRoaringBitmap;
  */
 public class Point extends Node
 {
-    private static MutableRoaringBitmap makeRoaringBitmap(int entry)
-    {
-        MutableRoaringBitmap retVal = new MutableRoaringBitmap();
-        retVal.add(entry);
-        return retVal;
+    private static GenericBitmap addToGenericBitmap(int entry, GenericBitmap bitmap)
+    {   
+        bitmap.add(entry);
+        return bitmap;
     }
 
     private final float[] coords;
-    private final MutableRoaringBitmap roaring;
+    private final GenericBitmap bitmap;
 
-    public Point(float[] coords, int entry)
+    public Point(float[] coords, int entry, GenericBitmap bitmap)
     {
-        super(coords, Arrays.copyOf(coords, coords.length), Lists.<Node>newArrayList(), true, null, makeRoaringBitmap(entry));
+        super(coords, Arrays.copyOf(coords, coords.length), Lists.<Node>newArrayList(), true, null, addToGenericBitmap(entry, bitmap));
 
         this.coords = coords;
-        this.roaring = new MutableRoaringBitmap();
-        this.roaring.add(entry);
+        this.bitmap = bitmap.getEmptyWrappedBitmap();
+        this.bitmap.add(entry);
     }
 
-    public Point(float[] coords, MutableRoaringBitmap entry)
+    public Point(float[] coords, GenericBitmap bitmap)
     {
-        super(coords, Arrays.copyOf(coords, coords.length), Lists.<Node>newArrayList(), true, null, entry);
+        super(coords, Arrays.copyOf(coords, coords.length), Lists.<Node>newArrayList(), true, null, bitmap);
 
         this.coords = coords;
-        this.roaring = entry;
+        this.bitmap = bitmap;
     }
 
     public float[] getCoords()
@@ -51,9 +52,9 @@ public class Point extends Node
     }
 
     @Override
-    public MutableRoaringBitmap getRoaringBitmap()
+    public GenericBitmap getBitmap()
     {
-        return this.roaring;
+        return this.bitmap;
     }
 
     @Override

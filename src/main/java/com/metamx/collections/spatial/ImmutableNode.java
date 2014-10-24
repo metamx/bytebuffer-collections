@@ -194,4 +194,8 @@ public class ImmutableNode
 
     return retVal;
   }
+  
+  public ImmutableGenericBitmap getBitmap(){
+	  return this.bitmap;
+  }
 }

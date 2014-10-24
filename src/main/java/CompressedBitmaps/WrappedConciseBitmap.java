@@ -135,4 +135,9 @@ public class WrappedConciseBitmap implements GenericBitmap {
 			return new WrappedImmutableConciseBitmap(ImmutableConciseSet.newImmutableFromMutable(core));
 		}
 
+		@Override
+		public GenericBitmap getEmptyWrappedBitmap() {
+			return new WrappedConciseBitmap();
+		}
+
 }

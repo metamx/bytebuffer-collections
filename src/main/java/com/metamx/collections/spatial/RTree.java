@@ -27,15 +27,15 @@ public class RTree
 
     public RTree(GenericBitmap bitmap)
     {
-        this(0, new LinearGutmanSplitStrategy(0, 0), bitmap);
+        this(0, new LinearGutmanSplitStrategy(0, 0, bitmap), bitmap);
     }
 
     public RTree(int numDims, SplitStrategy splitStrategy, GenericBitmap bitmap)
     {
         this.numDims = numDims;
         this.splitStrategy = splitStrategy;
-        this.root = buildRoot(true);
         this.bitmap = bitmap;
+        this.root = buildRoot(true);
     }
 
     /**
@@ -61,10 +61,10 @@ public class RTree
     public void insert(float[] coords, int entry)
     {
         Preconditions.checkArgument(coords.length == numDims);
-        insertInner(new Point(coords, entry));
+        insertInner(new Point(coords, entry, this.bitmap.getEmptyWrappedBitmap()));
     }
 
-    public void insert(float[] coords, MutableRoaringBitmap entry)
+    public void insert(float[] coords, GenericBitmap entry)
     {
         Preconditions.checkArgument(coords.length == numDims);
         insertInner(new Point(coords, entry));
@@ -110,7 +110,7 @@ public class RTree
         Arrays.fill(initMinCoords, -Float.MAX_VALUE);
         Arrays.fill(initMaxCoords, Float.MAX_VALUE);
 
-        return new Node(initMinCoords, initMaxCoords, isLeaf);
+        return new Node(initMinCoords, initMaxCoords, isLeaf, this.bitmap.getEmptyWrappedBitmap());
     }
 
     private void insertInner(Point point)
@@ -151,7 +151,7 @@ public class RTree
      */
     private Node chooseLeaf(Node node, Point point)
     {
-        node.addToRoaringBitmap(point);
+        node.addToBitmap(point);
 
         if (node.isLeaf()) {
             return node;

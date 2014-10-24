@@ -14,7 +14,7 @@ public class WrappedImmutableConciseBitmap implements ImmutableGenericBitmap
 	/**
 	 * Underlying bitmap.
 	 */
-	public ImmutableConciseSet core;
+	public ImmutableConciseSet core=null;
 
 	@SuppressWarnings("unused")
 	private WrappedImmutableConciseBitmap() {
@@ -142,6 +142,10 @@ public class WrappedImmutableConciseBitmap implements ImmutableGenericBitmap
 
   		};
 
+  	}
+  	
+  	public ImmutableConciseSet getCore(){
+  		return this.core;
   	}
 
 }

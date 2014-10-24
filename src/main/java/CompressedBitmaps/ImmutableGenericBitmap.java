@@ -77,7 +77,6 @@ public interface ImmutableGenericBitmap
 	 */
 	public ImmutableGenericBitmap union(ImmutableGenericBitmap bitmap);
 
-
 	/**
 	 * Compute the bitwise-and of this bitmap with another bitmap. A new bitmap is generated.
 	 * 

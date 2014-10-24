@@ -97,7 +97,7 @@ public class RTreeUtils
                                 "%scoords: %s, conciseSet: %s%n",
                                 makeDashes(level),
                                 jsonMapper.writeValueAsString(point.getCoords()),
-                                point.getRoaringBitmap()
+                                point.getBitmap()
                         );
             }
         } else {

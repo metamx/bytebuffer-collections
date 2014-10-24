@@ -8,8 +8,6 @@ import com.metamx.collections.spatial.search.Bound;
 import com.metamx.collections.spatial.search.GutmanSearchStrategy;
 import com.metamx.collections.spatial.search.SearchStrategy;
 
-import org.roaringbitmap.buffer.ImmutableRoaringBitmap;
-
 import java.nio.ByteBuffer;
 
 /**

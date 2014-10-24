@@ -140,5 +140,10 @@ public class WrappedRoaringBitmap implements GenericBitmap
 		return new WrappedImmutableRoaringBitmap(this.core.toImmutableRoaringBitmap());
 	}
 
+	@Override
+	public GenericBitmap getEmptyWrappedBitmap() {
+		return new WrappedRoaringBitmap();
+	}
+
 
 }
