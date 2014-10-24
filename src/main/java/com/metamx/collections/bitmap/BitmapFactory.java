@@ -38,7 +38,7 @@ public interface BitmapFactory
    * @throws ClassCastException if one of the ImmutableGenericBitmap objects if not an instance
    *                            of WrappedImmutableConciseBitmap
    */
-  public abstract ImmutableGenericBitmap union(Iterable<ImmutableGenericBitmap> b);
+  public ImmutableGenericBitmap union(Iterable<ImmutableGenericBitmap> b);
 
   /**
    * Compute the intersection (bitwise-AND) of a set of bitmaps. They are assumed to be
@@ -52,5 +52,5 @@ public interface BitmapFactory
    * @throws ClassCastException if one of the ImmutableGenericBitmap objects if not an instance
    *                            of WrappedImmutableConciseBitmap
    */
-  public abstract ImmutableGenericBitmap intersection(Iterable<ImmutableGenericBitmap> b);
+  public ImmutableGenericBitmap intersection(Iterable<ImmutableGenericBitmap> b);
 }

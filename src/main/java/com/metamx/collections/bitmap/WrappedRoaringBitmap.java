@@ -124,13 +124,13 @@ public class WrappedRoaringBitmap implements GenericBitmap
                 @Override
                 public void write(byte[] b)
                 {
-                  throw new RuntimeException("Should never be called");
+                  mBB.put(b);
                 }
 
                 @Override
                 public void write(byte[] b, int off, int l)
                 {
-                  throw new RuntimeException("Should never be called");
+                  mBB.put(b, off, l);
                 }
               }.init(buffer)
           )

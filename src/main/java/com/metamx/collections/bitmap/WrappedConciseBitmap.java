@@ -123,7 +123,7 @@ public class WrappedConciseBitmap implements GenericBitmap
       @Override
       public IntIterator clone()
       {
-        throw new RuntimeException("clone is not supported on ConciseSet iterator");
+        throw new UnsupportedOperationException("clone is not supported on ConciseSet iterator");
       }
 
       @Override
