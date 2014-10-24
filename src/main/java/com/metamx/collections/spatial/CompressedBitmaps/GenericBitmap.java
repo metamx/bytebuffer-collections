@@ -1,4 +1,4 @@
-package CompressedBitmaps;
+package com.metamx.collections.spatial.CompressedBitmaps;
 
 import java.nio.ByteBuffer;
 
@@ -11,6 +11,10 @@ import org.roaringbitmap.IntIterator;
 public interface GenericBitmap
 {
 
+	/**
+	 * 
+	 * @return transform the current object to a WrappedImmutableRoaringbitmap or WrappedImmutableConciseBitmap object corresponding to its class
+	 */
 	public ImmutableGenericBitmap toImmutableGenericBitmap();
 	
 	/**
@@ -82,8 +86,19 @@ public interface GenericBitmap
 	 */
 	public void add(int entry);
 	
+	/**
+	 * 
+	 * @return a new empty wrapped bitmap object from the corresponding class 
+	 */
 	public GenericBitmap getEmptyWrappedBitmap();
+	
+	/**
+	 * 
+	 * @return a new empty immutable wrapped bitmap object from the corresponding class
+	 */
+	public ImmutableGenericBitmap getEmptyImmutableGenericBitmap(); 
 
+	
 	/**
 	 * Remove the specified integer to the bitmap. This is equivalent to setting the
 	 * ith bit to the value 1.

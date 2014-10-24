@@ -1,4 +1,4 @@
-package CompressedBitmaps;
+package com.metamx.collections.spatial.CompressedBitmaps;
 
 import java.nio.ByteBuffer;
 import java.util.Iterator;
@@ -14,7 +14,7 @@ public class WrappedImmutableConciseBitmap implements ImmutableGenericBitmap
 	/**
 	 * Underlying bitmap.
 	 */
-	public ImmutableConciseSet core=null;
+	public ImmutableConciseSet core;
 
 	@SuppressWarnings("unused")
 	private WrappedImmutableConciseBitmap() {
@@ -31,11 +31,10 @@ public class WrappedImmutableConciseBitmap implements ImmutableGenericBitmap
 	 * @param c
 	 *          bitmap to be wrapped
 	 */
-	public WrappedImmutableConciseBitmap(ImmutableConciseSet c) {
+	public WrappedImmutableConciseBitmap(
+			ImmutableConciseSet c) {
 		core = c;
 	}
-
-
 
 	@Override
 	public String toString() {

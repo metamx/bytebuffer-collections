@@ -1,9 +1,8 @@
 package com.metamx.collections.spatial.split;
 
-import CompressedBitmaps.GenericBitmap;
-
 import com.metamx.collections.spatial.Node;
 import com.metamx.collections.spatial.RTreeUtils;
+import com.metamx.collections.spatial.CompressedBitmaps.GenericBitmap;
 
 import java.util.List;
 

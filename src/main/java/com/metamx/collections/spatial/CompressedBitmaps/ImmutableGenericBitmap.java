@@ -1,4 +1,4 @@
-package CompressedBitmaps;
+package com.metamx.collections.spatial.CompressedBitmaps;
 
 import java.nio.ByteBuffer;
 

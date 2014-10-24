@@ -1,18 +1,17 @@
 package com.metamx.collections.spatial.Concise;
 
-import CompressedBitmaps.GenericBitmap;
-import CompressedBitmaps.ImmutableGenericBitmap;
-import CompressedBitmaps.WrappedConciseBitmap;
-import CompressedBitmaps.WrappedImmutableConciseBitmap;
-import CompressedBitmaps.WrappedImmutableRoaringBitmap;
-import CompressedBitmaps.WrappedRoaringBitmap;
-
 import com.google.common.base.Stopwatch;
 import com.google.common.base.Throwables;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Sets;
 import com.metamx.collections.spatial.ImmutableRTree;
 import com.metamx.collections.spatial.RTree;
+import com.metamx.collections.spatial.CompressedBitmaps.GenericBitmap;
+import com.metamx.collections.spatial.CompressedBitmaps.ImmutableGenericBitmap;
+import com.metamx.collections.spatial.CompressedBitmaps.WrappedConciseBitmap;
+import com.metamx.collections.spatial.CompressedBitmaps.WrappedImmutableConciseBitmap;
+import com.metamx.collections.spatial.CompressedBitmaps.WrappedImmutableRoaringBitmap;
+import com.metamx.collections.spatial.CompressedBitmaps.WrappedRoaringBitmap;
 import com.metamx.collections.spatial.search.RadiusBound;
 import com.metamx.collections.spatial.search.RectangularBound;
 import com.metamx.collections.spatial.split.LinearGutmanSplitStrategy;

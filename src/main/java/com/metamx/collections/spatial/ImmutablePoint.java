@@ -2,7 +2,7 @@ package com.metamx.collections.spatial;
 
 import java.nio.ByteBuffer;
 
-import CompressedBitmaps.ImmutableGenericBitmap;
+import com.metamx.collections.spatial.CompressedBitmaps.ImmutableGenericBitmap;
 
 public class ImmutablePoint extends ImmutableNode
 {

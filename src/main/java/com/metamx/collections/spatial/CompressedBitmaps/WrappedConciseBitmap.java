@@ -1,4 +1,4 @@
-package CompressedBitmaps;
+package com.metamx.collections.spatial.CompressedBitmaps;
 
 import java.nio.ByteBuffer;
 
@@ -138,6 +138,12 @@ public class WrappedConciseBitmap implements GenericBitmap {
 		@Override
 		public GenericBitmap getEmptyWrappedBitmap() {
 			return new WrappedConciseBitmap();
+		}
+
+		@Override
+		public ImmutableGenericBitmap getEmptyImmutableGenericBitmap() {
+			// TODO Auto-generated method stub
+			return new WrappedImmutableConciseBitmap(new ImmutableConciseSet());
 		}
 
 }

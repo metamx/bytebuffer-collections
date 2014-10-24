@@ -1,11 +1,8 @@
 package com.metamx.collections.spatial;
 
-import CompressedBitmaps.ImmutableGenericBitmap;
-
 import com.google.common.primitives.Floats;
 import com.google.common.primitives.Ints;
-
-import org.roaringbitmap.buffer.ImmutableRoaringBitmap;
+import com.metamx.collections.spatial.CompressedBitmaps.ImmutableGenericBitmap;
 
 import java.nio.ByteBuffer;
 import java.util.Iterator;
@@ -53,7 +50,6 @@ public class ImmutableNode
                           + 2 * numDims * Floats.BYTES
                           + Ints.BYTES
                           + conciseSetSize;
-
     this.data = data;
     this.bitmap = bitmap;
   }

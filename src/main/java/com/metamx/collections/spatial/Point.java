@@ -1,20 +1,10 @@
 package com.metamx.collections.spatial;
 
-import CompressedBitmaps.GenericBitmap;
-
 import com.google.common.collect.Lists;
-import com.google.common.primitives.Floats;
-import com.google.common.primitives.Ints;
+import com.metamx.collections.spatial.CompressedBitmaps.GenericBitmap;
 
-import it.uniroma3.mat.extendedset.intset.ConciseSet;
-import it.uniroma3.mat.extendedset.intset.ImmutableConciseSet;
-
-import java.nio.ByteBuffer;
 import java.util.Arrays;
 import java.util.List;
-
-import org.roaringbitmap.RoaringBitmap;
-import org.roaringbitmap.buffer.MutableRoaringBitmap;
 
 /**
  */
@@ -34,7 +24,7 @@ public class Point extends Node
         super(coords, Arrays.copyOf(coords, coords.length), Lists.<Node>newArrayList(), true, null, addToGenericBitmap(entry, bitmap));
 
         this.coords = coords;
-        this.bitmap = bitmap.getEmptyWrappedBitmap();
+        this.bitmap = bitmap;
         this.bitmap.add(entry);
     }
 
@@ -92,26 +82,4 @@ public class Point extends Node
     {
         return false;
     }
-    //
-    //@Override
-    //public int getSizeInBytes()
-    //{
-    //  return coords.length * Floats.BYTES
-    //         + Ints.BYTES // size of conciseSet
-    //         + conciseSet.getWords().length * Ints.BYTES;
-    //}
-    //
-    //@Override
-    //public int storeInByteBuffer(ByteBuffer buffer, int position)
-    //{
-    //  buffer.position(position);
-    //  for (float v : getCoords()) {
-    //    buffer.putFloat(v);
-    //  }
-    //  byte[] bytes = ImmutableConciseSet.newImmutableFromMutable(conciseSet).toBytes();
-    //  buffer.putInt(bytes.length);
-    //  buffer.put(bytes);
-    //
-    //  return buffer.position();
-    //}
 }

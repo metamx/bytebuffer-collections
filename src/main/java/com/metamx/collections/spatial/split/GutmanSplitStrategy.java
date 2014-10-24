@@ -1,8 +1,5 @@
 package com.metamx.collections.spatial.split;
 
-import CompressedBitmaps.GenericBitmap;
-import CompressedBitmaps.ImmutableGenericBitmap;
-
 import com.google.common.collect.Lists;
 import com.metamx.collections.spatial.Node;
 
@@ -11,6 +8,8 @@ import java.util.Arrays;
 import java.util.List;
 
 import com.metamx.collections.spatial.RTreeUtils;
+import com.metamx.collections.spatial.CompressedBitmaps.GenericBitmap;
+import com.metamx.collections.spatial.CompressedBitmaps.ImmutableGenericBitmap;
 
 import org.roaringbitmap.IntIterator;
 import org.roaringbitmap.buffer.MutableRoaringBitmap;

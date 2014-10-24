@@ -1,4 +1,4 @@
-package CompressedBitmaps;
+package com.metamx.collections.spatial.CompressedBitmaps;
 
 import java.nio.ByteBuffer;
 import java.util.Iterator;
@@ -29,9 +29,8 @@ public class WrappedImmutableRoaringBitmap implements ImmutableGenericBitmap
 	 *          bitmap to be wrapped
 	 */
 	public WrappedImmutableRoaringBitmap(ImmutableRoaringBitmap c) {
-		core = c;
+		this.core = c;
 	}
-
 
 	@Override
 	public String toString() {

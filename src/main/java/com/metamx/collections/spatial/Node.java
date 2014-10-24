@@ -1,11 +1,10 @@
 package com.metamx.collections.spatial;
 
-import CompressedBitmaps.GenericBitmap;
-
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Lists;
 import com.google.common.primitives.Floats;
 import com.google.common.primitives.Ints;
+import com.metamx.collections.spatial.CompressedBitmaps.GenericBitmap;
 
 import java.io.DataOutputStream;
 import java.io.IOException;

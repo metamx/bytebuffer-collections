@@ -1,8 +1,7 @@
 package com.metamx.collections.spatial.Concise;
 
-import CompressedBitmaps.WrappedConciseBitmap;
-
 import com.metamx.collections.spatial.RTree;
+import com.metamx.collections.spatial.CompressedBitmaps.WrappedConciseBitmap;
 import com.metamx.collections.spatial.split.LinearGutmanSplitStrategy;
 
 import junit.framework.Assert;

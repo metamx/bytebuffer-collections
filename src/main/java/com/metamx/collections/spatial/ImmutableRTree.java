@@ -1,9 +1,8 @@
 package com.metamx.collections.spatial;
 
-import CompressedBitmaps.ImmutableGenericBitmap;
-
 import com.google.common.base.Preconditions;
 import com.google.common.primitives.Ints;
+import com.metamx.collections.spatial.CompressedBitmaps.ImmutableGenericBitmap;
 import com.metamx.collections.spatial.search.Bound;
 import com.metamx.collections.spatial.search.GutmanSearchStrategy;
 import com.metamx.collections.spatial.search.SearchStrategy;
@@ -28,7 +27,7 @@ public class ImmutableRTree
         buffer.putInt(rTree.getNumDims());
         int spaceUsed = rTree.getRoot().storeInByteBuffer(buffer, buffer.position());
         buffer.position(0);
-        return new ImmutableRTree(buffer.asReadOnlyBuffer(), rTree.bitmap.toImmutableGenericBitmap());
+        return new ImmutableRTree(buffer.asReadOnlyBuffer(), rTree.getRoot().getBitmap().getEmptyWrappedBitmap().toImmutableGenericBitmap());
     }
 
     private static int calcNumBytes(RTree tree)

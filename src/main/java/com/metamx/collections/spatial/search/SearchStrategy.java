@@ -1,8 +1,7 @@
 package com.metamx.collections.spatial.search;
 
-import CompressedBitmaps.ImmutableGenericBitmap;
-
 import com.metamx.collections.spatial.ImmutableNode;
+import com.metamx.collections.spatial.CompressedBitmaps.ImmutableGenericBitmap;
 
 import org.roaringbitmap.buffer.ImmutableRoaringBitmap;
 /**

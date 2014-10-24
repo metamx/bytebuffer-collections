@@ -1,4 +1,4 @@
-package CompressedBitmaps;
+package com.metamx.collections.spatial.CompressedBitmaps;
 
 import java.io.DataOutputStream;
 import java.io.IOException;
@@ -143,6 +143,11 @@ public class WrappedRoaringBitmap implements GenericBitmap
 	@Override
 	public GenericBitmap getEmptyWrappedBitmap() {
 		return new WrappedRoaringBitmap();
+	}
+
+	@Override
+	public ImmutableGenericBitmap getEmptyImmutableGenericBitmap() {
+		return new WrappedImmutableRoaringBitmap(new ImmutableRoaringBitmap(null));
 	}
 
 

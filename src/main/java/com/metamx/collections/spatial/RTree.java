@@ -1,9 +1,8 @@
 package com.metamx.collections.spatial;
 
-import CompressedBitmaps.GenericBitmap;
-import CompressedBitmaps.ImmutableGenericBitmap;
-
 import com.google.common.base.Preconditions;
+import com.metamx.collections.spatial.CompressedBitmaps.GenericBitmap;
+import com.metamx.collections.spatial.CompressedBitmaps.ImmutableGenericBitmap;
 import com.metamx.collections.spatial.split.LinearGutmanSplitStrategy;
 import com.metamx.collections.spatial.split.SplitStrategy;
 
@@ -23,7 +22,6 @@ public class RTree
     private final SplitStrategy splitStrategy;
     private Node root;
     private volatile int size;
-    protected GenericBitmap bitmap;
 
     public RTree(GenericBitmap bitmap)
     {
@@ -34,8 +32,7 @@ public class RTree
     {
         this.numDims = numDims;
         this.splitStrategy = splitStrategy;
-        this.bitmap = bitmap;
-        this.root = buildRoot(true);
+        this.root = buildRoot(true, bitmap);
     }
 
     /**
@@ -61,7 +58,7 @@ public class RTree
     public void insert(float[] coords, int entry)
     {
         Preconditions.checkArgument(coords.length == numDims);
-        insertInner(new Point(coords, entry, this.bitmap.getEmptyWrappedBitmap()));
+        insertInner(new Point(coords, entry, this.root.getBitmap().getEmptyWrappedBitmap()));
     }
 
     public void insert(float[] coords, GenericBitmap entry)
@@ -103,14 +100,14 @@ public class RTree
         return root;
     }
 
-    private Node buildRoot(boolean isLeaf)
+    private Node buildRoot(boolean isLeaf, GenericBitmap bitmap)
     {
         float[] initMinCoords = new float[numDims];
         float[] initMaxCoords = new float[numDims];
         Arrays.fill(initMinCoords, -Float.MAX_VALUE);
         Arrays.fill(initMaxCoords, Float.MAX_VALUE);
 
-        return new Node(initMinCoords, initMaxCoords, isLeaf, this.bitmap.getEmptyWrappedBitmap());
+        return new Node(initMinCoords, initMaxCoords, isLeaf, bitmap);
     }
 
     private void insertInner(Point point)
@@ -197,7 +194,7 @@ public class RTree
         // special case for root
         if (n == root) {
             if (nn != null) {
-                root = buildRoot(false);
+                root = buildRoot(false, n.getBitmap().getEmptyWrappedBitmap());
                 root.addChild(n);
                 root.addChild(nn);
             }
