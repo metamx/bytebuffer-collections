@@ -10,8 +10,8 @@
         <connection>scm:git:ssh://git@github.com/metamx/bytebuffer-collections.git</connection>
         <developerConnection>scm:git:ssh://git@github.com/metamx/bytebuffer-collections.git</developerConnection>
         <url>http://www.github.com/metamx/bytebuffer-collections</url>
-      <tag>bytebuffer-collections-0.1.0-SNAPSHOT</tag>
-  </scm>
+        <tag>bytebuffer-collections-0.1.0-SNAPSHOT</tag>
+    </scm>
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -135,6 +135,7 @@
                     <plugin>
                         <artifactId>maven-surefire-plugin</artifactId>
                         <configuration>
+                            <argLine>-server -Xms3G -Xmx3G</argLine>
                           <groups>com.metamx.test.annotation.Benchmark</groups>
                           <excludedGroups>com.metamx.test.annotation.Dummy</excludedGroups>
                         </configuration>
