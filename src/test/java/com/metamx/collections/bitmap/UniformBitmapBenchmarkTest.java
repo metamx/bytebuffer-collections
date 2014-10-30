@@ -30,10 +30,10 @@ public class UniformBitmapBenchmarkTest extends BitmapBenchmark
           expectedUnion.set(k);
         }
       }
-      for(int k = 0; k < knownTrue.length; ++k) {
-        c.add(knownTrue[k]);
-        r.add(knownTrue[k]);
-        expectedUnion.set(knownTrue[k]);
+      for (int k : knownTrue) {
+        c.add(k);
+        r.add(k);
+        expectedUnion.set(k);
       }
       concise[i] = ImmutableConciseSet.newImmutableFromMutable(c);
       offheapConcise[i] = makeOffheapConcise(concise[i]);;
@@ -45,5 +45,6 @@ public class UniformBitmapBenchmarkTest extends BitmapBenchmark
     }
     unionCount = expectedUnion.cardinality();
     minIntersection = knownTrue.length;
+    printSizeStats();
   }
 }

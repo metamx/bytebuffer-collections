@@ -40,12 +40,15 @@ public class BitmapBenchmark
   final static RoaringBitmapFactory roaringFactory = new RoaringBitmapFactory();
   final static Random rand = new Random(0);
 
+  static long totalConciseBytes = 0;
+  static long totalRoaringBytes = 0;
   static long unionCount = 0;
   static long minIntersection = 0;
 
   protected static ImmutableConciseSet makeOffheapConcise(ImmutableConciseSet concise)
   {
     final byte[] bytes = concise.toBytes();
+    totalConciseBytes += bytes.length;
     final ByteBuffer buf = ByteBuffer.allocateDirect(bytes.length).put(bytes);
     buf.rewind();
     return new ImmutableConciseSet(buf);
@@ -55,9 +58,17 @@ public class BitmapBenchmark
   {
     final ByteArrayOutputStream out = new ByteArrayOutputStream();
     r.serialize(new DataOutputStream(out));
-    buf.put(out.toByteArray());
+    final byte[] bytes = out.toByteArray();
+    totalRoaringBytes += bytes.length;
+    buf.put(bytes);
     buf.rewind();
     return new ImmutableRoaringBitmap(buf.asReadOnlyBuffer());
+  }
+
+  protected static void printSizeStats() {
+    System.err.printf("Average concise size: %d" + System.lineSeparator(), totalConciseBytes / SIZE);
+    System.err.printf("Average roaring size: %d" + System.lineSeparator(), totalRoaringBytes / SIZE);
+    System.err.flush();
   }
 
   protected static ImmutableRoaringBitmap makeOffheap(MutableRoaringBitmap r) throws IOException

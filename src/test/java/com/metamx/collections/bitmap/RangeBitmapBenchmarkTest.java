@@ -48,5 +48,6 @@ public class RangeBitmapBenchmarkTest extends BitmapBenchmark
       genericRoaring[i] = new WrappedImmutableRoaringBitmap(offheapRoaring[i]);
     }
     unionCount = expectedUnion.cardinality();
+    printSizeStats();
   }
 }
