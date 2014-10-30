@@ -3,15 +3,15 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>com.metamx</groupId>
     <artifactId>bytebuffer-collections</artifactId>
-    <version>0.0.5-SNAPSHOT</version>
+    <version>0.1.0-SNAPSHOT</version>
     <name>bytebuffer-collections</name>
     <description>ByteBuffer Collections</description>
     <scm>
         <connection>scm:git:ssh://git@github.com/metamx/bytebuffer-collections.git</connection>
         <developerConnection>scm:git:ssh://git@github.com/metamx/bytebuffer-collections.git</developerConnection>
         <url>http://www.github.com/metamx/bytebuffer-collections</url>
-      <tag>bytebuffer-collections-0.0.4-SNAPSHOT</tag>
-  </scm>
+        <tag>bytebuffer-collections-0.1.0-SNAPSHOT</tag>
+    </scm>
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -73,13 +73,19 @@
         <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
-            <version>4.8.1</version>
+            <version>4.11</version>
             <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.easymock</groupId>
             <artifactId>easymock</artifactId>
             <version>3.0</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.carrotsearch</groupId>
+            <artifactId>junit-benchmarks</artifactId>
+            <version>0.7.2</version>
             <scope>test</scope>
         </dependency>
     </dependencies>
@@ -91,8 +97,8 @@
                 <artifactId>maven-compiler-plugin</artifactId>
                 <version>2.3.2</version>
                 <configuration>
-                    <source>1.6</source>
-                    <target>1.6</target>
+                    <source>1.7</source>
+                    <target>1.7</target>
                 </configuration>
             </plugin>
             <plugin>
@@ -112,8 +118,32 @@
                 <artifactId>maven-release-plugin</artifactId>
                 <version>2.5</version>
             </plugin>
+            <plugin>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <configuration>
+                    <excludedGroups>com.metamx.test.annotation.Benchmark</excludedGroups>
+                </configuration>
+            </plugin>
         </plugins>
     </build>
+
+    <profiles>
+        <profile>
+            <id>benchmark</id>
+            <build>
+                <plugins>
+                    <plugin>
+                        <artifactId>maven-surefire-plugin</artifactId>
+                        <configuration>
+                            <argLine>-server -Xms3G -Xmx3G</argLine>
+                          <groups>com.metamx.test.annotation.Benchmark</groups>
+                          <excludedGroups>com.metamx.test.annotation.Dummy</excludedGroups>
+                        </configuration>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+    </profiles>
 
     <distributionManagement>
         <repository>

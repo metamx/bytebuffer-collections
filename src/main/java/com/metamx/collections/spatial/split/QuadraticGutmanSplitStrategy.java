@@ -2,7 +2,7 @@ package com.metamx.collections.spatial.split;
 
 import com.metamx.collections.spatial.Node;
 import com.metamx.collections.spatial.RTreeUtils;
-import com.metamx.collections.spatial.bitmap.BitmapFactory;
+import com.metamx.collections.bitmap.BitmapFactory;
 
 import java.util.List;
 

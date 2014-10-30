@@ -3,7 +3,15 @@ bytebuffer-collections
 
 ByteBuffer collection classes for java and jvm-based languages.
 
+# Benchmarks
 
+To run benchmarks, use the maven benchmark profile:
+```sh
+mvn test -P benchmark
+```
+
+
+# Building
 
 If you are using maven to build this project, it might be convenient to edit your settings.xml file
 to include the following lines:

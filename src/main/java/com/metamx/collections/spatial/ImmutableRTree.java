@@ -2,11 +2,12 @@ package com.metamx.collections.spatial;
 
 import com.google.common.base.Preconditions;
 import com.google.common.primitives.Ints;
-import com.metamx.collections.spatial.bitmap.BitmapFactory;
-import com.metamx.collections.spatial.bitmap.ImmutableGenericBitmap;
+import com.metamx.collections.bitmap.BitmapFactory;
+import com.metamx.collections.bitmap.ImmutableGenericBitmap;
 import com.metamx.collections.spatial.search.Bound;
 import com.metamx.collections.spatial.search.GutmanSearchStrategy;
 import com.metamx.collections.spatial.search.SearchStrategy;
+
 import java.nio.ByteBuffer;
 
 /**
@@ -28,7 +29,7 @@ public class ImmutableRTree
     buffer.putInt(rTree.getNumDims());
     rTree.getRoot().storeInByteBuffer(buffer, buffer.position());
     buffer.position(0);
-    return new ImmutableRTree(buffer.asReadOnlyBuffer(), rTree.bf);
+    return new ImmutableRTree(buffer.asReadOnlyBuffer(), rTree.getBitmapFactory());
   }
 
   private static int calcNumBytes(RTree tree)
@@ -72,13 +73,13 @@ public class ImmutableRTree
     this.root = null;
   }
 
-  public ImmutableRTree(ByteBuffer data, BitmapFactory bf)
+  public ImmutableRTree(ByteBuffer data, BitmapFactory bitmapFactory)
   {
     final int initPosition = data.position();
     Preconditions.checkArgument(data.get(0) == VERSION, "Mismatching versions");
     this.numDims = data.getInt(1 + initPosition) & 0x7FFF;
     this.data = data;
-    this.root = new ImmutableNode(numDims, initPosition, 1 + Ints.BYTES, data, bf);
+    this.root = new ImmutableNode(numDims, initPosition, 1 + Ints.BYTES, data, bitmapFactory);
   }
 
   public int size()

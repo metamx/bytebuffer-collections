@@ -1,19 +1,33 @@
 package com.metamx.collections.spatial;
 
-import com.metamx.collections.spatial.bitmap.BitmapFactory;
+import com.metamx.collections.bitmap.BitmapFactory;
 
 import java.nio.ByteBuffer;
 
 public class ImmutablePoint extends ImmutableNode
 {
-  public ImmutablePoint(int numDims, int initialOffset, int offsetFromInitial, ByteBuffer data, BitmapFactory bf)
+  public ImmutablePoint(
+      int numDims,
+      int initialOffset,
+      int offsetFromInitial,
+      ByteBuffer data,
+      BitmapFactory bitmapFactory
+  )
   {
-    super(numDims, initialOffset, offsetFromInitial, (short) 0, true, data, bf);
+    super(numDims, initialOffset, offsetFromInitial, (short) 0, true, data, bitmapFactory);
   }
 
   public ImmutablePoint(ImmutableNode node)
   {
-    super(node.getNumDims(), node.getInitialOffset(), node.getOffsetFromInitial(), (short) 0, true, node.getData(), node.bf);
+    super(
+        node.getNumDims(),
+        node.getInitialOffset(),
+        node.getOffsetFromInitial(),
+        (short) 0,
+        true,
+        node.getData(),
+        node.getBitmapFactory()
+    );
   }
 
   public float[] getCoords()

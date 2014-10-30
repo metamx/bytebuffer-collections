@@ -1,8 +1,8 @@
 package com.metamx.collections.spatial;
 
-import com.metamx.collections.spatial.bitmap.BitmapFactory;
-import com.metamx.collections.spatial.bitmap.ConciseBitmapFactory;
-import com.metamx.collections.spatial.bitmap.RoaringBitmapFactory;
+import com.metamx.collections.bitmap.BitmapFactory;
+import com.metamx.collections.bitmap.ConciseBitmapFactory;
+import com.metamx.collections.bitmap.RoaringBitmapFactory;
 import com.metamx.collections.spatial.split.LinearGutmanSplitStrategy;
 
 import junit.framework.Assert;
