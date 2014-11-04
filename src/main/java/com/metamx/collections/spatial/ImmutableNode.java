@@ -3,7 +3,7 @@ package com.metamx.collections.spatial;
 import com.google.common.primitives.Floats;
 import com.google.common.primitives.Ints;
 import com.metamx.collections.bitmap.BitmapFactory;
-import com.metamx.collections.bitmap.ImmutableGenericBitmap;
+import com.metamx.collections.bitmap.ImmutableBitmap;
 
 import java.nio.ByteBuffer;
 import java.util.Iterator;
@@ -131,7 +131,7 @@ public class ImmutableNode
     return getCoords(initialOffset + offsetFromInitial + HEADER_NUM_BYTES + numDims * Floats.BYTES);
   }
 
-  public ImmutableGenericBitmap getImmutableBitmap()
+  public ImmutableBitmap getImmutableBitmap()
   {
     final int sizePosition = initialOffset + offsetFromInitial + HEADER_NUM_BYTES + 2 * numDims * Floats.BYTES;
     int numBytes = data.getInt(sizePosition);

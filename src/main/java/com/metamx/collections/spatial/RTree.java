@@ -1,8 +1,8 @@
 package com.metamx.collections.spatial;
 
 import com.google.common.base.Preconditions;
+import com.metamx.collections.bitmap.MutableBitmap;
 import com.metamx.collections.bitmap.BitmapFactory;
-import com.metamx.collections.bitmap.GenericBitmap;
 import com.metamx.collections.spatial.split.LinearGutmanSplitStrategy;
 import com.metamx.collections.spatial.split.SplitStrategy;
 
@@ -68,7 +68,7 @@ public class RTree
     insertInner(new Point(coords, entry, bitmapFactory));
   }
 
-  public void insert(float[] coords, GenericBitmap entry)
+  public void insert(float[] coords, MutableBitmap entry)
   {
     Preconditions.checkArgument(coords.length == numDims);
     insertInner(new Point(coords, entry));

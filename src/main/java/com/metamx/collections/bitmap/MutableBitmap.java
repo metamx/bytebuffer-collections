@@ -5,7 +5,7 @@ import java.nio.ByteBuffer;
 /**
  * This class is meant to represent a simple wrapper around a bitmap class.
  */
-public interface GenericBitmap extends ImmutableGenericBitmap
+public interface MutableBitmap extends ImmutableBitmap
 {
   /**
    * Empties the content of this bitmap.
@@ -18,9 +18,9 @@ public interface GenericBitmap extends ImmutableGenericBitmap
    * <p/>
    * Note that the other bitmap should be of the same class instance.
    *
-   * @param bitmap other bitmap
+   * @param mutableBitmap other bitmap
    */
-  public void or(GenericBitmap bitmap);
+  public void or(MutableBitmap mutableBitmap);
 
   /**
    * Compute the bitwise-and of this bitmap with another bitmap. The current
@@ -28,9 +28,9 @@ public interface GenericBitmap extends ImmutableGenericBitmap
    * <p/>
    * Note that the other bitmap should be of the same class instance.
    *
-   * @param bitmap other bitmap
+   * @param mutableBitmap other bitmap
    */
-  public void and(GenericBitmap bitmap);
+  public void and(MutableBitmap mutableBitmap);
 
 
   /**
@@ -39,9 +39,9 @@ public interface GenericBitmap extends ImmutableGenericBitmap
    * <p/>
    * Note that the other bitmap should be of the same class instance.
    *
-   * @param bitmap other bitmap
+   * @param mutableBitmap other bitmap
    */
-  public void xor(GenericBitmap bitmap);
+  public void xor(MutableBitmap mutableBitmap);
 
   /**
    * Compute the bitwise-andNot of this bitmap with another bitmap. The current
@@ -49,9 +49,9 @@ public interface GenericBitmap extends ImmutableGenericBitmap
    * <p/>
    * Note that the other bitmap should be of the same class instance.
    *
-   * @param bitmap other bitmap
+   * @param mutableBitmap other bitmap
    */
-  public void andNot(GenericBitmap bitmap);
+  public void andNot(MutableBitmap mutableBitmap);
 
   /**
    * Return the size in bytes for the purpose of serialization to a ByteBuffer.

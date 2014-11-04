@@ -34,8 +34,8 @@ public class BitmapBenchmark
   final static ImmutableRoaringBitmap roaring[] = new ImmutableRoaringBitmap[SIZE];
   final static ImmutableRoaringBitmap immutableRoaring[] = new ImmutableRoaringBitmap[SIZE];
   final static ImmutableRoaringBitmap offheapRoaring[] = new ImmutableRoaringBitmap[SIZE];
-  final static ImmutableGenericBitmap genericConcise[] = new ImmutableGenericBitmap[SIZE];
-  final static ImmutableGenericBitmap genericRoaring[] = new ImmutableGenericBitmap[SIZE];
+  final static ImmutableBitmap genericConcise[] = new ImmutableBitmap[SIZE];
+  final static ImmutableBitmap genericRoaring[] = new ImmutableBitmap[SIZE];
   final static ConciseBitmapFactory conciseFactory = new ConciseBitmapFactory();
   final static RoaringBitmapFactory roaringFactory = new RoaringBitmapFactory();
   final static Random rand = new Random(0);
@@ -100,14 +100,14 @@ public class BitmapBenchmark
   @Test @BenchmarkOptions(warmupRounds = 1, benchmarkRounds = 2)
   public void timeGenericConciseUnion() throws Exception
   {
-    ImmutableGenericBitmap union = conciseFactory.union(Lists.newArrayList(genericConcise));
+    ImmutableBitmap union = conciseFactory.union(Lists.newArrayList(genericConcise));
     Assert.assertEquals(unionCount, union.size());
   }
 
   @Test @BenchmarkOptions(warmupRounds = 1, benchmarkRounds = 5)
   public void timeGenericConciseIntersection() throws Exception
   {
-    ImmutableGenericBitmap intersection = conciseFactory.intersection(Lists.newArrayList(genericConcise));
+    ImmutableBitmap intersection = conciseFactory.intersection(Lists.newArrayList(genericConcise));
     Assert.assertTrue(intersection.size() >= minIntersection);
   }
 
@@ -135,14 +135,14 @@ public class BitmapBenchmark
   @Test
   public void timeGenericRoaringUnion() throws Exception
   {
-    ImmutableGenericBitmap union = roaringFactory.union(Lists.newArrayList(genericRoaring));
+    ImmutableBitmap union = roaringFactory.union(Lists.newArrayList(genericRoaring));
     Assert.assertEquals(unionCount, union.size());
   }
 
   @Test
   public void timeGenericRoaringIntersection() throws Exception
   {
-    ImmutableGenericBitmap intersection = roaringFactory.intersection(Lists.newArrayList(genericRoaring));
+    ImmutableBitmap intersection = roaringFactory.intersection(Lists.newArrayList(genericRoaring));
     Assert.assertTrue(intersection.size() >= minIntersection);
   }
 }

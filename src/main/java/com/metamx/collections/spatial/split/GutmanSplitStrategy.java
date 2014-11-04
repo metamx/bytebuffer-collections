@@ -60,7 +60,7 @@ public abstract class GutmanSplitStrategy implements SplitStrategy
         Lists.newArrayList(seeds[1]),
         node.isLeaf(),
         node.getParent(),
-        bf.getEmptyBitmap()
+        bf.makeEmptyMutableBitmap()
     );
     group1.addToInvertedIndex(seeds[1]);
     if (node.getParent() != null) {

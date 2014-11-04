@@ -6,16 +6,16 @@ import org.roaringbitmap.IntIterator;
 
 import java.nio.ByteBuffer;
 
-public class WrappedImmutableConciseBitmap implements ImmutableGenericBitmap
+public class WrappedImmutableConciseBitmap implements ImmutableBitmap
 {
   /**
    * Underlying bitmap.
    */
-  private final ImmutableConciseSet invertedIndex;
+  private final ImmutableConciseSet bitmap;
 
   public WrappedImmutableConciseBitmap(ByteBuffer byteBuffer)
   {
-    this.invertedIndex = new ImmutableConciseSet(byteBuffer.asReadOnlyBuffer());
+    this.bitmap = new ImmutableConciseSet(byteBuffer.asReadOnlyBuffer());
   }
 
   /**
@@ -25,24 +25,36 @@ public class WrappedImmutableConciseBitmap implements ImmutableGenericBitmap
    */
   public WrappedImmutableConciseBitmap(ImmutableConciseSet immutableConciseSet)
   {
-    this.invertedIndex = immutableConciseSet;
+    this.bitmap = immutableConciseSet;
   }
 
-  public ImmutableConciseSet getInvertedIndex()
+  public ImmutableConciseSet getBitmap()
   {
-    return invertedIndex;
+    return bitmap;
+  }
+
+  @Override
+  public byte[] toBytes()
+  {
+    return bitmap.toBytes();
+  }
+
+  @Override
+  public int compareTo(ImmutableBitmap other)
+  {
+    return bitmap.compareTo(((WrappedImmutableConciseBitmap)other).getBitmap());
   }
 
   @Override
   public String toString()
   {
-    return getClass().getSimpleName() + invertedIndex.toString();
+    return getClass().getSimpleName() + bitmap.toString();
   }
 
   @Override
   public IntIterator iterator()
   {
-    final IntSet.IntIterator i = invertedIndex.iterator();
+    final IntSet.IntIterator i = bitmap.iterator();
     return new IntIterator()
     {
       @Override
@@ -68,40 +80,40 @@ public class WrappedImmutableConciseBitmap implements ImmutableGenericBitmap
   @Override
   public int size()
   {
-    return invertedIndex.size();
+    return bitmap.size();
   }
 
   @Override
   public boolean isEmpty()
   {
-    return invertedIndex.size() == 0;
+    return bitmap.size() == 0;
   }
 
   @Override
-  public ImmutableGenericBitmap union(ImmutableGenericBitmap bitmap)
+  public ImmutableBitmap union(ImmutableBitmap otherBitmap)
   {
-    WrappedImmutableConciseBitmap other = (WrappedImmutableConciseBitmap) bitmap;
-    ImmutableConciseSet otherIndex = other.invertedIndex;
-    return new WrappedImmutableConciseBitmap(ImmutableConciseSet.union(invertedIndex, otherIndex));
+    WrappedImmutableConciseBitmap other = (WrappedImmutableConciseBitmap) otherBitmap;
+    ImmutableConciseSet unwrappedOtherBitmap = other.bitmap;
+    return new WrappedImmutableConciseBitmap(ImmutableConciseSet.union(bitmap, unwrappedOtherBitmap));
   }
 
   @Override
-  public ImmutableGenericBitmap intersection(ImmutableGenericBitmap bitmap)
+  public ImmutableBitmap intersection(ImmutableBitmap otherBitmap)
   {
-    WrappedImmutableConciseBitmap other = (WrappedImmutableConciseBitmap) bitmap;
-    ImmutableConciseSet otherIndex = other.invertedIndex;
-    return new WrappedImmutableConciseBitmap(ImmutableConciseSet.intersection(invertedIndex, otherIndex));
+    WrappedImmutableConciseBitmap other = (WrappedImmutableConciseBitmap) otherBitmap;
+    ImmutableConciseSet unwrappedOtherBitmap = other.bitmap;
+    return new WrappedImmutableConciseBitmap(ImmutableConciseSet.intersection(bitmap, unwrappedOtherBitmap));
   }
 
   @Override
-  public ImmutableGenericBitmap difference(ImmutableGenericBitmap bitmap)
+  public ImmutableBitmap difference(ImmutableBitmap otherBitmap)
   {
-    WrappedImmutableConciseBitmap other = (WrappedImmutableConciseBitmap) bitmap;
-    ImmutableConciseSet otherIndex = other.invertedIndex;
+    WrappedImmutableConciseBitmap other = (WrappedImmutableConciseBitmap) otherBitmap;
+    ImmutableConciseSet unwrappedOtherBitmap = other.bitmap;
     return new WrappedImmutableConciseBitmap(
         ImmutableConciseSet.intersection(
-            invertedIndex,
-            ImmutableConciseSet.complement(otherIndex)
+            bitmap,
+            ImmutableConciseSet.complement(unwrappedOtherBitmap)
         )
     );
   }

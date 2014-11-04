@@ -9,7 +9,11 @@ public interface BitmapFactory
    *
    * @return the new bitmap
    */
-  public GenericBitmap getEmptyBitmap();
+  public MutableBitmap makeEmptyMutableBitmap();
+
+  public ImmutableBitmap makeEmptyImmutableBitmap();
+
+  public ImmutableBitmap makeImmutableBitmap(MutableBitmap mutableBitmap);
 
   /**
    * Given a ByteBuffer pointing at a serialized version of a bitmap,
@@ -24,7 +28,7 @@ public interface BitmapFactory
    *
    * @return the new bitmap
    */
-  public ImmutableGenericBitmap mapImmutableBitmap(ByteBuffer b);
+  public ImmutableBitmap mapImmutableBitmap(ByteBuffer b);
 
   /**
    * Compute the union (bitwise-OR) of a set of bitmaps. They are assumed to be
@@ -38,7 +42,7 @@ public interface BitmapFactory
    * @throws ClassCastException if one of the ImmutableGenericBitmap objects if not an instance
    *                            of WrappedImmutableConciseBitmap
    */
-  public ImmutableGenericBitmap union(Iterable<ImmutableGenericBitmap> b);
+  public ImmutableBitmap union(Iterable<ImmutableBitmap> b);
 
   /**
    * Compute the intersection (bitwise-AND) of a set of bitmaps. They are assumed to be
@@ -52,5 +56,7 @@ public interface BitmapFactory
    * @throws ClassCastException if one of the ImmutableGenericBitmap objects if not an instance
    *                            of WrappedImmutableConciseBitmap
    */
-  public ImmutableGenericBitmap intersection(Iterable<ImmutableGenericBitmap> b);
+  public ImmutableBitmap intersection(Iterable<ImmutableBitmap> b);
+
+  public ImmutableBitmap complement(ImmutableBitmap b);
 }
