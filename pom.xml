@@ -88,6 +88,12 @@
             <version>0.7.2</version>
             <scope>test</scope>
         </dependency>
+        <dependency>
+            <groupId>com.h2database</groupId>
+            <artifactId>h2</artifactId>
+            <version>1.4.182</version>
+            <scope>test</scope>
+        </dependency>
     </dependencies>
 
     <build>
@@ -135,7 +141,7 @@
                     <plugin>
                         <artifactId>maven-surefire-plugin</artifactId>
                         <configuration>
-                            <argLine>-server -Xms3G -Xmx3G</argLine>
+                          <argLine>-server -Xms3G -Xmx3G -Djub.consumers=CONSOLE,H2 -Djub.db.file=benchmarks/benchmarks</argLine>
                           <groups>com.metamx.test.annotation.Benchmark</groups>
                           <excludedGroups>com.metamx.test.annotation.Dummy</excludedGroups>
                         </configuration>
