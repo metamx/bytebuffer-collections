@@ -23,6 +23,7 @@ public class UniformBitmapBenchmarkTest extends BitmapBenchmark
   public static void prepareMostlyUniform() throws Exception
   {
     System.setProperty("jub.customkey", String.format("%05.4f", DENSITY));
+    reset();
 
     final BitSet expectedUnion = new BitSet();
     final int[] knownTrue = new int[MIN_INTERSECT];
@@ -54,6 +55,6 @@ public class UniformBitmapBenchmarkTest extends BitmapBenchmark
     }
     unionCount = expectedUnion.cardinality();
     minIntersection = knownTrue.length;
-    printSizeStats();
+    printSizeStats(DENSITY, "Uniform Bitmap");
   }
 }

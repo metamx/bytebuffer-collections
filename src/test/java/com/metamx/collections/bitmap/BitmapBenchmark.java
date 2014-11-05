@@ -38,8 +38,8 @@ public class BitmapBenchmark
   final static ImmutableGenericBitmap genericRoaring[] = new ImmutableGenericBitmap[SIZE];
   final static ConciseBitmapFactory conciseFactory = new ConciseBitmapFactory();
   final static RoaringBitmapFactory roaringFactory = new RoaringBitmapFactory();
-  final static Random rand = new Random(0);
 
+  static Random rand = new Random(0);
   static long totalConciseBytes = 0;
   static long totalRoaringBytes = 0;
   static long conciseCount = 0;
@@ -68,13 +68,29 @@ public class BitmapBenchmark
     return new ImmutableRoaringBitmap(buf.asReadOnlyBuffer());
   }
 
-  protected static void printSizeStats() {
-    System.err.println("             | Concise | Roaring ");
-    System.err.println("-------------|---------|---------");
-    System.err.printf("Count        |   %5d |   %5d " + System.lineSeparator(), conciseCount, roaringCount);
-    System.err.printf( "Average size |   %5d |   %5d " + System.lineSeparator(), totalConciseBytes / conciseCount, totalRoaringBytes / roaringCount);
-    System.err.println("-------------|---------|---------");
-    System.err.flush();
+  protected static void reset()
+  {
+    conciseCount = 0;
+    roaringCount = 0;
+    totalConciseBytes = 0;
+    totalRoaringBytes = 0;
+    unionCount = 0;
+    minIntersection = 0;
+    rand = new Random(0);
+  }
+
+  protected static void printSizeStats(double density, String name)
+  {
+    System.out.println("");
+    System.out.println("## " + name);
+    System.out.println("");
+    System.out.printf(" d = %06.5f | Concise | Roaring" + System.lineSeparator(), density);
+    System.out.println("-------------|---------|---------");
+    System.out.printf ("Count        |   %5d |   %5d " + System.lineSeparator(), conciseCount, roaringCount);
+    System.out.printf ("Average size |   %5d |   %5d " + System.lineSeparator(), totalConciseBytes / conciseCount, totalRoaringBytes / roaringCount);
+    System.out.println("-------------|---------|---------");
+    System.out.println("");
+    System.out.flush();
   }
 
   protected static ImmutableRoaringBitmap makeOffheapRoaring(MutableRoaringBitmap r) throws IOException

@@ -23,6 +23,7 @@ public class RangeBitmapBenchmarkTest extends BitmapBenchmark
   public static void prepareRandomRanges() throws Exception
   {
     System.setProperty("jub.customkey", String.format("%06.5f", DENSITY));
+    reset();
 
     final BitSet expectedUnion = new BitSet();
     for (int i = 0; i < SIZE; ++i) {
@@ -57,6 +58,6 @@ public class RangeBitmapBenchmarkTest extends BitmapBenchmark
       genericRoaring[i] = new WrappedImmutableRoaringBitmap(offheapRoaring[i]);
     }
     unionCount = expectedUnion.cardinality();
-    printSizeStats();
+    printSizeStats(DENSITY, "Random Alternating Bitmap");
   }
 }
