@@ -42,6 +42,8 @@ public class BitmapBenchmark
 
   static long totalConciseBytes = 0;
   static long totalRoaringBytes = 0;
+  static long conciseCount = 0;
+  static long roaringCount = 0;
   static long unionCount = 0;
   static long minIntersection = 0;
 
@@ -49,6 +51,7 @@ public class BitmapBenchmark
   {
     final byte[] bytes = concise.toBytes();
     totalConciseBytes += bytes.length;
+    conciseCount++;
     final ByteBuffer buf = ByteBuffer.allocateDirect(bytes.length).put(bytes);
     buf.rewind();
     return new ImmutableConciseSet(buf);
@@ -60,14 +63,15 @@ public class BitmapBenchmark
     r.serialize(new DataOutputStream(out));
     final byte[] bytes = out.toByteArray();
     totalRoaringBytes += bytes.length;
+    roaringCount++;
     buf.put(bytes);
     buf.rewind();
     return new ImmutableRoaringBitmap(buf.asReadOnlyBuffer());
   }
 
   protected static void printSizeStats() {
-    System.err.printf("Average concise size: %d" + System.lineSeparator(), totalConciseBytes / SIZE);
-    System.err.printf("Average roaring size: %d" + System.lineSeparator(), totalRoaringBytes / SIZE);
+    System.err.printf("Average concise size: %d" + System.lineSeparator(), totalConciseBytes / conciseCount);
+    System.err.printf("Average roaring size: %d" + System.lineSeparator(), totalRoaringBytes / roaringCount);
     System.err.flush();
   }
 

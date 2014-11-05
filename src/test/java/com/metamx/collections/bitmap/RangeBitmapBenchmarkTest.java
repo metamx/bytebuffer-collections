@@ -16,7 +16,7 @@ import java.util.BitSet;
 public class RangeBitmapBenchmarkTest extends BitmapBenchmark
 {
 
-  public static final double DENSITY = 0.25;
+  public static final double DENSITY = 0.001;
   public static final int MIN_INTERSECT = 50;
 
   @BeforeClass
