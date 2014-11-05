@@ -67,6 +67,14 @@ public class RoaringBitmapFactory implements BitmapFactory
     );
   }
 
+  @Override
+  public ImmutableBitmap complement(
+      ImmutableBitmap b, int length
+  )
+  {
+    return null;
+  }
+
   private static Iterable<ImmutableRoaringBitmap> unwrap(
       final Iterable<ImmutableBitmap> b
   )

@@ -113,11 +113,9 @@ public class ImmutableRTree
 
   public byte[] toBytes()
   {
-    ByteBuffer buf = data.duplicate();
-    buf.position(0);
-    byte[] b = new byte[buf.remaining()];
-    buf.get(b);
-    return b;
+    ByteBuffer buf = ByteBuffer.allocate(data.capacity());
+    buf.put(data.asReadOnlyBuffer());
+    return buf.array();
   }
 
   public int compareTo(ImmutableRTree other)

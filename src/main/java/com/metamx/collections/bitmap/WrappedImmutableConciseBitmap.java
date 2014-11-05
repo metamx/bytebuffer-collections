@@ -60,7 +60,7 @@ public class WrappedImmutableConciseBitmap implements ImmutableBitmap
       @Override
       public IntIterator clone()
       {
-        throw new UnsupportedOperationException("clone is not supported on ConciseSet iterator");
+        return new WrappedConciseIntIterator(i.clone());
       }
 
       @Override

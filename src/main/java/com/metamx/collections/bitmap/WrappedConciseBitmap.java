@@ -41,13 +41,7 @@ public class WrappedConciseBitmap implements MutableBitmap
   @Override
   public byte[] toBytes()
   {
-    int[] words = bitmap.getWords();
-    if (words == null) {
-      return new byte[]{};
-    }
-    ByteBuffer buf = ByteBuffer.allocate(words.length * Ints.BYTES);
-    buf.asIntBuffer().put(words);
-    return buf.array();
+    return ImmutableConciseSet.newImmutableFromMutable(bitmap).toBytes();
   }
 
   @Override
@@ -97,7 +91,7 @@ public class WrappedConciseBitmap implements MutableBitmap
   @Override
   public int getSizeInBytes()
   {
-    return bitmap.getWords().length * Ints.BYTES + Ints.BYTES;
+    return bitmap.getWords().length * Ints.BYTES;
   }
 
   @Override

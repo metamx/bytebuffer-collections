@@ -173,7 +173,8 @@ public class Node
   {
     return ImmutableNode.HEADER_NUM_BYTES
            + 2 * getNumDims() * Floats.BYTES
-           + bitmap.getSizeInBytes() + Ints.BYTES
+           + Ints.BYTES // size of the set
+           + bitmap.getSizeInBytes()
            + getChildren().size() * Ints.BYTES;
   }
 
@@ -187,7 +188,10 @@ public class Node
     for (float v : getMaxCoordinates()) {
       buffer.putFloat(v);
     }
-    bitmap.serialize(buffer);
+    byte[] bytes = bitmap.toBytes();
+    buffer.putInt(bytes.length);
+    buffer.put(bytes);
+
     int pos = buffer.position();// better not to assign the parameter needlessly
     int childStartOffset = pos + getChildren().size() * Ints.BYTES;
     for (Node child : getChildren()) {

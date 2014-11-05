@@ -59,4 +59,6 @@ public interface BitmapFactory
   public ImmutableBitmap intersection(Iterable<ImmutableBitmap> b);
 
   public ImmutableBitmap complement(ImmutableBitmap b);
+
+  public ImmutableBitmap complement(ImmutableBitmap b, int length);
 }

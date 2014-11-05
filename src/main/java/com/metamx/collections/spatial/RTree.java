@@ -162,7 +162,7 @@ public class RTree
     }
 
     double minCost = Double.MAX_VALUE;
-    Node optimal = node.getChildren().get(0); //was: null and slightly unsafe
+    Node optimal = node.getChildren().get(0);
     for (Node child : node.getChildren()) {
       double cost = RTreeUtils.getExpansionCost(child, point);
       if (cost < minCost) {
