@@ -61,27 +61,30 @@ public class BitmapBenchmark
   {
     final ByteArrayOutputStream out = new ByteArrayOutputStream();
     r.serialize(new DataOutputStream(out));
-    final byte[] bytes = out.toByteArray();
-    totalRoaringBytes += bytes.length;
-    roaringCount++;
-    buf.put(bytes);
+    buf.put(out.toByteArray());
     buf.rewind();
     return new ImmutableRoaringBitmap(buf.asReadOnlyBuffer());
   }
 
   protected static void printSizeStats() {
-    System.err.printf("Average concise size: %d" + System.lineSeparator(), totalConciseBytes / conciseCount);
-    System.err.printf("Average roaring size: %d" + System.lineSeparator(), totalRoaringBytes / roaringCount);
+    System.err.println("             | Concise | Roaring ");
+    System.err.println("-------------|---------|---------");
+    System.err.printf( "Count        |   %5d |   %5d " + System.lineSeparator(), conciseCount, roaringCount);
+    System.err.printf( "Average size |   %5d |   %5d " + System.lineSeparator(), totalConciseBytes / conciseCount, totalRoaringBytes / roaringCount);
+    System.err.println("-------------|---------|---------");
     System.err.flush();
   }
 
-  protected static ImmutableRoaringBitmap makeOffheap(MutableRoaringBitmap r) throws IOException
+  protected static ImmutableRoaringBitmap makeOffheapRoaring(MutableRoaringBitmap r) throws IOException
   {
-    final ByteBuffer buf = ByteBuffer.allocateDirect(r.serializedSizeInBytes());
+    final int size = r.serializedSizeInBytes();
+    final ByteBuffer buf = ByteBuffer.allocateDirect(size);
+    totalRoaringBytes += size;
+    roaringCount++;
     return writeImmutable(r, buf);
   }
 
-  protected static ImmutableRoaringBitmap makeImmutable(MutableRoaringBitmap r) throws IOException
+  protected static ImmutableRoaringBitmap makeImmutableRoaring(MutableRoaringBitmap r) throws IOException
   {
     final ByteBuffer buf = ByteBuffer.allocate(r.serializedSizeInBytes());
     return writeImmutable(r, buf);

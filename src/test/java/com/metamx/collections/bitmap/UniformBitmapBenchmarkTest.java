@@ -16,7 +16,7 @@ import java.util.BitSet;
 public class UniformBitmapBenchmarkTest extends BitmapBenchmark
 {
 
-  public static final double DENSITY = 0.10;
+  public static final double DENSITY = 0.001;
   public static final int MIN_INTERSECT = 50;
 
   @BeforeClass
@@ -29,11 +29,11 @@ public class UniformBitmapBenchmarkTest extends BitmapBenchmark
     for (int i = 0; i < knownTrue.length; ++i) {
       knownTrue[i] = rand.nextInt(LENGTH);
     }
-    for(int i = 0; i < SIZE; ++i) {
+    for (int i = 0; i < SIZE; ++i) {
       ConciseSet c = new ConciseSet();
       MutableRoaringBitmap r = new MutableRoaringBitmap();
-      for(int k = 0; k < LENGTH; ++k) {
-        if(rand.nextDouble() < DENSITY) {
+      for (int k = 0; k < LENGTH; ++k) {
+        if (rand.nextDouble() < DENSITY) {
           c.add(k);
           r.add(k);
           expectedUnion.set(k);
@@ -45,10 +45,10 @@ public class UniformBitmapBenchmarkTest extends BitmapBenchmark
         expectedUnion.set(k);
       }
       concise[i] = ImmutableConciseSet.newImmutableFromMutable(c);
-      offheapConcise[i] = makeOffheapConcise(concise[i]);;
+      offheapConcise[i] = makeOffheapConcise(concise[i]);
       roaring[i] = r;
-      immutableRoaring[i] = makeImmutable(r);
-      offheapRoaring[i] = makeOffheap(r);
+      immutableRoaring[i] = makeImmutableRoaring(r);
+      offheapRoaring[i] = makeOffheapRoaring(r);
       genericConcise[i] = new WrappedImmutableConciseBitmap(offheapConcise[i]);
       genericRoaring[i] = new WrappedImmutableRoaringBitmap(offheapRoaring[i]);
     }

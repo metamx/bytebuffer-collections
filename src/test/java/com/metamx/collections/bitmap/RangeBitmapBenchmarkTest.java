@@ -51,8 +51,8 @@ public class RangeBitmapBenchmarkTest extends BitmapBenchmark
       concise[i] = ImmutableConciseSet.newImmutableFromMutable(c);
       offheapConcise[i] = makeOffheapConcise(concise[i]);
       roaring[i] = r;
-      immutableRoaring[i] = makeImmutable(r);
-      offheapRoaring[i] = makeOffheap(r);
+      immutableRoaring[i] = makeImmutableRoaring(r);
+      offheapRoaring[i] = makeOffheapRoaring(r);
       genericConcise[i] = new WrappedImmutableConciseBitmap(offheapConcise[i]);
       genericRoaring[i] = new WrappedImmutableRoaringBitmap(offheapRoaring[i]);
     }
