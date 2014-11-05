@@ -16,7 +16,7 @@ import java.util.BitSet;
 public class UniformBitmapBenchmarkTest extends BitmapBenchmark
 {
 
-  public static final double DENSITY = 0.001;
+  public static final double DENSITY = 0.01;
   public static final int MIN_INTERSECT = 50;
 
   @BeforeClass

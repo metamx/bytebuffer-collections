@@ -25,14 +25,14 @@ public class RangeBitmapBenchmarkTest extends BitmapBenchmark
     System.setProperty("jub.customkey", String.format("%06.5f", DENSITY));
 
     final BitSet expectedUnion = new BitSet();
-    for(int i = 0; i < SIZE; ++i) {
+    for (int i = 0; i < SIZE; ++i) {
       ConciseSet c = new ConciseSet();
       MutableRoaringBitmap r = new MutableRoaringBitmap();
       {
         int k = 0;
         boolean fill = true;
         while (k < LENGTH) {
-          int runLength = (int)(LENGTH  * DENSITY) + rand.nextInt((int)(LENGTH * DENSITY));
+          int runLength = (int) (LENGTH * DENSITY) + rand.nextInt((int) (LENGTH * DENSITY));
           for (int j = k; fill && j < LENGTH && j < k + runLength; ++j) {
             c.add(j);
             r.add(j);
@@ -43,7 +43,7 @@ public class RangeBitmapBenchmarkTest extends BitmapBenchmark
         }
       }
       minIntersection = MIN_INTERSECT;
-      for(int k = LENGTH / 2; k < LENGTH / 2 + minIntersection; ++k) {
+      for (int k = LENGTH / 2; k < LENGTH / 2 + minIntersection; ++k) {
         c.add(k);
         r.add(k);
         expectedUnion.set(k);

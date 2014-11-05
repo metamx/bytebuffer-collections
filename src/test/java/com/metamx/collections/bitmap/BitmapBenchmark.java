@@ -61,7 +61,9 @@ public class BitmapBenchmark
   {
     final ByteArrayOutputStream out = new ByteArrayOutputStream();
     r.serialize(new DataOutputStream(out));
-    buf.put(out.toByteArray());
+    final byte[] bytes = out.toByteArray();
+    Assert.assertEquals(buf.remaining(), bytes.length);
+    buf.put(bytes);
     buf.rewind();
     return new ImmutableRoaringBitmap(buf.asReadOnlyBuffer());
   }
@@ -69,7 +71,7 @@ public class BitmapBenchmark
   protected static void printSizeStats() {
     System.err.println("             | Concise | Roaring ");
     System.err.println("-------------|---------|---------");
-    System.err.printf( "Count        |   %5d |   %5d " + System.lineSeparator(), conciseCount, roaringCount);
+    System.err.printf("Count        |   %5d |   %5d " + System.lineSeparator(), conciseCount, roaringCount);
     System.err.printf( "Average size |   %5d |   %5d " + System.lineSeparator(), totalConciseBytes / conciseCount, totalRoaringBytes / roaringCount);
     System.err.println("-------------|---------|---------");
     System.err.flush();
