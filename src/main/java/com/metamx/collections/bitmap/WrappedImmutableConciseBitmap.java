@@ -34,6 +34,10 @@ public class WrappedImmutableConciseBitmap implements ImmutableBitmap
   }
 
   @Override
+  public boolean get(int value){
+    return bitmap.get(value)>0;
+  }
+  @Override
   public byte[] toBytes()
   {
     return bitmap.toBytes();

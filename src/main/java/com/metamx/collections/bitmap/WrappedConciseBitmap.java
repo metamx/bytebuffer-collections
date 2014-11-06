@@ -13,7 +13,7 @@ public class WrappedConciseBitmap implements MutableBitmap
   /**
    * Underlying bitmap.
    */
-  private final ConciseSet bitmap;
+  private ConciseSet bitmap;
 
   /**
    * Create a new WrappedConciseBitmap wrapping an empty  ConciseSet
@@ -69,7 +69,7 @@ public class WrappedConciseBitmap implements MutableBitmap
   {
     WrappedConciseBitmap other = (WrappedConciseBitmap) mutableBitmap;
     ConciseSet unwrappedOtherBitmap = other.bitmap;
-    bitmap.intersection(unwrappedOtherBitmap);
+    bitmap = bitmap.intersection(unwrappedOtherBitmap);
   }
 
   @Override
@@ -77,7 +77,7 @@ public class WrappedConciseBitmap implements MutableBitmap
   {
     WrappedConciseBitmap other = (WrappedConciseBitmap) mutableBitmap;
     ConciseSet unwrappedOtherBitmap = other.bitmap;
-    bitmap.symmetricDifference(unwrappedOtherBitmap);
+    bitmap = bitmap.symmetricDifference(unwrappedOtherBitmap);
   }
 
   @Override
@@ -85,7 +85,7 @@ public class WrappedConciseBitmap implements MutableBitmap
   {
     WrappedConciseBitmap other = (WrappedConciseBitmap) mutableBitmap;
     ConciseSet unwrappedOtherBitmap = other.bitmap;
-    bitmap.difference(unwrappedOtherBitmap);
+    bitmap = bitmap.difference(unwrappedOtherBitmap);
   }
 
   @Override
@@ -181,5 +181,9 @@ public class WrappedConciseBitmap implements MutableBitmap
     WrappedConciseBitmap other = (WrappedConciseBitmap) otherBitmap;
     ConciseSet unwrappedOtherBitmap = other.bitmap;
     return new WrappedConciseBitmap(bitmap.clone().difference(unwrappedOtherBitmap));
+  }
+  @Override
+  public boolean get(int value){
+    return bitmap.contains(value);
   }
 }
