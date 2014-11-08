@@ -78,7 +78,7 @@ public interface MutableBitmap extends ImmutableBitmap
   public void remove(int entry);
 
   /**
-   * Write out a serialized version of the bitmap to the ByteBuffer. We preprend
+   * Write out a serialized (Immutable) version of the bitmap to the ByteBuffer. We preprend
    * the serialized bitmap with a 4-byte int indicating the size in bytes. Thus
    * getSizeInBytes() + 4 bytes are written.
    * <p/>

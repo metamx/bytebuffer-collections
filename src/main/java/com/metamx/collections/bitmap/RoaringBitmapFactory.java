@@ -1,9 +1,12 @@
 package com.metamx.collections.bitmap;
 
+import com.google.common.base.Throwables;
+import org.roaringbitmap.RoaringBitmap;
 import org.roaringbitmap.buffer.BufferFastAggregation;
 import org.roaringbitmap.buffer.ImmutableRoaringBitmap;
-import org.roaringbitmap.buffer.MutableRoaringBitmap;
 
+import java.io.ByteArrayOutputStream;
+import java.io.DataOutputStream;
 import java.nio.ByteBuffer;
 import java.util.Iterator;
 
@@ -22,19 +25,42 @@ public class RoaringBitmapFactory implements BitmapFactory
   @Override
   public ImmutableBitmap makeEmptyImmutableBitmap()
   {
-    return new WrappedImmutableRoaringBitmap(new ImmutableRoaringBitmap(ByteBuffer.wrap(new byte[]{})));
+    try {
+      final RoaringBitmap roaringBitmap = new RoaringBitmap();
+      final ByteArrayOutputStream out = new ByteArrayOutputStream();
+      roaringBitmap.serialize(new DataOutputStream(out));
+      final byte[] bytes = out.toByteArray();
+
+      ByteBuffer buf = ByteBuffer.wrap(bytes);
+      return new WrappedImmutableRoaringBitmap(
+          new ImmutableRoaringBitmap(buf)
+      );
+    }
+    catch (Exception e) {
+      throw Throwables.propagate(e);
+    }
   }
 
   @Override
   public ImmutableBitmap makeImmutableBitmap(MutableBitmap mutableBitmap)
   {
-    if (mutableBitmap instanceof MutableRoaringBitmap) {
+    if (!(mutableBitmap instanceof WrappedRoaringBitmap)) {
       throw new IllegalStateException(String.format("Cannot convert [%s]", mutableBitmap.getClass()));
     }
-    ByteBuffer buf = ByteBuffer.allocate(mutableBitmap.getSizeInBytes());
-    return new WrappedImmutableRoaringBitmap(
-        new ImmutableRoaringBitmap(buf.asReadOnlyBuffer())
-    );
+    try {
+      final ByteArrayOutputStream out = new ByteArrayOutputStream();
+      ((WrappedRoaringBitmap) mutableBitmap).getBitmap().serialize(new DataOutputStream(out));
+      final byte[] bytes = out.toByteArray();
+
+
+      ByteBuffer buf = ByteBuffer.wrap(bytes);
+      return new WrappedImmutableRoaringBitmap(
+          new ImmutableRoaringBitmap(buf)
+      );
+    }
+    catch (Exception e) {
+      throw Throwables.propagate(e);
+    }
   }
 
   @Override
@@ -72,7 +98,7 @@ public class RoaringBitmapFactory implements BitmapFactory
       ImmutableBitmap b, int length
   )
   {
-    return null;
+    return complement(b);
   }
 
   private static Iterable<ImmutableRoaringBitmap> unwrap(

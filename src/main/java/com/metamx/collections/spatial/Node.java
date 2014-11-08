@@ -80,9 +80,6 @@ public class Node
 
   public void addChild(Node node)
   {
-    if (node == this) {
-      System.out.println("WTF");
-    }
     node.setParent(this);
     children.add(node);
   }
@@ -158,7 +155,7 @@ public class Node
     return bitmap;
   }
 
-  public void addToInvertedIndex(Node node)
+  public void addToBitmapIndex(Node node)
   {
     bitmap.or(node.getBitmap());
   }
@@ -192,7 +189,7 @@ public class Node
     buffer.putInt(bytes.length);
     buffer.put(bytes);
 
-    int pos = buffer.position();// better not to assign the parameter needlessly
+    int pos = buffer.position();
     int childStartOffset = pos + getChildren().size() * Ints.BYTES;
     for (Node child : getChildren()) {
       buffer.putInt(pos, childStartOffset);

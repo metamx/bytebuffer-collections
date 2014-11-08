@@ -26,6 +26,9 @@ public class ConciseBitmapFactory implements BitmapFactory
   @Override
   public ImmutableBitmap makeImmutableBitmap(MutableBitmap mutableBitmap)
   {
+    if (!(mutableBitmap instanceof WrappedConciseBitmap)) {
+      throw new IllegalStateException(String.format("Cannot convert [%s]", mutableBitmap.getClass()));
+    }
     return new WrappedImmutableConciseBitmap(
         ImmutableConciseSet.newImmutableFromMutable(
             ((WrappedConciseBitmap) mutableBitmap).getBitmap()

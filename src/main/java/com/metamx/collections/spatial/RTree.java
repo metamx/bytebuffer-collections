@@ -155,7 +155,7 @@ public class RTree
    */
   private Node chooseLeaf(Node node, Point point)
   {
-    node.addToInvertedIndex(point);
+    node.addToBitmapIndex(point);
 
     if (node.isLeaf()) {
       return node;
