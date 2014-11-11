@@ -147,12 +147,13 @@ public class TestIntegerSet
       set.remove(1);
       set.add(9999);
 
-      integerSet.retainAll(set);
-
-      set = IntSetTestUtility.getSetBits();
-      set.remove(1);
-
-      Assert.assertTrue(Sets.difference(integerSet, set).isEmpty());
+      boolean threwError = false;
+      try {
+        integerSet.retainAll(set);
+      }catch(UnsupportedOperationException ex){
+        threwError = true;
+      }
+      Assert.assertTrue(threwError);
     }
   }
 

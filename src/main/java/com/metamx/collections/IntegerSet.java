@@ -2,7 +2,6 @@ package com.metamx.collections;
 
 import com.google.common.collect.Sets;
 import com.metamx.collections.bitmap.MutableBitmap;
-import com.metamx.collections.bitmap.MutableBitmapFactory;
 import org.roaringbitmap.IntIterator;
 
 import java.util.Collection;
@@ -163,22 +162,8 @@ public class IntegerSet implements Set<Integer>
   @Override
   public boolean retainAll(Collection<?> c)
   {
-    MutableBitmap otherMap = MutableBitmapFactory.newEmpty(mutableBitmap.getClass());
-
-    Iterator<?> it = c.iterator();
-    while (it.hasNext()) {
-      Object next = it.next();
-      if (next instanceof Integer) {
-        if (contains(next)) {
-          otherMap.add((Integer) next);
-        }
-      } else {
-        throw new ClassCastException("Only integers can be retained");
-      }
-    }
-    int cardinality = mutableBitmap.size();
-    mutableBitmap.and(otherMap);
-    return cardinality == mutableBitmap.size();
+    // Stub
+    throw new UnsupportedOperationException("Cannot retainAll ona an IntegerSet");
   }
 
   @Override
