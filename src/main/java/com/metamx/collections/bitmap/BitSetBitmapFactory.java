@@ -5,7 +5,6 @@ import java.util.BitSet;
 
 /**
  * BitSetBitmapFactory implements BitmapFactory as a wrapper for java.util.BitSet
- * Created by charlesallen on 11/5/14.
  */
 public class BitSetBitmapFactory implements BitmapFactory
 {

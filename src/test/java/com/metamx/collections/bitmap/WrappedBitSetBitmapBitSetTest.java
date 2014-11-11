@@ -7,6 +7,7 @@ import org.junit.Test;
 import org.roaringbitmap.IntIterator;
 
 import java.nio.ByteBuffer;
+import java.nio.ByteOrder;
 import java.util.BitSet;
 import java.util.Set;
 
@@ -39,6 +40,16 @@ public class WrappedBitSetBitmapBitSetTest
     Assert.assertEquals(bitSet.cardinality(), wrappedBitSetBitmapBitSet.size());
   }
 
+  @Test
+  public void testOffHeap(){
+    ByteBuffer buffer = ByteBuffer.allocateDirect(Long.SIZE * 100 / 8).order(ByteOrder.LITTLE_ENDIAN);
+    BitSet testSet = BitSet.valueOf(buffer);
+    testSet.set(1);
+    WrappedImmutableBitSetBitmap bitMap = new WrappedImmutableBitSetBitmap(testSet);
+    Assert.assertTrue(bitMap.get(1));
+    testSet.set(2);
+    Assert.assertTrue(bitMap.get(2));
+  }
   @Test
   public void testSimpleBitSet(){
     WrappedBitSetBitmap bitSet = new WrappedBitSetBitmap(IntSetTestUtility.createSimpleBitSet(IntSetTestUtility.getSetBits()));

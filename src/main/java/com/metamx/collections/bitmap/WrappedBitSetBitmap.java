@@ -5,7 +5,6 @@ import java.util.BitSet;
 
 /**
  * WrappedBitSetBitmap implements MutableBitmap for java.util.BitSet
- * Created by charlesallen on 11/5/14.
  */
 public class WrappedBitSetBitmap extends WrappedImmutableBitSetBitmap implements MutableBitmap
 {
@@ -20,6 +19,9 @@ public class WrappedBitSetBitmap extends WrappedImmutableBitSetBitmap implements
     super(bitSet);
   }
 
+  public WrappedBitSetBitmap(ByteBuffer byteBuffer){
+    super(byteBuffer);
+  }
   protected BitSet cloneBitSet()
   {
     return (BitSet) bitmap.clone();

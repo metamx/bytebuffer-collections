@@ -1,8 +1,8 @@
 package com.metamx.collections;
 
-import com.google.common.base.Throwables;
 import com.google.common.collect.Sets;
 import com.metamx.collections.bitmap.MutableBitmap;
+import com.metamx.collections.bitmap.MutableBitmapFactory;
 import org.roaringbitmap.IntIterator;
 
 import java.util.Collection;
@@ -50,8 +50,6 @@ public class IntegerSet implements Set<Integer>
       this.intIt = bitSet.iterator();
       this.bitSet = bitSet;
     }
-
-    private int pos = 0;
 
     @Override
     public boolean hasNext()
@@ -165,16 +163,7 @@ public class IntegerSet implements Set<Integer>
   @Override
   public boolean retainAll(Collection<?> c)
   {
-    MutableBitmap otherMap = null;
-    try {
-      otherMap = mutableBitmap.getClass().newInstance();
-    }
-    catch (InstantiationException e) {
-      throw Throwables.propagate(e);
-    }
-    catch (IllegalAccessException e) {
-      throw Throwables.propagate(e);
-    }
+    MutableBitmap otherMap = MutableBitmapFactory.newEmpty(mutableBitmap.getClass());
 
     Iterator<?> it = c.iterator();
     while (it.hasNext()) {

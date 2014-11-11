@@ -2,11 +2,11 @@ package com.metamx.collections.bitmap;
 
 import org.roaringbitmap.IntIterator;
 
+import java.nio.ByteBuffer;
 import java.util.BitSet;
 
 /**
  * WrappedImmutableBitSetBitmap implements ImmutableBitmap for java.util.BitSet
- * Created by charlesallen on 11/5/14.
  */
 public class WrappedImmutableBitSetBitmap implements ImmutableBitmap
 {
@@ -20,6 +20,13 @@ public class WrappedImmutableBitSetBitmap implements ImmutableBitmap
   public WrappedImmutableBitSetBitmap()
   {
     this(new BitSet());
+  }
+
+  // WARNING: the current implementation of BitSet (1.7) copies the contents of ByteBuffer to
+  // on heap!
+  // TODO: make a new BitSet implementation which can use ByteBuffers properly.
+  public WrappedImmutableBitSetBitmap(ByteBuffer byteBuffer){
+    this(BitSet.valueOf(byteBuffer));
   }
 
   private class BitSetIterator implements IntIterator
