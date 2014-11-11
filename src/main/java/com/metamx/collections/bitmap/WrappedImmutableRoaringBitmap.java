@@ -87,6 +87,12 @@ public class WrappedImmutableRoaringBitmap implements ImmutableBitmap
   }
 
   @Override
+  public boolean get(int value)
+  {
+    return bitmap.contains(value);
+  }
+
+  @Override
   public ImmutableBitmap intersection(ImmutableBitmap otherBitmap)
   {
     WrappedImmutableRoaringBitmap other = (WrappedImmutableRoaringBitmap) otherBitmap;
