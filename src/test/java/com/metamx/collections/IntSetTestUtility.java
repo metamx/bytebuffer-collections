@@ -12,7 +12,7 @@ import java.util.Iterator;
 import java.util.Set;
 
 /**
- * Created by charlesallen on 11/5/14.
+ * 
  */
 public class IntSetTestUtility
 {
