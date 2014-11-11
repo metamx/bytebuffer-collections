@@ -3,24 +3,24 @@ package com.metamx.collections.spatial.search;
 import com.google.common.base.Function;
 import com.google.common.base.Predicate;
 import com.google.common.collect.Iterables;
+import com.metamx.collections.bitmap.ImmutableBitmap;
 import com.metamx.collections.spatial.ImmutableNode;
 import com.metamx.collections.spatial.ImmutablePoint;
-import com.metamx.collections.bitmap.ImmutableGenericBitmap;
 
 /**
  */
 public class GutmanSearchStrategy implements SearchStrategy
 {
   @Override
-  public Iterable<ImmutableGenericBitmap> search(ImmutableNode node, Bound bound)
+  public Iterable<ImmutableBitmap> search(ImmutableNode node, Bound bound)
   {
     if (bound.getLimit() > 0) {
       return Iterables.transform(
           breadthFirstSearch(node, bound),
-          new Function<ImmutableNode, ImmutableGenericBitmap>()
+          new Function<ImmutableNode, ImmutableBitmap>()
           {
             @Override
-            public ImmutableGenericBitmap apply(ImmutableNode immutableNode)
+            public ImmutableBitmap apply(ImmutableNode immutableNode)
             {
               return immutableNode.getImmutableBitmap();
             }
@@ -30,10 +30,10 @@ public class GutmanSearchStrategy implements SearchStrategy
 
     return Iterables.transform(
         depthFirstSearch(node, bound),
-        new Function<ImmutablePoint, ImmutableGenericBitmap>()
+        new Function<ImmutablePoint, ImmutableBitmap>()
         {
           @Override
-          public ImmutableGenericBitmap apply(ImmutablePoint immutablePoint)
+          public ImmutableBitmap apply(ImmutablePoint immutablePoint)
           {
             return immutablePoint.getImmutableBitmap();
           }

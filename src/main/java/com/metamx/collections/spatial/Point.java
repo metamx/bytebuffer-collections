@@ -1,8 +1,8 @@
 package com.metamx.collections.spatial;
 
 import com.google.common.collect.Lists;
+import com.metamx.collections.bitmap.MutableBitmap;
 import com.metamx.collections.bitmap.BitmapFactory;
-import com.metamx.collections.bitmap.GenericBitmap;
 
 import java.util.Arrays;
 import java.util.List;
@@ -11,15 +11,15 @@ import java.util.List;
  */
 public class Point extends Node
 {
-  private static GenericBitmap makeBitmap(int entry, BitmapFactory bitmapFactory)
+  private static MutableBitmap makeBitmap(int entry, BitmapFactory bitmapFactory)
   {
-    GenericBitmap retVal = bitmapFactory.getEmptyBitmap();
+    MutableBitmap retVal = bitmapFactory.makeEmptyMutableBitmap();
     retVal.add(entry);
     return retVal;
   }
 
   private final float[] coords;
-  private final GenericBitmap invertedIndex;
+  private final MutableBitmap bitmap;
 
   public Point(float[] coords, int entry, BitmapFactory bitmapFactory)
   {
@@ -33,16 +33,16 @@ public class Point extends Node
     );
 
     this.coords = coords;
-    this.invertedIndex = bitmapFactory.getEmptyBitmap();
-    this.invertedIndex.add(entry);
+    this.bitmap = bitmapFactory.makeEmptyMutableBitmap();
+    this.bitmap.add(entry);
   }
 
-  public Point(float[] coords, GenericBitmap entry)
+  public Point(float[] coords, MutableBitmap entry)
   {
     super(coords, Arrays.copyOf(coords, coords.length), Lists.<Node>newArrayList(), true, null, entry);
 
     this.coords = coords;
-    this.invertedIndex = entry;
+    this.bitmap = entry;
   }
 
   public float[] getCoords()
@@ -51,9 +51,9 @@ public class Point extends Node
   }
 
   @Override
-  public GenericBitmap getBitmap()
+  public MutableBitmap getBitmap()
   {
-    return invertedIndex;
+    return bitmap;
   }
 
   @Override

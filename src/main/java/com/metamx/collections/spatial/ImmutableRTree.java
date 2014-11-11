@@ -3,7 +3,7 @@ package com.metamx.collections.spatial;
 import com.google.common.base.Preconditions;
 import com.google.common.primitives.Ints;
 import com.metamx.collections.bitmap.BitmapFactory;
-import com.metamx.collections.bitmap.ImmutableGenericBitmap;
+import com.metamx.collections.bitmap.ImmutableBitmap;
 import com.metamx.collections.spatial.search.Bound;
 import com.metamx.collections.spatial.search.GutmanSearchStrategy;
 import com.metamx.collections.spatial.search.SearchStrategy;
@@ -97,14 +97,14 @@ public class ImmutableRTree
     return numDims;
   }
 
-  public Iterable<ImmutableGenericBitmap> search(Bound bound)
+  public Iterable<ImmutableBitmap> search(Bound bound)
   {
     Preconditions.checkArgument(bound.getNumDims() == numDims);
 
     return defaultSearchStrategy.search(root, bound);
   }
 
-  public Iterable<ImmutableGenericBitmap> search(SearchStrategy strategy, Bound bound)
+  public Iterable<ImmutableBitmap> search(SearchStrategy strategy, Bound bound)
   {
     Preconditions.checkArgument(bound.getNumDims() == numDims);
 
@@ -113,11 +113,9 @@ public class ImmutableRTree
 
   public byte[] toBytes()
   {
-    ByteBuffer buf = data.duplicate();
-    buf.position(0);
-    byte[] b = new byte[buf.remaining()];
-    buf.get(b);
-    return b;
+    ByteBuffer buf = ByteBuffer.allocate(data.capacity());
+    buf.put(data.asReadOnlyBuffer());
+    return buf.array();
   }
 
   public int compareTo(ImmutableRTree other)

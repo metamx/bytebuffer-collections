@@ -12,33 +12,69 @@ import java.util.Iterator;
 public class ConciseBitmapFactory implements BitmapFactory
 {
   @Override
-  public GenericBitmap getEmptyBitmap()
+  public MutableBitmap makeEmptyMutableBitmap()
   {
     return new WrappedConciseBitmap();
   }
 
   @Override
-  public ImmutableGenericBitmap mapImmutableBitmap(ByteBuffer b)
+  public ImmutableBitmap makeEmptyImmutableBitmap()
+  {
+    return new WrappedImmutableConciseBitmap(new ImmutableConciseSet());
+  }
+
+  @Override
+  public ImmutableBitmap makeImmutableBitmap(MutableBitmap mutableBitmap)
+  {
+    if (!(mutableBitmap instanceof WrappedConciseBitmap)) {
+      throw new IllegalStateException(String.format("Cannot convert [%s]", mutableBitmap.getClass()));
+    }
+    return new WrappedImmutableConciseBitmap(
+        ImmutableConciseSet.newImmutableFromMutable(
+            ((WrappedConciseBitmap) mutableBitmap).getBitmap()
+        )
+    );
+  }
+
+  @Override
+  public ImmutableBitmap mapImmutableBitmap(ByteBuffer b)
   {
     return new WrappedImmutableConciseBitmap(b);
   }
 
   @Override
-  public ImmutableGenericBitmap union(Iterable<ImmutableGenericBitmap> b)
+  public ImmutableBitmap union(Iterable<ImmutableBitmap> b)
       throws ClassCastException
   {
     return new WrappedImmutableConciseBitmap(ImmutableConciseSet.union(unwrap(b)));
   }
 
   @Override
-  public ImmutableGenericBitmap intersection(Iterable<ImmutableGenericBitmap> b)
+  public ImmutableBitmap intersection(Iterable<ImmutableBitmap> b)
       throws ClassCastException
   {
     return new WrappedImmutableConciseBitmap(ImmutableConciseSet.intersection(unwrap(b)));
   }
 
+  @Override
+  public ImmutableBitmap complement(ImmutableBitmap b)
+  {
+    return new WrappedImmutableConciseBitmap(ImmutableConciseSet.complement(((WrappedImmutableConciseBitmap) b).getBitmap()));
+  }
+
+  @Override
+  public ImmutableBitmap complement(ImmutableBitmap b, int length)
+  {
+    return new WrappedImmutableConciseBitmap(
+        ImmutableConciseSet.complement(
+            ((WrappedImmutableConciseBitmap) b).getBitmap(),
+            length
+        )
+    );
+  }
+
   private static Iterable<ImmutableConciseSet> unwrap(
-      final Iterable<ImmutableGenericBitmap> b
+      final Iterable<ImmutableBitmap> b
   )
   {
     return new Iterable<ImmutableConciseSet>()
@@ -46,7 +82,7 @@ public class ConciseBitmapFactory implements BitmapFactory
       @Override
       public Iterator<ImmutableConciseSet> iterator()
       {
-        final Iterator<ImmutableGenericBitmap> i = b.iterator();
+        final Iterator<ImmutableBitmap> i = b.iterator();
         return new Iterator<ImmutableConciseSet>()
         {
           @Override
@@ -64,7 +100,7 @@ public class ConciseBitmapFactory implements BitmapFactory
           @Override
           public ImmutableConciseSet next()
           {
-            return ((WrappedImmutableConciseBitmap) i.next()).getInvertedIndex();
+            return ((WrappedImmutableConciseBitmap) i.next()).getBitmap();
           }
         };
       }

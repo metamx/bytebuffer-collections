@@ -1,20 +1,23 @@
 package com.metamx.collections.bitmap;
 
+import com.google.common.base.Throwables;
 import org.roaringbitmap.IntIterator;
 import org.roaringbitmap.buffer.ImmutableRoaringBitmap;
 
+import java.io.ByteArrayOutputStream;
+import java.io.DataOutputStream;
 import java.nio.ByteBuffer;
 
-public class WrappedImmutableRoaringBitmap implements ImmutableGenericBitmap
+public class WrappedImmutableRoaringBitmap implements ImmutableBitmap
 {
   /**
    * Underlying bitmap.
    */
-  private final ImmutableRoaringBitmap invertedIndex;
+  private final ImmutableRoaringBitmap bitmap;
 
   protected WrappedImmutableRoaringBitmap(ByteBuffer byteBuffer)
   {
-    this.invertedIndex = new ImmutableRoaringBitmap(byteBuffer.asReadOnlyBuffer());
+    this.bitmap = new ImmutableRoaringBitmap(byteBuffer.asReadOnlyBuffer());
   }
 
   /**
@@ -24,59 +27,84 @@ public class WrappedImmutableRoaringBitmap implements ImmutableGenericBitmap
    */
   public WrappedImmutableRoaringBitmap(ImmutableRoaringBitmap immutableRoaringBitmap)
   {
-    this.invertedIndex = immutableRoaringBitmap;
+    this.bitmap = immutableRoaringBitmap;
   }
 
-  public ImmutableRoaringBitmap getInvertedIndex()
+  public ImmutableRoaringBitmap getBitmap()
   {
-    return invertedIndex;
+    return bitmap;
+  }
+
+  @Override
+  public byte[] toBytes()
+  {
+    try {
+      final ByteArrayOutputStream out = new ByteArrayOutputStream();
+      bitmap.serialize(new DataOutputStream(out));
+      return out.toByteArray();
+    }
+    catch (Exception e) {
+      throw Throwables.propagate(e);
+    }
+  }
+
+  @Override
+  public int compareTo(ImmutableBitmap other)
+  {
+    return 0;
   }
 
   @Override
   public String toString()
   {
-    return getClass().getSimpleName() + invertedIndex.toString();
+    return getClass().getSimpleName() + bitmap.toString();
   }
 
   @Override
   public IntIterator iterator()
   {
-    return invertedIndex.getIntIterator();
+    return bitmap.getIntIterator();
   }
 
   @Override
   public int size()
   {
-    return invertedIndex.getCardinality();
+    return bitmap.getCardinality();
   }
 
   @Override
   public boolean isEmpty()
   {
-    return invertedIndex.isEmpty();
+    return bitmap.isEmpty();
   }
 
   @Override
-  public ImmutableGenericBitmap union(ImmutableGenericBitmap bitmap)
+  public ImmutableBitmap union(ImmutableBitmap otherBitmap)
   {
-    WrappedImmutableRoaringBitmap other = (WrappedImmutableRoaringBitmap) bitmap;
-    ImmutableRoaringBitmap otherIndex = other.invertedIndex;
-    return new WrappedImmutableRoaringBitmap(ImmutableRoaringBitmap.or(invertedIndex, otherIndex));
+    WrappedImmutableRoaringBitmap other = (WrappedImmutableRoaringBitmap) otherBitmap;
+    ImmutableRoaringBitmap unwrappedOtherBitmap = other.bitmap;
+    return new WrappedImmutableRoaringBitmap(ImmutableRoaringBitmap.or(bitmap, unwrappedOtherBitmap));
   }
 
   @Override
-  public ImmutableGenericBitmap intersection(ImmutableGenericBitmap bitmap)
+  public boolean get(int value)
   {
-    WrappedImmutableRoaringBitmap other = (WrappedImmutableRoaringBitmap) bitmap;
-    ImmutableRoaringBitmap otherIndex = other.invertedIndex;
-    return new WrappedImmutableRoaringBitmap(ImmutableRoaringBitmap.and(invertedIndex, otherIndex));
+    return bitmap.contains(value);
   }
 
   @Override
-  public ImmutableGenericBitmap difference(ImmutableGenericBitmap bitmap)
+  public ImmutableBitmap intersection(ImmutableBitmap otherBitmap)
   {
-    WrappedImmutableRoaringBitmap other = (WrappedImmutableRoaringBitmap) bitmap;
-    ImmutableRoaringBitmap otherIndex = other.invertedIndex;
-    return new WrappedImmutableRoaringBitmap(ImmutableRoaringBitmap.andNot(invertedIndex, otherIndex));
+    WrappedImmutableRoaringBitmap other = (WrappedImmutableRoaringBitmap) otherBitmap;
+    ImmutableRoaringBitmap unwrappedOtherBitmap = other.bitmap;
+    return new WrappedImmutableRoaringBitmap(ImmutableRoaringBitmap.and(bitmap, unwrappedOtherBitmap));
+  }
+
+  @Override
+  public ImmutableBitmap difference(ImmutableBitmap otherBitmap)
+  {
+    WrappedImmutableRoaringBitmap other = (WrappedImmutableRoaringBitmap) otherBitmap;
+    ImmutableRoaringBitmap unwrappedOtherBitmap = other.bitmap;
+    return new WrappedImmutableRoaringBitmap(ImmutableRoaringBitmap.andNot(bitmap, unwrappedOtherBitmap));
   }
 }
