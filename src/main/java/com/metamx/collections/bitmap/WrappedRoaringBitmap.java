@@ -209,8 +209,10 @@ public class WrappedRoaringBitmap implements MutableBitmap
     MutableRoaringBitmap unwrappedOtherBitmap = other.bitmap;
     return new WrappedImmutableRoaringBitmap(MutableRoaringBitmap.andNot(bitmap, unwrappedOtherBitmap));
   }
+
   @Override
-  public boolean get(int value){
+  public boolean get(int value)
+  {
     return bitmap.contains(value);
   }
 }

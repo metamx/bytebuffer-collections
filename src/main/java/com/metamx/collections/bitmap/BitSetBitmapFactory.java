@@ -37,10 +37,10 @@ public class BitSetBitmapFactory implements BitmapFactory
   public ImmutableBitmap union(Iterable<ImmutableBitmap> b)
   {
     WrappedBitSetBitmap newSet = null;
-    for( ImmutableBitmap bm : b){
-      if(null == newSet){
-        newSet = new WrappedBitSetBitmap(((WrappedBitSetBitmap)bm).cloneBitSet());
-      }else{
+    for (ImmutableBitmap bm : b) {
+      if (null == newSet) {
+        newSet = new WrappedBitSetBitmap(((WrappedBitSetBitmap) bm).cloneBitSet());
+      } else {
         newSet.union(bm);
       }
     }
@@ -52,10 +52,10 @@ public class BitSetBitmapFactory implements BitmapFactory
   {
 
     WrappedBitSetBitmap newSet = null;
-    for( ImmutableBitmap bm : b){
-      if(null == newSet){
-        newSet = new WrappedBitSetBitmap(((WrappedBitSetBitmap)bm).cloneBitSet());
-      }else{
+    for (ImmutableBitmap bm : b) {
+      if (null == newSet) {
+        newSet = new WrappedBitSetBitmap(((WrappedBitSetBitmap) bm).cloneBitSet());
+      } else {
         newSet.intersection(bm);
       }
     }
@@ -65,8 +65,8 @@ public class BitSetBitmapFactory implements BitmapFactory
   @Override
   public ImmutableBitmap complement(ImmutableBitmap b)
   {
-    BitSet bitSet = ((WrappedBitSetBitmap)b).cloneBitSet();
-    bitSet.flip(0,bitSet.size());
+    BitSet bitSet = ((WrappedBitSetBitmap) b).cloneBitSet();
+    bitSet.flip(0, bitSet.size());
     return new WrappedBitSetBitmap(bitSet);
   }
 

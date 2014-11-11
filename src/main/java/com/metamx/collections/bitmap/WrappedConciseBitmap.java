@@ -182,8 +182,10 @@ public class WrappedConciseBitmap implements MutableBitmap
     ConciseSet unwrappedOtherBitmap = other.bitmap;
     return new WrappedConciseBitmap(bitmap.clone().difference(unwrappedOtherBitmap));
   }
+
   @Override
-  public boolean get(int value){
+  public boolean get(int value)
+  {
     return bitmap.contains(value);
   }
 }

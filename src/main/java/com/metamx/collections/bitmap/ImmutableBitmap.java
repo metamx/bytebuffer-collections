@@ -29,10 +29,13 @@ public interface ImmutableBitmap
 
   /**
    * Returns true if the bit at position value is set
+   *
    * @param value the position to check
+   *
    * @return true if bit is set
    */
   public boolean get(int value);
+
   /**
    * Compute the bitwise-or of this bitmap with another bitmap. A new bitmap is generated.
    * <p/>
