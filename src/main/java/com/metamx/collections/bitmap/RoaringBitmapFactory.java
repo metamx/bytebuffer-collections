@@ -88,7 +88,7 @@ public class RoaringBitmapFactory implements BitmapFactory
         ImmutableRoaringBitmap.flip(
             ((WrappedImmutableRoaringBitmap) b).getBitmap(),
             0,
-            0xFFFF
+            b.size()
         )
     );
   }
@@ -98,7 +98,13 @@ public class RoaringBitmapFactory implements BitmapFactory
       ImmutableBitmap b, int length
   )
   {
-    return complement(b);
+    return new WrappedImmutableRoaringBitmap(
+        ImmutableRoaringBitmap.flip(
+            ((WrappedImmutableRoaringBitmap) b).getBitmap(),
+            0,
+            length
+        )
+    );
   }
 
   private static Iterable<ImmutableRoaringBitmap> unwrap(
