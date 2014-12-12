@@ -3,14 +3,14 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>com.metamx</groupId>
     <artifactId>bytebuffer-collections</artifactId>
-    <version>0.1.2-SNAPSHOT</version>
+    <version>0.1.2</version>
     <name>bytebuffer-collections</name>
     <description>ByteBuffer Collections</description>
     <scm>
         <connection>scm:git:ssh://git@github.com/metamx/bytebuffer-collections.git</connection>
         <developerConnection>scm:git:ssh://git@github.com/metamx/bytebuffer-collections.git</developerConnection>
         <url>http://www.github.com/metamx/bytebuffer-collections</url>
-        <tag>bytebuffer-collections-0.1.1-SNAPSHOT</tag>
+        <tag>bytebuffer-collections-0.1.2</tag>
     </scm>
 
     <properties>
