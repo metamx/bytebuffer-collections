@@ -1,6 +1,7 @@
 package com.metamx.collections.spatial;
 
 import com.google.common.base.Preconditions;
+import com.google.common.collect.ImmutableList;
 import com.google.common.primitives.Ints;
 import com.metamx.collections.bitmap.BitmapFactory;
 import com.metamx.collections.bitmap.ImmutableBitmap;
@@ -99,16 +100,17 @@ public class ImmutableRTree
 
   public Iterable<ImmutableBitmap> search(Bound bound)
   {
-    Preconditions.checkArgument(bound.getNumDims() == numDims);
-
-    return defaultSearchStrategy.search(root, bound);
+    return search(defaultSearchStrategy, bound);
   }
 
   public Iterable<ImmutableBitmap> search(SearchStrategy strategy, Bound bound)
   {
-    Preconditions.checkArgument(bound.getNumDims() == numDims);
-
-    return strategy.search(root, bound);
+    if(bound.getNumDims() == numDims) {
+      return strategy.search(root, bound);
+    }else{
+      // If the dimension counts don't match (for example, if this is called on a blank `new ImmutableRTree()`)
+      return ImmutableList.<ImmutableBitmap>of();
+    }
   }
 
   public byte[] toBytes()
