@@ -32,6 +32,23 @@ import java.util.Iterator;
  */
 public class RoaringBitmapFactory implements BitmapFactory
 {
+  private static final ImmutableRoaringBitmap EMPTY_IMMUTABLE_BITMAP;
+
+  static {
+    try {
+      final RoaringBitmap roaringBitmap = new RoaringBitmap();
+      final ByteArrayOutputStream out = new ByteArrayOutputStream();
+      roaringBitmap.serialize(new DataOutputStream(out));
+      final byte[] bytes = out.toByteArray();
+
+      ByteBuffer buf = ByteBuffer.wrap(bytes);
+      EMPTY_IMMUTABLE_BITMAP = new ImmutableRoaringBitmap(buf);
+    }
+    catch (Exception e) {
+      throw Throwables.propagate(e);
+    }
+  }
+
   @Override
   public MutableBitmap makeEmptyMutableBitmap()
   {
@@ -41,20 +58,9 @@ public class RoaringBitmapFactory implements BitmapFactory
   @Override
   public ImmutableBitmap makeEmptyImmutableBitmap()
   {
-    try {
-      final RoaringBitmap roaringBitmap = new RoaringBitmap();
-      final ByteArrayOutputStream out = new ByteArrayOutputStream();
-      roaringBitmap.serialize(new DataOutputStream(out));
-      final byte[] bytes = out.toByteArray();
-
-      ByteBuffer buf = ByteBuffer.wrap(bytes);
-      return new WrappedImmutableRoaringBitmap(
-          new ImmutableRoaringBitmap(buf)
-      );
-    }
-    catch (Exception e) {
-      throw Throwables.propagate(e);
-    }
+    return new WrappedImmutableRoaringBitmap(
+        EMPTY_IMMUTABLE_BITMAP
+    );
   }
 
   @Override
@@ -138,7 +144,7 @@ public class RoaringBitmapFactory implements BitmapFactory
           @Override
           public void remove()
           {
-            i.remove();
+            throw new UnsupportedOperationException();
           }
 
           @Override
@@ -150,7 +156,13 @@ public class RoaringBitmapFactory implements BitmapFactory
           @Override
           public ImmutableRoaringBitmap next()
           {
-            return ((WrappedImmutableRoaringBitmap) i.next()).getBitmap();
+            WrappedImmutableRoaringBitmap wrappedBitmap = (WrappedImmutableRoaringBitmap) i.next();
+
+            if (wrappedBitmap == null) {
+              return EMPTY_IMMUTABLE_BITMAP;
+            }
+
+            return wrappedBitmap.getBitmap();
           }
         };
       }
