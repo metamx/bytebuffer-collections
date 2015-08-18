@@ -27,7 +27,7 @@ public class RoaringBitmapFactory implements BitmapFactory
   @Override
   public ImmutableGenericBitmap union(Iterable<ImmutableGenericBitmap> b)
   {
-    return new WrappedImmutableRoaringBitmap(BufferFastAggregation.horizontal_or(unwrap(b).iterator()));
+    return new WrappedImmutableRoaringBitmap(ImmutableRoaringBitmap.or(unwrap(b).iterator()));
   }
 
   @Override

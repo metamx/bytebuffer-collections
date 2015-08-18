@@ -14,6 +14,11 @@ public class WrappedRoaringBitmap implements GenericBitmap
    * Underlying bitmap.
    */
   private MutableRoaringBitmap invertedIndex;
+  
+  // attempt to compress long runs prior to serialization (requires RoaringBitmap version 0.5 or better)
+  // this may improve compression greatly in some cases at the expense of slower serialization
+  // Intuition: slower serialization is a small price to pay in most applications.
+  public static final boolean COMPRESS_RUN_ONSERIALIZATION = true; 
 
   /**
    * Create a new WrappedRoaringBitmap wrapping an empty MutableRoaringBitmap
@@ -89,6 +94,7 @@ public class WrappedRoaringBitmap implements GenericBitmap
   @Override
   public void serialize(ByteBuffer buffer)
   {
+    if ( COMPRESS_RUN_ONSERIALIZATION ) invertedIndex.runOptimize();
     buffer.putInt(getSizeInBytes());
     try {
       invertedIndex.serialize(
