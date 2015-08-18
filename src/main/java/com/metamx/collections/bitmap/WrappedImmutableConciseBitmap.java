@@ -1,3 +1,19 @@
+/*
+ * Copyright 2011 - 2015 Metamarkets Group Inc.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package com.metamx.collections.bitmap;
 
 import it.uniroma3.mat.extendedset.intset.ImmutableConciseSet;
@@ -6,16 +22,16 @@ import org.roaringbitmap.IntIterator;
 
 import java.nio.ByteBuffer;
 
-public class WrappedImmutableConciseBitmap implements ImmutableGenericBitmap
+public class WrappedImmutableConciseBitmap implements ImmutableBitmap
 {
   /**
    * Underlying bitmap.
    */
-  private final ImmutableConciseSet invertedIndex;
+  private final ImmutableConciseSet bitmap;
 
   public WrappedImmutableConciseBitmap(ByteBuffer byteBuffer)
   {
-    this.invertedIndex = new ImmutableConciseSet(byteBuffer.asReadOnlyBuffer());
+    this.bitmap = new ImmutableConciseSet(byteBuffer.asReadOnlyBuffer());
   }
 
   /**
@@ -25,30 +41,48 @@ public class WrappedImmutableConciseBitmap implements ImmutableGenericBitmap
    */
   public WrappedImmutableConciseBitmap(ImmutableConciseSet immutableConciseSet)
   {
-    this.invertedIndex = immutableConciseSet;
+    this.bitmap = immutableConciseSet;
   }
 
-  public ImmutableConciseSet getInvertedIndex()
+  public ImmutableConciseSet getBitmap()
   {
-    return invertedIndex;
+    return bitmap;
+  }
+
+  @Override
+  public boolean get(int value)
+  {
+    return bitmap.get(value) > 0;
+  }
+
+  @Override
+  public byte[] toBytes()
+  {
+    return bitmap.toBytes();
+  }
+
+  @Override
+  public int compareTo(ImmutableBitmap other)
+  {
+    return bitmap.compareTo(((WrappedImmutableConciseBitmap) other).getBitmap());
   }
 
   @Override
   public String toString()
   {
-    return getClass().getSimpleName() + invertedIndex.toString();
+    return getClass().getSimpleName() + bitmap.toString();
   }
 
   @Override
   public IntIterator iterator()
   {
-    final IntSet.IntIterator i = invertedIndex.iterator();
+    final IntSet.IntIterator i = bitmap.iterator();
     return new IntIterator()
     {
       @Override
       public IntIterator clone()
       {
-        throw new UnsupportedOperationException("clone is not supported on ConciseSet iterator");
+        return new WrappedConciseIntIterator(i.clone());
       }
 
       @Override
@@ -68,40 +102,40 @@ public class WrappedImmutableConciseBitmap implements ImmutableGenericBitmap
   @Override
   public int size()
   {
-    return invertedIndex.size();
+    return bitmap.size();
   }
 
   @Override
   public boolean isEmpty()
   {
-    return invertedIndex.size() == 0;
+    return bitmap.size() == 0;
   }
 
   @Override
-  public ImmutableGenericBitmap union(ImmutableGenericBitmap bitmap)
+  public ImmutableBitmap union(ImmutableBitmap otherBitmap)
   {
-    WrappedImmutableConciseBitmap other = (WrappedImmutableConciseBitmap) bitmap;
-    ImmutableConciseSet otherIndex = other.invertedIndex;
-    return new WrappedImmutableConciseBitmap(ImmutableConciseSet.union(invertedIndex, otherIndex));
+    WrappedImmutableConciseBitmap other = (WrappedImmutableConciseBitmap) otherBitmap;
+    ImmutableConciseSet unwrappedOtherBitmap = other.bitmap;
+    return new WrappedImmutableConciseBitmap(ImmutableConciseSet.union(bitmap, unwrappedOtherBitmap));
   }
 
   @Override
-  public ImmutableGenericBitmap intersection(ImmutableGenericBitmap bitmap)
+  public ImmutableBitmap intersection(ImmutableBitmap otherBitmap)
   {
-    WrappedImmutableConciseBitmap other = (WrappedImmutableConciseBitmap) bitmap;
-    ImmutableConciseSet otherIndex = other.invertedIndex;
-    return new WrappedImmutableConciseBitmap(ImmutableConciseSet.intersection(invertedIndex, otherIndex));
+    WrappedImmutableConciseBitmap other = (WrappedImmutableConciseBitmap) otherBitmap;
+    ImmutableConciseSet unwrappedOtherBitmap = other.bitmap;
+    return new WrappedImmutableConciseBitmap(ImmutableConciseSet.intersection(bitmap, unwrappedOtherBitmap));
   }
 
   @Override
-  public ImmutableGenericBitmap difference(ImmutableGenericBitmap bitmap)
+  public ImmutableBitmap difference(ImmutableBitmap otherBitmap)
   {
-    WrappedImmutableConciseBitmap other = (WrappedImmutableConciseBitmap) bitmap;
-    ImmutableConciseSet otherIndex = other.invertedIndex;
+    WrappedImmutableConciseBitmap other = (WrappedImmutableConciseBitmap) otherBitmap;
+    ImmutableConciseSet unwrappedOtherBitmap = other.bitmap;
     return new WrappedImmutableConciseBitmap(
         ImmutableConciseSet.intersection(
-            invertedIndex,
-            ImmutableConciseSet.complement(otherIndex)
+            bitmap,
+            ImmutableConciseSet.complement(unwrappedOtherBitmap)
         )
     );
   }

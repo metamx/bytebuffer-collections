@@ -1,3 +1,19 @@
+/*
+ * Copyright 2011 - 2015 Metamarkets Group Inc.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package com.metamx.collections.bitmap;
 
 import com.carrotsearch.junitbenchmarks.BenchmarkOptions;
@@ -34,14 +50,16 @@ public class BitmapBenchmark
   final static ImmutableRoaringBitmap roaring[] = new ImmutableRoaringBitmap[SIZE];
   final static ImmutableRoaringBitmap immutableRoaring[] = new ImmutableRoaringBitmap[SIZE];
   final static ImmutableRoaringBitmap offheapRoaring[] = new ImmutableRoaringBitmap[SIZE];
-  final static ImmutableGenericBitmap genericConcise[] = new ImmutableGenericBitmap[SIZE];
-  final static ImmutableGenericBitmap genericRoaring[] = new ImmutableGenericBitmap[SIZE];
+  final static ImmutableBitmap genericConcise[] = new ImmutableBitmap[SIZE];
+  final static ImmutableBitmap genericRoaring[] = new ImmutableBitmap[SIZE];
   final static ConciseBitmapFactory conciseFactory = new ConciseBitmapFactory();
   final static RoaringBitmapFactory roaringFactory = new RoaringBitmapFactory();
-  final static Random rand = new Random(0);
 
+  static Random rand = new Random(0);
   static long totalConciseBytes = 0;
   static long totalRoaringBytes = 0;
+  static long conciseCount = 0;
+  static long roaringCount = 0;
   static long unionCount = 0;
   static long minIntersection = 0;
 
@@ -49,6 +67,7 @@ public class BitmapBenchmark
   {
     final byte[] bytes = concise.toBytes();
     totalConciseBytes += bytes.length;
+    conciseCount++;
     final ByteBuffer buf = ByteBuffer.allocateDirect(bytes.length).put(bytes);
     buf.rewind();
     return new ImmutableConciseSet(buf);
@@ -59,25 +78,47 @@ public class BitmapBenchmark
     final ByteArrayOutputStream out = new ByteArrayOutputStream();
     r.serialize(new DataOutputStream(out));
     final byte[] bytes = out.toByteArray();
-    totalRoaringBytes += bytes.length;
+    Assert.assertEquals(buf.remaining(), bytes.length);
     buf.put(bytes);
     buf.rewind();
     return new ImmutableRoaringBitmap(buf.asReadOnlyBuffer());
   }
 
-  protected static void printSizeStats() {
-    System.err.printf("Average concise size: %d" + System.lineSeparator(), totalConciseBytes / SIZE);
-    System.err.printf("Average roaring size: %d" + System.lineSeparator(), totalRoaringBytes / SIZE);
-    System.err.flush();
+  protected static void reset()
+  {
+    conciseCount = 0;
+    roaringCount = 0;
+    totalConciseBytes = 0;
+    totalRoaringBytes = 0;
+    unionCount = 0;
+    minIntersection = 0;
+    rand = new Random(0);
   }
 
-  protected static ImmutableRoaringBitmap makeOffheap(MutableRoaringBitmap r) throws IOException
+  protected static void printSizeStats(double density, String name)
   {
-    final ByteBuffer buf = ByteBuffer.allocateDirect(r.serializedSizeInBytes());
+    System.out.println("");
+    System.out.println("## " + name);
+    System.out.println("");
+    System.out.printf(" d = %06.5f | Concise | Roaring" + System.lineSeparator(), density);
+    System.out.println("-------------|---------|---------");
+    System.out.printf ("Count        |   %5d |   %5d " + System.lineSeparator(), conciseCount, roaringCount);
+    System.out.printf ("Average size |   %5d |   %5d " + System.lineSeparator(), totalConciseBytes / conciseCount, totalRoaringBytes / roaringCount);
+    System.out.println("-------------|---------|---------");
+    System.out.println("");
+    System.out.flush();
+  }
+
+  protected static ImmutableRoaringBitmap makeOffheapRoaring(MutableRoaringBitmap r) throws IOException
+  {
+    final int size = r.serializedSizeInBytes();
+    final ByteBuffer buf = ByteBuffer.allocateDirect(size);
+    totalRoaringBytes += size;
+    roaringCount++;
     return writeImmutable(r, buf);
   }
 
-  protected static ImmutableRoaringBitmap makeImmutable(MutableRoaringBitmap r) throws IOException
+  protected static ImmutableRoaringBitmap makeImmutableRoaring(MutableRoaringBitmap r) throws IOException
   {
     final ByteBuffer buf = ByteBuffer.allocate(r.serializedSizeInBytes());
     return writeImmutable(r, buf);
@@ -100,14 +141,14 @@ public class BitmapBenchmark
   @Test @BenchmarkOptions(warmupRounds = 1, benchmarkRounds = 2)
   public void timeGenericConciseUnion() throws Exception
   {
-    ImmutableGenericBitmap union = conciseFactory.union(Lists.newArrayList(genericConcise));
+    ImmutableBitmap union = conciseFactory.union(Lists.newArrayList(genericConcise));
     Assert.assertEquals(unionCount, union.size());
   }
 
   @Test @BenchmarkOptions(warmupRounds = 1, benchmarkRounds = 5)
   public void timeGenericConciseIntersection() throws Exception
   {
-    ImmutableGenericBitmap intersection = conciseFactory.intersection(Lists.newArrayList(genericConcise));
+    ImmutableBitmap intersection = conciseFactory.intersection(Lists.newArrayList(genericConcise));
     Assert.assertTrue(intersection.size() >= minIntersection);
   }
 
@@ -135,14 +176,14 @@ public class BitmapBenchmark
   @Test
   public void timeGenericRoaringUnion() throws Exception
   {
-    ImmutableGenericBitmap union = roaringFactory.union(Lists.newArrayList(genericRoaring));
+    ImmutableBitmap union = roaringFactory.union(Lists.newArrayList(genericRoaring));
     Assert.assertEquals(unionCount, union.size());
   }
 
   @Test
   public void timeGenericRoaringIntersection() throws Exception
   {
-    ImmutableGenericBitmap intersection = roaringFactory.intersection(Lists.newArrayList(genericRoaring));
+    ImmutableBitmap intersection = roaringFactory.intersection(Lists.newArrayList(genericRoaring));
     Assert.assertTrue(intersection.size() >= minIntersection);
   }
 }

@@ -1,3 +1,19 @@
+/*
+ * Copyright 2011 - 2015 Metamarkets Group Inc.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package com.metamx.collections.bitmap;
 
 import java.nio.ByteBuffer;
@@ -9,7 +25,11 @@ public interface BitmapFactory
    *
    * @return the new bitmap
    */
-  public GenericBitmap getEmptyBitmap();
+  public MutableBitmap makeEmptyMutableBitmap();
+
+  public ImmutableBitmap makeEmptyImmutableBitmap();
+
+  public ImmutableBitmap makeImmutableBitmap(MutableBitmap mutableBitmap);
 
   /**
    * Given a ByteBuffer pointing at a serialized version of a bitmap,
@@ -24,7 +44,7 @@ public interface BitmapFactory
    *
    * @return the new bitmap
    */
-  public ImmutableGenericBitmap mapImmutableBitmap(ByteBuffer b);
+  public ImmutableBitmap mapImmutableBitmap(ByteBuffer b);
 
   /**
    * Compute the union (bitwise-OR) of a set of bitmaps. They are assumed to be
@@ -38,7 +58,7 @@ public interface BitmapFactory
    * @throws ClassCastException if one of the ImmutableGenericBitmap objects if not an instance
    *                            of WrappedImmutableConciseBitmap
    */
-  public ImmutableGenericBitmap union(Iterable<ImmutableGenericBitmap> b);
+  public ImmutableBitmap union(Iterable<ImmutableBitmap> b);
 
   /**
    * Compute the intersection (bitwise-AND) of a set of bitmaps. They are assumed to be
@@ -52,5 +72,9 @@ public interface BitmapFactory
    * @throws ClassCastException if one of the ImmutableGenericBitmap objects if not an instance
    *                            of WrappedImmutableConciseBitmap
    */
-  public ImmutableGenericBitmap intersection(Iterable<ImmutableGenericBitmap> b);
+  public ImmutableBitmap intersection(Iterable<ImmutableBitmap> b);
+
+  public ImmutableBitmap complement(ImmutableBitmap b);
+
+  public ImmutableBitmap complement(ImmutableBitmap b, int length);
 }

@@ -1,8 +1,26 @@
+/*
+ * Copyright 2011 - 2015 Metamarkets Group Inc.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package com.metamx.collections.spatial;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.common.base.Function;
 import com.google.common.base.Preconditions;
 import com.google.common.base.Throwables;
+import com.google.common.collect.Iterables;
 
 /**
  */
@@ -52,6 +70,43 @@ public class RTreeUtils
   {
     for (Node node : nodes) {
       node.enclose();
+    }
+  }
+
+  public static Iterable<ImmutablePoint> getBitmaps(ImmutableRTree tree)
+  {
+    return depthFirstSearch(tree.getRoot());
+  }
+
+  public static Iterable<ImmutablePoint> depthFirstSearch(ImmutableNode node)
+  {
+    if (node.isLeaf()) {
+      return Iterables.transform(
+          node.getChildren(),
+          new Function<ImmutableNode, ImmutablePoint>()
+          {
+            @Override
+            public ImmutablePoint apply(ImmutableNode tNode)
+            {
+              return new ImmutablePoint(tNode);
+            }
+          }
+      );
+    } else {
+      return Iterables.concat(
+          Iterables.transform(
+
+              node.getChildren(),
+              new Function<ImmutableNode, Iterable<ImmutablePoint>>()
+              {
+                @Override
+                public Iterable<ImmutablePoint> apply(ImmutableNode child)
+                {
+                  return depthFirstSearch(child);
+                }
+              }
+          )
+      );
     }
   }
 

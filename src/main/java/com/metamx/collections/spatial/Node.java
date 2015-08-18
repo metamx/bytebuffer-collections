@@ -1,11 +1,27 @@
+/*
+ * Copyright 2011 - 2015 Metamarkets Group Inc.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package com.metamx.collections.spatial;
 
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Lists;
 import com.google.common.primitives.Floats;
 import com.google.common.primitives.Ints;
+import com.metamx.collections.bitmap.MutableBitmap;
 import com.metamx.collections.bitmap.BitmapFactory;
-import com.metamx.collections.bitmap.GenericBitmap;
 
 import java.nio.ByteBuffer;
 import java.util.Arrays;
@@ -20,11 +36,11 @@ public class Node
 
   private final List<Node> children;
   private final boolean isLeaf;
-  private final GenericBitmap invertedIndex;
+  private final MutableBitmap bitmap;
 
   private Node parent;
 
-  public Node(float[] minCoordinates, float[] maxCoordinates, boolean isLeaf, BitmapFactory bitmapIndex)
+  public Node(float[] minCoordinates, float[] maxCoordinates, boolean isLeaf, BitmapFactory bitmapFactory)
   {
     this(
         minCoordinates,
@@ -32,7 +48,7 @@ public class Node
         Lists.<Node>newArrayList(),
         isLeaf,
         null,
-        bitmapIndex.getEmptyBitmap()
+        bitmapFactory.makeEmptyMutableBitmap()
     );
   }
 
@@ -42,7 +58,7 @@ public class Node
       List<Node> children,
       boolean isLeaf,
       Node parent,
-      GenericBitmap invertedIndex
+      MutableBitmap bitmap
   )
   {
     Preconditions.checkArgument(minCoordinates.length == maxCoordinates.length);
@@ -54,7 +70,7 @@ public class Node
       child.setParent(this);
     }
     this.isLeaf = isLeaf;
-    this.invertedIndex = invertedIndex;
+    this.bitmap = bitmap;
     this.parent = parent;
   }
 
@@ -80,9 +96,6 @@ public class Node
 
   public void addChild(Node node)
   {
-    if (node == this) {
-      System.out.println("WTF");
-    }
     node.setParent(this);
     children.add(node);
   }
@@ -153,27 +166,28 @@ public class Node
     return retVal;
   }
 
-  public GenericBitmap getBitmap()
+  public MutableBitmap getBitmap()
   {
-    return invertedIndex;
+    return bitmap;
   }
 
-  public void addToInvertedIndex(Node node)
+  public void addToBitmapIndex(Node node)
   {
-    invertedIndex.or(node.getBitmap());
+    bitmap.or(node.getBitmap());
   }
 
   public void clear()
   {
     children.clear();
-    invertedIndex.clear();
+    bitmap.clear();
   }
 
   public int getSizeInBytes()
   {
     return ImmutableNode.HEADER_NUM_BYTES
            + 2 * getNumDims() * Floats.BYTES
-           + invertedIndex.getSizeInBytes() + Ints.BYTES
+           + Ints.BYTES // size of the set
+           + bitmap.getSizeInBytes()
            + getChildren().size() * Ints.BYTES;
   }
 
@@ -187,8 +201,11 @@ public class Node
     for (float v : getMaxCoordinates()) {
       buffer.putFloat(v);
     }
-    invertedIndex.serialize(buffer);
-    int pos = buffer.position();// better not to assign the parameter needlessly
+    byte[] bytes = bitmap.toBytes();
+    buffer.putInt(bytes.length);
+    buffer.put(bytes);
+
+    int pos = buffer.position();
     int childStartOffset = pos + getChildren().size() * Ints.BYTES;
     for (Node child : getChildren()) {
       buffer.putInt(pos, childStartOffset);

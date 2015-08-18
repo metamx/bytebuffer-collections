@@ -14,15 +14,37 @@
  * limitations under the License.
  */
 
-package com.metamx.collections.spatial.split;
+package com.metamx.collections.bitmap;
 
-import com.metamx.collections.spatial.Node;
+import it.uniroma3.mat.extendedset.intset.IntSet;
+import org.roaringbitmap.IntIterator;
 
 /**
  */
-public interface SplitStrategy
+public class WrappedConciseIntIterator implements IntIterator
 {
-  public boolean needToSplit(Node node);
+  private final IntSet.IntIterator itr;
 
-  public Node[] split(Node node);
+  public WrappedConciseIntIterator(IntSet.IntIterator itr)
+  {
+    this.itr = itr;
+  }
+
+  @Override
+  public boolean hasNext()
+  {
+    return itr.hasNext();
+  }
+
+  @Override
+  public int next()
+  {
+    return itr.next();
+  }
+
+  @Override
+  public IntIterator clone()
+  {
+    return new WrappedConciseIntIterator(itr.clone());
+  }
 }

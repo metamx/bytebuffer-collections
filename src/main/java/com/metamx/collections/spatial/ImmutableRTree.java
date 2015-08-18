@@ -1,9 +1,26 @@
+/*
+ * Copyright 2011 - 2015 Metamarkets Group Inc.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package com.metamx.collections.spatial;
 
 import com.google.common.base.Preconditions;
+import com.google.common.collect.ImmutableList;
 import com.google.common.primitives.Ints;
 import com.metamx.collections.bitmap.BitmapFactory;
-import com.metamx.collections.bitmap.ImmutableGenericBitmap;
+import com.metamx.collections.bitmap.ImmutableBitmap;
 import com.metamx.collections.spatial.search.Bound;
 import com.metamx.collections.spatial.search.GutmanSearchStrategy;
 import com.metamx.collections.spatial.search.SearchStrategy;
@@ -97,27 +114,26 @@ public class ImmutableRTree
     return numDims;
   }
 
-  public Iterable<ImmutableGenericBitmap> search(Bound bound)
+  public Iterable<ImmutableBitmap> search(Bound bound)
   {
-    Preconditions.checkArgument(bound.getNumDims() == numDims);
-
-    return defaultSearchStrategy.search(root, bound);
+    return search(defaultSearchStrategy, bound);
   }
 
-  public Iterable<ImmutableGenericBitmap> search(SearchStrategy strategy, Bound bound)
+  public Iterable<ImmutableBitmap> search(SearchStrategy strategy, Bound bound)
   {
-    Preconditions.checkArgument(bound.getNumDims() == numDims);
-
-    return strategy.search(root, bound);
+    if(bound.getNumDims() == numDims) {
+      return strategy.search(root, bound);
+    }else{
+      // If the dimension counts don't match (for example, if this is called on a blank `new ImmutableRTree()`)
+      return ImmutableList.<ImmutableBitmap>of();
+    }
   }
 
   public byte[] toBytes()
   {
-    ByteBuffer buf = data.duplicate();
-    buf.position(0);
-    byte[] b = new byte[buf.remaining()];
-    buf.get(b);
-    return b;
+    ByteBuffer buf = ByteBuffer.allocate(data.capacity());
+    buf.put(data.asReadOnlyBuffer());
+    return buf.array();
   }
 
   public int compareTo(ImmutableRTree other)

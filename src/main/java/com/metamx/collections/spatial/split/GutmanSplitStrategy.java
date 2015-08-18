@@ -1,9 +1,26 @@
+/*
+ * Copyright 2011 - 2015 Metamarkets Group Inc.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package com.metamx.collections.spatial.split;
 
 import com.google.common.collect.Lists;
+import com.metamx.collections.bitmap.BitmapFactory;
 import com.metamx.collections.spatial.Node;
 import com.metamx.collections.spatial.RTreeUtils;
-import com.metamx.collections.bitmap.BitmapFactory;
+
 import java.util.Arrays;
 import java.util.List;
 
@@ -52,7 +69,7 @@ public abstract class GutmanSplitStrategy implements SplitStrategy
 
     node.clear();
     node.addChild(seeds[0]);
-    node.addToInvertedIndex(seeds[0]);
+    node.addToBitmapIndex(seeds[0]);
 
     Node group1 = new Node(
         Arrays.copyOf(seeds[1].getMinCoordinates(), seeds[1].getMinCoordinates().length),
@@ -60,9 +77,9 @@ public abstract class GutmanSplitStrategy implements SplitStrategy
         Lists.newArrayList(seeds[1]),
         node.isLeaf(),
         node.getParent(),
-        bf.getEmptyBitmap()
+        bf.makeEmptyMutableBitmap()
     );
-    group1.addToInvertedIndex(seeds[1]);
+    group1.addToBitmapIndex(seeds[1]);
     if (node.getParent() != null) {
       node.getParent().addChild(group1);
     }
@@ -75,8 +92,8 @@ public abstract class GutmanSplitStrategy implements SplitStrategy
     while (!children.isEmpty()) {
       for (Node group : groups) {
         if (group.getChildren().size() + children.size() <= minNumChildren) {
-          for (Node child : group.getChildren()) {
-            group.addToInvertedIndex(child);
+          for (Node child : children) {
+            group.addToBitmapIndex(child);
             group.addChild(child);
           }
           RTreeUtils.enclose(groups);
@@ -101,7 +118,7 @@ public abstract class GutmanSplitStrategy implements SplitStrategy
         optimal = groups[1];
       }
 
-      optimal.addToInvertedIndex(nextToAssign);
+      optimal.addToBitmapIndex(nextToAssign);
       optimal.addChild(nextToAssign);
       optimal.enclose();
     }
