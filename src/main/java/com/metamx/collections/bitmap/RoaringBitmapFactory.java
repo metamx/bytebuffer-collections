@@ -51,6 +51,9 @@ public class RoaringBitmapFactory implements BitmapFactory
     }
   }
 
+  private static final WrappedImmutableRoaringBitmap WRAPPED_IMMUTABLE_ROARING_BITMAP =
+      new WrappedImmutableRoaringBitmap(EMPTY_IMMUTABLE_BITMAP);
+
   private final boolean compressRunOnSerialization;
 
   public RoaringBitmapFactory()
@@ -72,9 +75,7 @@ public class RoaringBitmapFactory implements BitmapFactory
   @Override
   public ImmutableBitmap makeEmptyImmutableBitmap()
   {
-    return new WrappedImmutableRoaringBitmap(
-        EMPTY_IMMUTABLE_BITMAP
-    );
+    return WRAPPED_IMMUTABLE_ROARING_BITMAP;
   }
 
   @Override
