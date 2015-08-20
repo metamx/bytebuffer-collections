@@ -32,7 +32,6 @@ public class WrappedRoaringBitmap implements MutableBitmap
    * Underlying bitmap.
    */
   private MutableRoaringBitmap bitmap;
-  
 
   /**
    * Create a new WrappedRoaringBitmap wrapping an empty MutableRoaringBitmap
