@@ -18,6 +18,7 @@ package com.metamx.collections.bitmap;
 
 import com.google.common.base.Throwables;
 import org.roaringbitmap.IntIterator;
+import org.roaringbitmap.RoaringBitmap;
 import org.roaringbitmap.buffer.MutableRoaringBitmap;
 
 import java.io.ByteArrayOutputStream;
@@ -33,12 +34,28 @@ public class WrappedRoaringBitmap implements MutableBitmap
    */
   private MutableRoaringBitmap bitmap;
 
+  // attempt to compress long runs prior to serialization (requires RoaringBitmap version 0.5 or better)
+  // this may improve compression greatly in some cases at the expense of slower serialization
+  // in the worst case.
+  private final boolean compressRunOnSerialization;
+
   /**
-   * Create a new WrappedRoaringBitmap wrapping an empty MutableRoaringBitmap
+   * Creates a new WrappedRoaringBitmap wrapping an empty MutableRoaringBitmap
    */
   public WrappedRoaringBitmap()
   {
+    this(RoaringBitmapFactory.DEFAULT_COMPRESS_RUN_ON_SERIALIZATION);
+  }
+
+  /**
+   * Creates a new WrappedRoaringBitmap wrapping an empty MutableRoaringBitmap
+   *
+   * @param compressRunOnSerialization indicates whether to call {@link RoaringBitmap#runOptimize()} before serializing
+   */
+  public WrappedRoaringBitmap(boolean compressRunOnSerialization)
+  {
     this.bitmap = new MutableRoaringBitmap();
+    this.compressRunOnSerialization = compressRunOnSerialization;
   }
 
   public MutableRoaringBitmap getBitmap()
@@ -126,6 +143,9 @@ public class WrappedRoaringBitmap implements MutableBitmap
   @Override
   public void serialize(ByteBuffer buffer)
   {
+    if (compressRunOnSerialization) {
+      bitmap.runOptimize();
+    }
     buffer.putInt(getSizeInBytes());
     try {
       bitmap.serialize(

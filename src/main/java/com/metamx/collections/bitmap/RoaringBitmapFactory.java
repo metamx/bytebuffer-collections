@@ -32,6 +32,8 @@ import java.util.Iterator;
  */
 public class RoaringBitmapFactory implements BitmapFactory
 {
+  static final boolean DEFAULT_COMPRESS_RUN_ON_SERIALIZATION = false;
+
   private static final ImmutableRoaringBitmap EMPTY_IMMUTABLE_BITMAP;
 
   static {
@@ -49,10 +51,22 @@ public class RoaringBitmapFactory implements BitmapFactory
     }
   }
 
+  private final boolean compressRunOnSerialization;
+
+  public RoaringBitmapFactory()
+  {
+    this(DEFAULT_COMPRESS_RUN_ON_SERIALIZATION);
+  }
+
+  public RoaringBitmapFactory(boolean compressRunOnSerialization)
+  {
+    this.compressRunOnSerialization = compressRunOnSerialization;
+  }
+
   @Override
   public MutableBitmap makeEmptyMutableBitmap()
   {
-    return new WrappedRoaringBitmap();
+    return new WrappedRoaringBitmap(compressRunOnSerialization);
   }
 
   @Override
@@ -94,7 +108,7 @@ public class RoaringBitmapFactory implements BitmapFactory
   @Override
   public ImmutableBitmap union(Iterable<ImmutableBitmap> b)
   {
-    return new WrappedImmutableRoaringBitmap(BufferFastAggregation.horizontal_or(unwrap(b).iterator()));
+    return new WrappedImmutableRoaringBitmap(ImmutableRoaringBitmap.or(unwrap(b).iterator()));
   }
 
   @Override
