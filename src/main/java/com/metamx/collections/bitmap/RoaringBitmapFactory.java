@@ -34,6 +34,10 @@ public class RoaringBitmapFactory implements BitmapFactory
 {
   private static final ImmutableRoaringBitmap EMPTY_IMMUTABLE_BITMAP;
 
+  // attempt to compress long runs prior to serialization (requires RoaringBitmap version 0.5 or better)
+  // this may improve compression greatly in some cases 
+  public static final boolean COMPRESS_RUN_ON_SERIALIZATION = true; 
+
   static {
     try {
       final RoaringBitmap roaringBitmap = new RoaringBitmap();

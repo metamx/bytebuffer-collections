@@ -33,10 +33,6 @@ public class WrappedRoaringBitmap implements MutableBitmap
    */
   private MutableRoaringBitmap bitmap;
   
-  // attempt to compress long runs prior to serialization (requires RoaringBitmap version 0.5 or better)
-  // this may improve compression greatly in some cases at the expense of slower serialization
-  // Intuition: slower serialization is a small price to pay in most applications.
-  public static final boolean COMPRESS_RUN_ONSERIALIZATION = true; 
 
   /**
    * Create a new WrappedRoaringBitmap wrapping an empty MutableRoaringBitmap
@@ -131,7 +127,9 @@ public class WrappedRoaringBitmap implements MutableBitmap
   @Override
   public void serialize(ByteBuffer buffer)
   {
-    if ( COMPRESS_RUN_ONSERIALIZATION ) bitmap.runOptimize();
+    if ( RoaringBitmapFactory.COMPRESS_RUN_ON_SERIALIZATION ) {
+        bitmap.runOptimize();
+    }
     buffer.putInt(getSizeInBytes());
     try {
       bitmap.serialize(
