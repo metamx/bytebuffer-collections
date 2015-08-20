@@ -32,11 +32,9 @@ import java.util.Iterator;
  */
 public class RoaringBitmapFactory implements BitmapFactory
 {
-  private static final ImmutableRoaringBitmap EMPTY_IMMUTABLE_BITMAP;
+  static final boolean DEFAULT_COMPRESS_RUN_ON_SERIALIZATION = false;
 
-  // attempt to compress long runs prior to serialization (requires RoaringBitmap version 0.5 or better)
-  // this may improve compression greatly in some cases 
-  public static final boolean COMPRESS_RUN_ON_SERIALIZATION = true; 
+  private static final ImmutableRoaringBitmap EMPTY_IMMUTABLE_BITMAP;
 
   static {
     try {
@@ -53,10 +51,22 @@ public class RoaringBitmapFactory implements BitmapFactory
     }
   }
 
+  private final boolean compressRunOnSerialization;
+
+  public RoaringBitmapFactory()
+  {
+    this(DEFAULT_COMPRESS_RUN_ON_SERIALIZATION);
+  }
+
+  public RoaringBitmapFactory(boolean compressRunOnSerialization)
+  {
+    this.compressRunOnSerialization = compressRunOnSerialization;
+  }
+
   @Override
   public MutableBitmap makeEmptyMutableBitmap()
   {
-    return new WrappedRoaringBitmap();
+    return new WrappedRoaringBitmap(compressRunOnSerialization);
   }
 
   @Override
