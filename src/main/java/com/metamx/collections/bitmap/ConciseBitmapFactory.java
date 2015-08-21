@@ -27,7 +27,9 @@ import java.util.Iterator;
  */
 public class ConciseBitmapFactory implements BitmapFactory
 {
-  private static ImmutableConciseSet EMPTY_IMMUTABLE_BITMAP = new ImmutableConciseSet();
+  private static final ImmutableConciseSet EMPTY_IMMUTABLE_BITMAP = new ImmutableConciseSet();
+  private static final WrappedImmutableConciseBitmap WRAPPED_IMMUTABLE_CONCISE_BITMAP =
+      new WrappedImmutableConciseBitmap(EMPTY_IMMUTABLE_BITMAP);
 
   @Override
   public MutableBitmap makeEmptyMutableBitmap()
@@ -38,7 +40,7 @@ public class ConciseBitmapFactory implements BitmapFactory
   @Override
   public ImmutableBitmap makeEmptyImmutableBitmap()
   {
-    return new WrappedImmutableConciseBitmap(EMPTY_IMMUTABLE_BITMAP);
+    return WRAPPED_IMMUTABLE_CONCISE_BITMAP;
   }
 
   @Override
