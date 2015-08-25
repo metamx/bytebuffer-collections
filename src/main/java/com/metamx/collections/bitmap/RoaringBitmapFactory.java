@@ -85,15 +85,7 @@ public class RoaringBitmapFactory implements BitmapFactory
       throw new IllegalStateException(String.format("Cannot convert [%s]", mutableBitmap.getClass()));
     }
     try {
-      final ByteArrayOutputStream out = new ByteArrayOutputStream();
-      ((WrappedRoaringBitmap) mutableBitmap).getBitmap().serialize(new DataOutputStream(out));
-      final byte[] bytes = out.toByteArray();
-
-
-      ByteBuffer buf = ByteBuffer.wrap(bytes);
-      return new WrappedImmutableRoaringBitmap(
-          new ImmutableRoaringBitmap(buf)
-      );
+      return ((WrappedRoaringBitmap) mutableBitmap).toImmutableBitmap();
     }
     catch (Exception e) {
       throw Throwables.propagate(e);
