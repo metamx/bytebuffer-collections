@@ -38,6 +38,7 @@ public class WrappedBitSetBitmap extends WrappedImmutableBitSetBitmap implements
   public WrappedBitSetBitmap(ByteBuffer byteBuffer){
     super(byteBuffer);
   }
+
   protected BitSet cloneBitSet()
   {
     return (BitSet) bitmap.clone();

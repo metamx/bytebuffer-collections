@@ -58,7 +58,7 @@ public class WrappedRoaringBitmap implements MutableBitmap
     this.compressRunOnSerialization = compressRunOnSerialization;
   }
 
-  public ImmutableBitmap toImmutableBitmap()
+  ImmutableBitmap toImmutableBitmap()
   {
     MutableRoaringBitmap mrb = bitmap.clone();
     if (compressRunOnSerialization) {

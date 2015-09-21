@@ -49,7 +49,7 @@ public class WrappedConciseBitmap implements MutableBitmap
     this.bitmap = conciseSet;
   }
 
-  public ConciseSet getBitmap()
+  ConciseSet getBitmap()
   {
     return bitmap;
   }
