@@ -36,6 +36,7 @@ import org.roaringbitmap.IntIterator;
 import java.nio.ByteBuffer;
 import java.util.Random;
 import java.util.Set;
+import java.util.concurrent.TimeUnit;
 
 /**
  */
@@ -460,17 +461,17 @@ public class ImmutableRTreeTest
         BitmapFactory bf = new ConciseBitmapFactory();
         RTree tree = new RTree(2, new LinearGutmanSplitStrategy(0, 50, bf), bf);
 
-        Stopwatch stopwatch = new Stopwatch().start();
+        Stopwatch stopwatch = Stopwatch.createStarted();
         Random rand = new Random();
         for (int i = 0; i < numPoints; i++) {
           tree.insert(new float[]{(float) (rand.nextDouble() * 100), (float) (rand.nextDouble() * 100)}, i);
         }
-        long stop = stopwatch.elapsedMillis();
+        long stop = stopwatch.elapsed(TimeUnit.MILLISECONDS);
         System.out.printf("[%,d]: insert = %,d ms%n", numPoints, stop);
 
         stopwatch.reset().start();
         ImmutableRTree searchTree = ImmutableRTree.newImmutableFromMutable(tree);
-        stop = stopwatch.elapsedMillis();
+        stop = stopwatch.elapsed(TimeUnit.MILLISECONDS);
         System.out.printf("[%,d]: size = %,d bytes%n", numPoints, searchTree.toBytes().length);
         System.out.printf("[%,d]: buildImmutable = %,d ms%n", numPoints, stop);
 
@@ -479,7 +480,7 @@ public class ImmutableRTreeTest
         Iterable<ImmutableBitmap> points = searchTree.search(new RadiusBound(new float[]{50, 50}, radius));
 
         Iterables.size(points);
-        stop = stopwatch.elapsedMillis();
+        stop = stopwatch.elapsed(TimeUnit.MILLISECONDS);
 
         System.out.printf("[%,d]: search = %,dms%n", numPoints, stop);
 
@@ -487,7 +488,7 @@ public class ImmutableRTreeTest
 
         ImmutableBitmap finalSet = bf.union(points);
 
-        stop = stopwatch.elapsedMillis();
+        stop = stopwatch.elapsed(TimeUnit.MILLISECONDS);
         System.out.printf("[%,d]: union of %,d points in %,d ms%n", numPoints, finalSet.size(), stop);
       }
       catch (Exception e) {
@@ -510,17 +511,17 @@ public class ImmutableRTreeTest
         BitmapFactory bf = new ConciseBitmapFactory();
         RTree tree = new RTree(2, new LinearGutmanSplitStrategy(0, 50, bf), bf);
 
-        Stopwatch stopwatch = new Stopwatch().start();
+        Stopwatch stopwatch = Stopwatch.createStarted();
         Random rand = new Random();
         for (int i = 0; i < numPoints; i++) {
           tree.insert(new float[]{(float) (rand.nextDouble() * 100), (float) (rand.nextDouble() * 100)}, i);
         }
-        long stop = stopwatch.elapsedMillis();
+        long stop = stopwatch.elapsed(TimeUnit.MILLISECONDS);
         System.out.printf("[%,d]: insert = %,d ms%n", numPoints, stop);
 
         stopwatch.reset().start();
         ImmutableRTree searchTree = ImmutableRTree.newImmutableFromMutable(tree);
-        stop = stopwatch.elapsedMillis();
+        stop = stopwatch.elapsed(TimeUnit.MILLISECONDS);
         System.out.printf("[%,d]: size = %,d bytes%n", numPoints, searchTree.toBytes().length);
         System.out.printf("[%,d]: buildImmutable = %,d ms%n", numPoints, stop);
 
@@ -535,7 +536,7 @@ public class ImmutableRTreeTest
         );
 
         Iterables.size(points);
-        stop = stopwatch.elapsedMillis();
+        stop = stopwatch.elapsed(TimeUnit.MILLISECONDS);
 
         System.out.printf("[%,d]: search = %,dms%n", numPoints, stop);
 
@@ -543,7 +544,7 @@ public class ImmutableRTreeTest
 
         ImmutableBitmap finalSet = bf.union(points);
 
-        stop = stopwatch.elapsedMillis();
+        stop = stopwatch.elapsed(TimeUnit.MILLISECONDS);
         System.out.printf("[%,d]: union of %,d points in %,d ms%n", numPoints, finalSet.size(), stop);
       }
       catch (Exception e) {
