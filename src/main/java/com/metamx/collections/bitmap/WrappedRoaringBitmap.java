@@ -58,9 +58,13 @@ public class WrappedRoaringBitmap implements MutableBitmap
     this.compressRunOnSerialization = compressRunOnSerialization;
   }
 
-  public MutableRoaringBitmap getBitmap()
+  public ImmutableBitmap toImmutableBitmap()
   {
-    return bitmap;
+    MutableRoaringBitmap mrb = bitmap.clone();
+    if (compressRunOnSerialization) {
+      mrb.runOptimize();
+    }
+    return new WrappedImmutableRoaringBitmap(mrb);
   }
 
   @Override
@@ -68,6 +72,9 @@ public class WrappedRoaringBitmap implements MutableBitmap
   {
     try {
       final ByteArrayOutputStream out = new ByteArrayOutputStream();
+      if (compressRunOnSerialization) {
+        bitmap.runOptimize();
+      }
       bitmap.serialize(new DataOutputStream(out));
       return out.toByteArray();
     }
@@ -125,6 +132,9 @@ public class WrappedRoaringBitmap implements MutableBitmap
   @Override
   public int getSizeInBytes()
   {
+    if (compressRunOnSerialization) {
+      bitmap.runOptimize();
+    }
     return bitmap.serializedSizeInBytes();
   }
 
@@ -146,7 +156,6 @@ public class WrappedRoaringBitmap implements MutableBitmap
     if (compressRunOnSerialization) {
       bitmap.runOptimize();
     }
-    buffer.putInt(getSizeInBytes());
     try {
       bitmap.serialize(
           new DataOutputStream(

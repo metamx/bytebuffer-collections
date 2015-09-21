@@ -125,9 +125,7 @@ public class WrappedConciseBitmap implements MutableBitmap
   @Override
   public void serialize(ByteBuffer buffer)
   {
-    byte[] bytes = ImmutableConciseSet.newImmutableFromMutable(bitmap).toBytes();
-    buffer.putInt(bytes.length);
-    buffer.put(bytes);
+    buffer.put(toBytes());
   }
 
   @Override
