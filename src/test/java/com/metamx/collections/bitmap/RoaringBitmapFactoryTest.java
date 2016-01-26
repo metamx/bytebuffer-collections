@@ -19,7 +19,7 @@ package com.metamx.collections.bitmap;
 import com.google.common.base.Function;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
-import junit.framework.Assert;
+import org.junit.Assert;
 import org.junit.Test;
 import org.roaringbitmap.IntIterator;
 
@@ -32,21 +32,20 @@ public class RoaringBitmapFactoryTest
   @Test
   public void testIssue26() throws Exception
   {
-    printBitMap(new ConciseBitmapFactory());
-    printBitMap(new RoaringBitmapFactory());
+    checkEmptyComplement(new ConciseBitmapFactory());
+    checkEmptyComplement(new RoaringBitmapFactory());
   }
 
   // used by issue 26
-  private void printBitMap(BitmapFactory bitmapFactory) throws Exception
+  private void checkEmptyComplement(BitmapFactory bitmapFactory) throws Exception
   {
     int numRow = 5104234;
     ImmutableBitmap bitmap = bitmapFactory.complement(bitmapFactory.makeEmptyImmutableBitmap(), numRow);
     ImmutableBitmap notBitmap = bitmapFactory.complement(bitmap,numRow);
-    if(notBitmap.size() != 0) throw new RuntimeException("should be empty");
+    Assert.assertTrue(notBitmap.size() == 0);
+    Assert.assertTrue(notBitmap.isEmpty());
     IntIterator intIter = notBitmap.iterator();
-    while(intIter.hasNext()) {
-        throw new RuntimeException("should be empty");
-    }
+    Assert.assertFalse(intIter.hasNext());
   }
   
   @Test
