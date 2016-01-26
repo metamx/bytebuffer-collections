@@ -21,11 +21,34 @@ import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 import junit.framework.Assert;
 import org.junit.Test;
+import org.roaringbitmap.IntIterator;
 
 import java.util.Arrays;
 
 public class RoaringBitmapFactoryTest
 {
+    
+  // testing https://github.com/metamx/bytebuffer-collections/issues/26
+  @Test
+  public void testIssue26() throws Exception
+  {
+    printBitMap(new ConciseBitmapFactory());
+    printBitMap(new RoaringBitmapFactory());
+  }
+
+  // used by issue 26
+  private void printBitMap(BitmapFactory bitmapFactory) throws Exception
+  {
+    int numRow = 5104234;
+    ImmutableBitmap bitmap = bitmapFactory.complement(bitmapFactory.makeEmptyImmutableBitmap(), numRow);
+    ImmutableBitmap notBitmap = bitmapFactory.complement(bitmap,numRow);
+    if(notBitmap.size() != 0) throw new RuntimeException("should be empty");
+    IntIterator intIter = notBitmap.iterator();
+    while(intIter.hasNext()) {
+        throw new RuntimeException("should be empty");
+    }
+  }
+  
   @Test
   public void testUnwrapWithNull() throws Exception
   {
