@@ -31,7 +31,7 @@ import java.util.List;
 /**
  */
 public class PolygonBound extends RectangularBound {
-  private static final byte CACHE_TYPE_ID = 0x0;
+
   private final float[] abscissa;
   private final float[] ordinate;
 
