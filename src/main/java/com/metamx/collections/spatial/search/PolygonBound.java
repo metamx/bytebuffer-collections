@@ -30,10 +30,22 @@ import java.util.List;
 
 /**
  */
-public class PolygonBound extends RectangularBound {
-
+public class PolygonBound extends RectangularBound
+{
   private final float[] abscissa;
   private final float[] ordinate;
+
+  @JsonProperty
+  public float[] getOrdinate()
+  {
+    return ordinate;
+  }
+
+  @JsonProperty
+  public float[] getAbscissa()
+  {
+    return abscissa;
+  }
 
   private static float[] getMinCoords(float[] abscissa, float[] ordinate)
   {
@@ -79,7 +91,10 @@ public class PolygonBound extends RectangularBound {
     this.ordinate = ordinate;
   }
 
-  public PolygonBound(float[] abscissa, float[] ordinate)
+  public PolygonBound(
+      float[] abscissa,
+      float[] ordinate
+  )
   {
     this(abscissa, ordinate, 0);
   }
