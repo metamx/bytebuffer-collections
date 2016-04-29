@@ -27,7 +27,7 @@ import com.metamx.collections.spatial.ImmutablePoint;
 @JsonSubTypes(value={
     @JsonSubTypes.Type(name="rectangular", value=RectangularBound.class),
     @JsonSubTypes.Type(name="radius", value=RadiusBound.class),
-    @JsonSubTypes.Type(name="polygon", value=RadiusBound.class)
+    @JsonSubTypes.Type(name="polygon", value=PolygonBound.class)
 })
 public interface Bound
 {
