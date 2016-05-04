@@ -77,28 +77,39 @@ public class PolygonBound extends RectangularBound
     return retVal;
   }
 
+  /**
+   * abscissa and ordinate contain the coordinates of polygon.
+   * abscissa[i] is the horizontal coordinate for the i'th corner of the polygon,
+   * and ordinate[i] is the vertical coordinate for the i'th corner.
+   * The polygon must have more than 2 corners, so the length of abscissa or ordinate must be equal or greater than 3.
+   * @param abscissa
+   * @param ordinate
+   * @param limit
+     * @return
+     */
   @JsonCreator
-  public PolygonBound(
+  public static PolygonBound from(
       @JsonProperty("abscissa") float[] abscissa,
       @JsonProperty("ordinate") float[] ordinate,
       @JsonProperty("limit") int limit
   )
   {
-    super(getMinCoords(abscissa, ordinate), getMaxCoords(abscissa, ordinate), limit);
     Preconditions.checkArgument(abscissa.length == ordinate.length);
     Preconditions.checkArgument(abscissa.length >= 3);
+    return new PolygonBound(abscissa, ordinate, limit);
+  }
+
+  public static PolygonBound from(float[] abscissa, float[] ordinate)
+  {
+    return PolygonBound.from(abscissa, ordinate, 0);
+  }
+
+  private PolygonBound (float[] abscissa, float[] ordinate, int limit)
+  {
+    super(getMinCoords(abscissa, ordinate), getMaxCoords(abscissa, ordinate), limit);
     this.abscissa = abscissa;
     this.ordinate = ordinate;
   }
-
-  public PolygonBound(
-      float[] abscissa,
-      float[] ordinate
-  )
-  {
-    this(abscissa, ordinate, 0);
-  }
-
 
   @Override
   public boolean contains(float[] coords)

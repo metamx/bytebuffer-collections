@@ -361,29 +361,45 @@ public class ImmutableRTreeTest
   {
     BitmapFactory bf = new ConciseBitmapFactory();
     RTree tree = new RTree(2, new LinearGutmanSplitStrategy(0, 50, bf), bf);
-    tree.insert(new float[]{0, 0}, 1);
-    tree.insert(new float[]{1, 3}, 2);
-    tree.insert(new float[]{4, 2}, 3);
-    tree.insert(new float[]{5, 0}, 4);
-    tree.insert(new float[]{-4, -3}, 5);
-
     Random rand = new Random();
-    for (int i = 0; i < 95; i++) {
-      tree.insert(
-              new float[]{(float) (rand.nextDouble() * 10 + 10.0), (float) (rand.nextDouble() * 10 + 10.0)},
-              i
-      );
+
+    int outPolygon = 0, inPolygon = 0;
+    for (; inPolygon < 500;) {
+      double abscissa = rand.nextDouble() * 5;
+      double ordinate = rand.nextDouble() * 4;
+
+      if (abscissa < 1 || abscissa > 4 || ordinate < 1 || ordinate > 3 || abscissa < 2 && ordinate > 2)
+      {
+        tree.insert(
+            new float[]{(float) abscissa, (float) ordinate},
+            outPolygon + 500
+        );
+        outPolygon ++;
+      }
+      else if (abscissa > 1 && abscissa < 4 && ordinate > 1 && ordinate < 2
+          || abscissa > 2 && abscissa < 4 && ordinate >= 2 && ordinate < 3)
+      {
+        tree.insert(
+            new float[]{(float) abscissa, (float) ordinate},
+            inPolygon
+        );
+        inPolygon ++;
+      }
     }
 
     ImmutableRTree searchTree = ImmutableRTree.newImmutableFromMutable(tree);
-    Iterable<ImmutableBitmap> points = searchTree.search(new PolygonBound(
-            new float[]{0.0f, 0.0f, 9f, 9f},
-            new float[]{0.0f, 9f, 9f, 0.0f}
-            ));
+    Iterable<ImmutableBitmap> points = searchTree.search(PolygonBound.from(
+        new float[]{1.0f, 1.0f, 2.0f, 2.0f, 4.0f, 4.0f},
+        new float[]{1.0f, 2.0f, 2.0f, 3.0f, 3.0f, 1.0f}
+    ));
     ImmutableBitmap finalSet = bf.union(points);
-    Assert.assertTrue(finalSet.size() >= 2);
+    Assert.assertTrue(finalSet.size() == 500);
 
-    Set<Integer> expected = Sets.newHashSet(2, 3);
+    Set<Integer> expected = Sets.newHashSet();
+    for (int i = 0; i < 500; i ++)
+    {
+      expected.add(i);
+    }
     IntIterator iter = finalSet.iterator();
     while (iter.hasNext()) {
       Assert.assertTrue(expected.contains(iter.next()));
@@ -395,29 +411,45 @@ public class ImmutableRTreeTest
   {
     BitmapFactory bf = new RoaringBitmapFactory();
     RTree tree = new RTree(2, new LinearGutmanSplitStrategy(0, 50, bf), bf);
-    tree.insert(new float[]{0, 0}, 1);
-    tree.insert(new float[]{1, 3}, 2);
-    tree.insert(new float[]{4, 2}, 3);
-    tree.insert(new float[]{5, 0}, 4);
-    tree.insert(new float[]{-4, -3}, 5);
-
     Random rand = new Random();
-    for (int i = 0; i < 95; i++) {
-      tree.insert(
-              new float[]{(float) (rand.nextDouble() * 10 + 10.0), (float) (rand.nextDouble() * 10 + 10.0)},
-              i
-      );
+
+    int outPolygon = 0, inPolygon = 0;
+    for (; inPolygon < 500;) {
+      double abscissa = rand.nextDouble() * 5;
+      double ordinate = rand.nextDouble() * 4;
+
+      if (abscissa < 1 || abscissa > 4 || ordinate < 1 || ordinate > 3 || abscissa < 2 && ordinate > 2)
+      {
+        tree.insert(
+            new float[]{(float) abscissa, (float) ordinate},
+            outPolygon + 500
+        );
+        outPolygon ++;
+      }
+      else if (abscissa > 1 && abscissa < 4 && ordinate > 1 && ordinate < 2
+          || abscissa > 2 && abscissa < 4 && ordinate >= 2 && ordinate < 3)
+      {
+        tree.insert(
+            new float[]{(float) abscissa, (float) ordinate},
+            inPolygon
+        );
+        inPolygon ++;
+      }
     }
 
     ImmutableRTree searchTree = ImmutableRTree.newImmutableFromMutable(tree);
-    Iterable<ImmutableBitmap> points = searchTree.search(new PolygonBound(
-            new float[]{0.0f, 0.0f, 9f, 9f},
-            new float[]{0.0f, 9f, 9f, 0.0f}
+    Iterable<ImmutableBitmap> points = searchTree.search(PolygonBound.from(
+            new float[]{1.0f, 1.0f, 2.0f, 2.0f, 4.0f, 4.0f},
+            new float[]{1.0f, 2.0f, 2.0f, 3.0f, 3.0f, 1.0f}
     ));
     ImmutableBitmap finalSet = bf.union(points);
-    Assert.assertTrue(finalSet.size() >= 2);
+    Assert.assertTrue(finalSet.size() == 500);
 
-    Set<Integer> expected = Sets.newHashSet(2, 3);
+    Set<Integer> expected = Sets.newHashSet();
+    for (int i = 0; i < 500; i ++)
+    {
+      expected.add(i);
+    }
     IntIterator iter = finalSet.iterator();
     while (iter.hasNext()) {
       Assert.assertTrue(expected.contains(iter.next()));
