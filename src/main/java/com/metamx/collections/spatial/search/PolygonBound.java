@@ -82,10 +82,9 @@ public class PolygonBound extends RectangularBound
    * abscissa[i] is the horizontal coordinate for the i'th corner of the polygon,
    * and ordinate[i] is the vertical coordinate for the i'th corner.
    * The polygon must have more than 2 corners, so the length of abscissa or ordinate must be equal or greater than 3.
-   * @param abscissa
-   * @param ordinate
-   * @param limit
-     * @return
+   *
+   * if the polygon is a rectangular, which corners are {0.0, 0.0}, {0.0, 1.0}, {1.0, 1.0}, {1.0, 0.0},
+   * the abscissa should be {0.0, 0.0, 1.0, 1.0} and ordinate should be {0.0, 1.0, 1.0, 0.0}
      */
   @JsonCreator
   public static PolygonBound from(
@@ -94,8 +93,8 @@ public class PolygonBound extends RectangularBound
       @JsonProperty("limit") int limit
   )
   {
-    Preconditions.checkArgument(abscissa.length == ordinate.length);
-    Preconditions.checkArgument(abscissa.length >= 3);
+    Preconditions.checkArgument(abscissa.length == ordinate.length); //abscissa and ordinate should be the same length
+    Preconditions.checkArgument(abscissa.length > 2); //a polygon should have more than 2 corners
     return new PolygonBound(abscissa, ordinate, limit);
   }
 

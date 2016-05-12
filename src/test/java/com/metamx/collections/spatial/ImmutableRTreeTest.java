@@ -29,6 +29,7 @@ import com.metamx.collections.spatial.search.RadiusBound;
 import com.metamx.collections.spatial.search.RectangularBound;
 import com.metamx.collections.spatial.split.LinearGutmanSplitStrategy;
 
+import com.metamx.collections.spatial.split.QuadraticGutmanSplitStrategy;
 import junit.framework.Assert;
 
 import org.junit.Test;
@@ -360,6 +361,7 @@ public class ImmutableRTreeTest
   public void testSearchWithSplit4()
   {
     BitmapFactory bf = new ConciseBitmapFactory();
+    //RTree tree = new RTree(2, new QuadraticGutmanSplitStrategy(0, 100, bf), bf);
     RTree tree = new RTree(2, new LinearGutmanSplitStrategy(0, 50, bf), bf);
     Random rand = new Random();
 
