@@ -17,12 +17,16 @@
 package com.metamx.collections.bitmap;
 
 import com.google.common.base.Function;
+import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
+import it.uniroma3.mat.extendedset.intset.ConciseSet;
+import it.uniroma3.mat.extendedset.intset.ImmutableConciseSet;
 import junit.framework.Assert;
 import org.junit.Test;
 
 import java.util.Arrays;
+import java.util.Set;
 
 public class ConciseBitmapFactoryTest
 {
@@ -66,5 +70,22 @@ public class ConciseBitmapFactoryTest
     );
 
     Assert.assertEquals(3, bitmap.size());
+  }
+
+  @Test
+  public void testGetOutOfBounds()
+  {
+    final ConciseSet conciseSet = new ConciseSet();
+    final Set<Integer> ints = ImmutableSet.of(0, 4, 9);
+    for (int i : ints) {
+      conciseSet.add(i);
+    }
+    final ImmutableBitmap immutableBitmap = new WrappedImmutableConciseBitmap(
+        ImmutableConciseSet.newImmutableFromMutable(conciseSet));
+    final MutableBitmap mutableBitmap = new WrappedConciseBitmap(conciseSet);
+    for (int i = 0; i < 10; ++i) {
+      Assert.assertEquals(Integer.toString(i), ints.contains(i), mutableBitmap.get(i));
+      Assert.assertEquals(Integer.toString(i), ints.contains(i), immutableBitmap.get(i));
+    }
   }
 }
