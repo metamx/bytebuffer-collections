@@ -16,6 +16,7 @@
 
 package com.metamx.collections.bitmap;
 
+import it.uniroma3.mat.extendedset.intset.ConciseSet;
 import it.uniroma3.mat.extendedset.intset.ImmutableConciseSet;
 import it.uniroma3.mat.extendedset.intset.IntSet;
 import org.roaringbitmap.IntIterator;
@@ -52,7 +53,10 @@ public class WrappedImmutableConciseBitmap implements ImmutableBitmap
   @Override
   public boolean get(int value)
   {
-    return bitmap.get(value) > 0;
+    final ConciseSet conciseSet = new ConciseSet();
+    conciseSet.add(value);
+    final ImmutableConciseSet immutableConciseSet = ImmutableConciseSet.newImmutableFromMutable(conciseSet);
+    return ImmutableConciseSet.intersection(this.bitmap, immutableConciseSet).size() != 0;
   }
 
   @Override
