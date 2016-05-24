@@ -52,7 +52,7 @@ public class WrappedImmutableConciseBitmap implements ImmutableBitmap
   @Override
   public boolean get(int value)
   {
-    return bitmap.get(value) > 0;
+    return bitmap.contains(value);
   }
 
   @Override
