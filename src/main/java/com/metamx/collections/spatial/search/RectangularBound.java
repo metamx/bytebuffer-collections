@@ -22,6 +22,7 @@ import com.google.common.base.Preconditions;
 import com.google.common.base.Predicate;
 import com.google.common.collect.Iterables;
 import com.google.common.primitives.Floats;
+import com.google.common.primitives.Ints;
 import com.metamx.collections.spatial.ImmutableNode;
 import com.metamx.collections.spatial.ImmutablePoint;
 
@@ -140,10 +141,12 @@ public class RectangularBound implements Bound
     maxCoordsBuffer.asFloatBuffer().put(maxCoords);
     final byte[] maxCoordsCacheKey = maxCoordsBuffer.array();
 
-    final ByteBuffer cacheKey = ByteBuffer.allocate(1 + minCoordsCacheKey.length + maxCoordsCacheKey.length)
-                                          .put(minCoordsCacheKey)
-                                          .put(maxCoordsCacheKey)
-                                          .put(CACHE_TYPE_ID);
+    final ByteBuffer cacheKey = ByteBuffer
+        .allocate(1 + minCoordsCacheKey.length + maxCoordsCacheKey.length + Ints.BYTES)
+        .put(minCoordsCacheKey)
+        .put(maxCoordsCacheKey)
+        .putInt(limit)
+        .put(CACHE_TYPE_ID);
     return cacheKey.array();
   }
 }
