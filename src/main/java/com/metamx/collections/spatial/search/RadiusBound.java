@@ -20,12 +20,18 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.common.base.Predicate;
 import com.google.common.collect.Iterables;
+import com.google.common.primitives.Floats;
+import com.google.common.primitives.Ints;
 import com.metamx.collections.spatial.ImmutablePoint;
+
+import java.nio.ByteBuffer;
 
 /**
  */
 public class RadiusBound extends RectangularBound
 {
+  private static final byte CACHE_TYPE_ID = 0x01;
+
   private static float[] getMinCoords(float[] coords, float radius)
   {
     float[] retVal = new float[coords.length];
@@ -105,5 +111,20 @@ public class RadiusBound extends RectangularBound
           }
         }
     );
+  }
+
+  @Override
+  public byte[] getCacheKey()
+  {
+    final ByteBuffer minCoordsBuffer = ByteBuffer.allocate(coords.length * Floats.BYTES);
+    minCoordsBuffer.asFloatBuffer().put(coords);
+    final byte[] minCoordsCacheKey = minCoordsBuffer.array();
+    final ByteBuffer cacheKey = ByteBuffer
+        .allocate(1 + minCoordsCacheKey.length + Ints.BYTES + Floats.BYTES)
+        .put(minCoordsCacheKey)
+        .putFloat(radius)
+        .putInt(getLimit())
+        .put(CACHE_TYPE_ID);
+    return cacheKey.array();
   }
 }
