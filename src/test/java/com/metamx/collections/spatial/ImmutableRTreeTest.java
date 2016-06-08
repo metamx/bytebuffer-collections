@@ -24,10 +24,12 @@ import com.metamx.collections.bitmap.BitmapFactory;
 import com.metamx.collections.bitmap.ConciseBitmapFactory;
 import com.metamx.collections.bitmap.ImmutableBitmap;
 import com.metamx.collections.bitmap.RoaringBitmapFactory;
+import com.metamx.collections.spatial.search.PolygonBound;
 import com.metamx.collections.spatial.search.RadiusBound;
 import com.metamx.collections.spatial.search.RectangularBound;
 import com.metamx.collections.spatial.split.LinearGutmanSplitStrategy;
 
+import com.metamx.collections.spatial.split.QuadraticGutmanSplitStrategy;
 import junit.framework.Assert;
 
 import org.junit.Test;
@@ -353,7 +355,108 @@ public class ImmutableRTreeTest
     while (iter.hasNext()) {
       Assert.assertTrue(expected.contains(iter.next()));
     }
-  }  
+  }
+
+  @Test
+  public void testSearchWithSplit4()
+  {
+    BitmapFactory bf = new ConciseBitmapFactory();
+    //RTree tree = new RTree(2, new QuadraticGutmanSplitStrategy(0, 100, bf), bf);
+    RTree tree = new RTree(2, new LinearGutmanSplitStrategy(0, 50, bf), bf);
+    Random rand = new Random();
+
+    int outPolygon = 0, inPolygon = 0;
+    for (; inPolygon < 500;) {
+      double abscissa = rand.nextDouble() * 5;
+      double ordinate = rand.nextDouble() * 4;
+
+      if (abscissa < 1 || abscissa > 4 || ordinate < 1 || ordinate > 3 || abscissa < 2 && ordinate > 2)
+      {
+        tree.insert(
+            new float[]{(float) abscissa, (float) ordinate},
+            outPolygon + 500
+        );
+        outPolygon ++;
+      }
+      else if (abscissa > 1 && abscissa < 4 && ordinate > 1 && ordinate < 2
+          || abscissa > 2 && abscissa < 4 && ordinate >= 2 && ordinate < 3)
+      {
+        tree.insert(
+            new float[]{(float) abscissa, (float) ordinate},
+            inPolygon
+        );
+        inPolygon ++;
+      }
+    }
+
+    ImmutableRTree searchTree = ImmutableRTree.newImmutableFromMutable(tree);
+    Iterable<ImmutableBitmap> points = searchTree.search(PolygonBound.from(
+        new float[]{1.0f, 1.0f, 2.0f, 2.0f, 4.0f, 4.0f},
+        new float[]{1.0f, 2.0f, 2.0f, 3.0f, 3.0f, 1.0f}
+    ));
+    ImmutableBitmap finalSet = bf.union(points);
+    Assert.assertTrue(finalSet.size() == 500);
+
+    Set<Integer> expected = Sets.newHashSet();
+    for (int i = 0; i < 500; i ++)
+    {
+      expected.add(i);
+    }
+    IntIterator iter = finalSet.iterator();
+    while (iter.hasNext()) {
+      Assert.assertTrue(expected.contains(iter.next()));
+    }
+  }
+
+  @Test
+  public void testSearchWithSplit4Roaring()
+  {
+    BitmapFactory bf = new RoaringBitmapFactory();
+    RTree tree = new RTree(2, new LinearGutmanSplitStrategy(0, 50, bf), bf);
+    Random rand = new Random();
+
+    int outPolygon = 0, inPolygon = 0;
+    for (; inPolygon < 500;) {
+      double abscissa = rand.nextDouble() * 5;
+      double ordinate = rand.nextDouble() * 4;
+
+      if (abscissa < 1 || abscissa > 4 || ordinate < 1 || ordinate > 3 || abscissa < 2 && ordinate > 2)
+      {
+        tree.insert(
+            new float[]{(float) abscissa, (float) ordinate},
+            outPolygon + 500
+        );
+        outPolygon ++;
+      }
+      else if (abscissa > 1 && abscissa < 4 && ordinate > 1 && ordinate < 2
+          || abscissa > 2 && abscissa < 4 && ordinate >= 2 && ordinate < 3)
+      {
+        tree.insert(
+            new float[]{(float) abscissa, (float) ordinate},
+            inPolygon
+        );
+        inPolygon ++;
+      }
+    }
+
+    ImmutableRTree searchTree = ImmutableRTree.newImmutableFromMutable(tree);
+    Iterable<ImmutableBitmap> points = searchTree.search(PolygonBound.from(
+            new float[]{1.0f, 1.0f, 2.0f, 2.0f, 4.0f, 4.0f},
+            new float[]{1.0f, 2.0f, 2.0f, 3.0f, 3.0f, 1.0f}
+    ));
+    ImmutableBitmap finalSet = bf.union(points);
+    Assert.assertTrue(finalSet.size() == 500);
+
+    Set<Integer> expected = Sets.newHashSet();
+    for (int i = 0; i < 500; i ++)
+    {
+      expected.add(i);
+    }
+    IntIterator iter = finalSet.iterator();
+    while (iter.hasNext()) {
+      Assert.assertTrue(expected.contains(iter.next()));
+    }
+  }
 
   @Test
   public void testEmptyConciseSet()
