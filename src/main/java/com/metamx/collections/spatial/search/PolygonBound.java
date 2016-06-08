@@ -22,6 +22,7 @@ import com.google.common.base.Preconditions;
 import com.google.common.base.Predicate;
 import com.google.common.collect.Iterables;
 import com.google.common.primitives.Floats;
+import com.google.common.primitives.Ints;
 import com.metamx.collections.spatial.ImmutableNode;
 import com.metamx.collections.spatial.ImmutablePoint;
 
@@ -32,6 +33,8 @@ import java.util.List;
  */
 public class PolygonBound extends RectangularBound
 {
+  private static final byte CACHE_TYPE_ID = 0x02;
+
   private final float[] abscissa;
   private final float[] ordinate;
 
@@ -146,5 +149,26 @@ public class PolygonBound extends RectangularBound
           }
         }
     );
+  }
+
+  @Override
+  public byte[] getCacheKey()
+  {
+    ByteBuffer abscissaBuffer = ByteBuffer.allocate(abscissa.length * Floats.BYTES);
+    abscissaBuffer.asFloatBuffer().put(abscissa);
+    final byte[] abscissaCacheKey = abscissaBuffer.array();
+
+    ByteBuffer ordinateBuffer = ByteBuffer.allocate(ordinate.length * Floats.BYTES);
+    ordinateBuffer.asFloatBuffer().put(ordinate);
+    final byte[] ordinateCacheKey = ordinateBuffer.array();
+
+    final ByteBuffer cacheKey = ByteBuffer
+        .allocate(1 + abscissaCacheKey.length + ordinateCacheKey.length + Ints.BYTES)
+        .put(abscissaCacheKey)
+        .put(ordinateCacheKey)
+        .putInt(getLimit())
+        .put(CACHE_TYPE_ID);
+
+    return cacheKey.array();
   }
 }
