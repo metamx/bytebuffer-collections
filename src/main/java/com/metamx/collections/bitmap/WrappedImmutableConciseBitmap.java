@@ -76,27 +76,7 @@ public class WrappedImmutableConciseBitmap implements ImmutableBitmap
   @Override
   public IntIterator iterator()
   {
-    final IntSet.IntIterator i = bitmap.iterator();
-    return new IntIterator()
-    {
-      @Override
-      public IntIterator clone()
-      {
-        return new WrappedConciseIntIterator(i.clone());
-      }
-
-      @Override
-      public boolean hasNext()
-      {
-        return i.hasNext();
-      }
-
-      @Override
-      public int next()
-      {
-        return i.next();
-      }
-    };
+    return bitmap.iterator();
   }
 
   @Override
