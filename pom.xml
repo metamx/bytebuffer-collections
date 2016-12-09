@@ -25,7 +25,7 @@
     </parent>
 
     <artifactId>bytebuffer-collections</artifactId>
-    <version>0.3.1-SNAPSHOT</version>
+    <version>0.3.1</version>
 
     <name>${project.groupId}:${project.artifactId}</name>
     <description>ByteBuffer Collections</description>
@@ -42,7 +42,7 @@
         <connection>scm:git:ssh://git@github.com/metamx/bytebuffer-collections.git</connection>
         <developerConnection>scm:git:ssh://git@github.com/metamx/bytebuffer-collections.git</developerConnection>
         <url>https://github.com/metamx/bytebuffer-collections.git</url>
-        <tag>HEAD</tag>
+        <tag>bytebuffer-collections-0.3.1</tag>
     </scm>
 
     <developers>
