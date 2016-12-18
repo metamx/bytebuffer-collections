@@ -25,7 +25,7 @@
     </parent>
 
     <artifactId>bytebuffer-collections</artifactId>
-    <version>0.3.3-SNAPSHOT</version>
+    <version>0.4.0-mmx-SNAPSHOT</version>
 
     <name>${project.groupId}:${project.artifactId}</name>
     <description>ByteBuffer Collections</description>
@@ -64,7 +64,7 @@
         <dependency>
             <groupId>com.metamx</groupId>
             <artifactId>extendedset</artifactId>
-            <version>1.4.2</version>
+            <version>1.5.0-mmx</version>
         </dependency>
         <dependency>
             <groupId>com.google.guava</groupId>
