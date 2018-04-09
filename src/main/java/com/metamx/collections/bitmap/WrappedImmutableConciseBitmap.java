@@ -115,7 +115,7 @@ public class WrappedImmutableConciseBitmap implements ImmutableBitmap
     return new WrappedImmutableConciseBitmap(
         ImmutableConciseSet.intersection(
             bitmap,
-            ImmutableConciseSet.complement(unwrappedOtherBitmap)
+            ImmutableConciseSet.complement(unwrappedOtherBitmap, bitmap.getLast() + 1)
         )
     );
   }
